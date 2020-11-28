@@ -1,0 +1,45 @@
+{% import 'macros/scripts.html' as scripts %}
+{% macro global_controls() %}
+  <section id='global_controls'>
+    <a id='product_name' href='/'><img src='images/Home_Icon.svg'>
+      <b>Nonogram Pro</b> by Jim Blackler 2017</a>
+    {% if user %}
+      <a href='{{ logout }}'>{{ user }}</a>
+    {% else %}
+      <a href='{{ login }}'>Sign in</a>
+    {% endif %}
+  </section>
+{% endmacro %}
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+  <meta charset='UTF-8'>
+  <title>Nonogram</title>
+  {% block syles %}
+    <link rel='stylesheet' href='/styles/base.css'>
+  {% endblock %}
+</head>
+<body {% block body_attributes %}{% endblock %}>
+<header>
+  {% block header %}
+  {% endblock %}
+</header>
+<main>
+  {% block main %}
+  {% endblock %}
+</main>
+
+<div id='dialog' style='visibility: hidden;'>
+  <button id='close'>☓</button>
+  <div id='dialog_content'></div>
+</div>
+
+{% block scripts %}
+  {{ scripts.include('db/completed_db') }}
+  {{ scripts.include('db/games_db') }}
+  {{ scripts.include('db/plays_db') }}
+{% endblock %}
+
+</body>
+</html>
+

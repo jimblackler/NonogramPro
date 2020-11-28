@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block syles %}
+  {{ super() }}
+  <link rel="stylesheet" href="/styles/list.css">
+{% endblock %}
+
+{% block header %}
+  {{ global_controls() }}
+  <section><a href='about:blank'>Click for game information and play
+    guide</a></section>
+
+{% endblock %}
+
+{% block main %}
+  <section>
+    <a class="link_button" href="?v=local">Local games</a>
+    <a class="link_button" href="?v=published">Published games</a>
+    <a class="link_button" href="/edit">Design a game</a>
+  </section>
+  <ol id='games'></ol>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  {{ scripts.include('gup') }}
+  {{ scripts.include('request') }}
+  {{ scripts.include('encoder_decoder') }}
+  {{ scripts.include('list') }}
+{% endblock %}

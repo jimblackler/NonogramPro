@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created by:"Roy Pfund";
+	License:"http://creativecommons.org/licenses/publicdomain/"; -->
+
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" width="26px" height="20px">
+  <g>
+    <path style="fill: lightblue"
+        d="m 0,12 12,-9.6 4.8,3.6 0,-1.6 2.4,0 0,3.6 4.8,4 -2.4,0 0,9.6 -6,0 0,-8 -4.8,0 0,8 -8.4,0 0,-9.6 z"/>
+  </g>
+</svg>

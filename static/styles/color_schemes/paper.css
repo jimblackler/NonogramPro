@@ -1,0 +1,97 @@
+html {
+  background: #fbf8f0;
+}
+
+body {
+  background: linear-gradient(to bottom, #ffffff, #fbf8f0) no-repeat;
+}
+
+body, button, a, select {
+    color: black;
+}
+
+button, a.link_button, select {
+  background-color: #e1f1ff;
+}
+
+section.bordered {
+  border: 1px dashed rgba(12, 12, 12, 0.59);
+}
+
+button:hover:enabled, select:hover:enabled {
+  background-color: #da57d9;
+  color: #ffffff;
+}
+
+body.edit g.major line, body.edit g.minor line, body.edit g.outer line {
+  opacity: 0.5;
+}
+
+g.labels {
+  fill: #ff0000;
+}
+
+g.labels g.valid {
+  fill: #000000;
+}
+
+text.complete, tspan.complete {
+  fill: #ababab;
+}
+
+rect.even, rect.odd {
+    opacity: 0.4;
+}
+
+rect.even, rect.odd {
+  opacity: 0.15;
+}
+
+rect.even {
+  fill: #000000;
+}
+
+rect.odd, svg.game_complete rect.even {
+  fill: rgb(183, 183, 185);
+}
+
+g.hover rect.highlighted, g.locked rect.highlighted {
+  fill: #7cedff;
+}
+
+svg.game_complete g.hover rect.highlighted {
+  fill: #221f2c;
+}
+
+g.hint rect.highlighted {
+  fill: #d1000a;
+}
+
+g.major line, g.minor line, g.outer line {
+  stroke: #f1f1f1;
+}
+
+div#dialog {
+  border: 2px solid white;
+}
+
+g.squares rect.prior {
+  fill: #000000;
+}
+
+g.squares rect.new {
+  fill: red;
+}
+
+g.crosses line.prior {
+  stroke: #366fa9;
+}
+
+g.crosses line.new {
+  stroke: red;
+}
+
+div#dialog {
+  background: black;
+  box-shadow: 15px 15px 20px rgba(0, 0, 0, 0.69);
+}

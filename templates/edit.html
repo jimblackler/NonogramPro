@@ -1,0 +1,51 @@
+{% extends "has_grid.html" %}
+
+{% block body_attributes %}
+  {{ super() }}
+  class="edit"
+{% endblock %}
+
+{% block syles %}
+  {{ super() }}
+  <link rel="stylesheet" href="/styles/edit.css">
+{% endblock %}
+
+{% block controls %}
+  {{ super() }}
+  <h1 id="title" contenteditable="true">Title</h1>
+  <section id="status">
+    Edit mode
+  </section>
+  <section id="edit_section">
+    <section class="bordered">
+      <button id="play">Play</button>
+      <button id="analyze">Analyze</button>
+      <button id="create_new">New</button>
+    </section>
+    <section class="bordered">
+      <button id="publish" disabled>Publish</button>
+      <button id="cancel">Cancel</button>
+      <button id="delete">Delete</button>
+    </section>
+    <section class="bordered">
+      <select id="grid_size">
+        <option value='{"width": 5, "height": 5}'>5x5</option>
+        <option value='{"width": 10, "height": 10}'>10x10</option>
+        <option value='{"width": 15, "height": 15}'>15x15</option>
+        <option value='{"width": 20, "height": 20}'>20x20</option>
+      </select>
+      <select id="color_scheme">
+        <option value="midnight">Midnight blue</option>
+        <option value="sapphire">Sapphire</option>
+        <option value="sepia">Sepia</option>
+        <option value="ocean">Ocean</option>
+        <option value="paper">Paper</option>
+      </select>
+    </section>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  {{ scripts.include('edit') }}
+{% endblock scripts %}
