@@ -117,7 +117,7 @@ class Renderer {
       line.setAttribute('x2', this.left_offset + x * cell_size + 'px');
       line.setAttribute('y1', this.top_offset + 'px');
       line.setAttribute('y2', this.top_offset + spec.height * cell_size + 'px');
-      if (x == 0 || x == spec.width) {
+      if (x === 0 || x === spec.width) {
         outer.appendChild(line);
       } else if (x % divisions) {
         minor.appendChild(line);
@@ -134,7 +134,7 @@ class Renderer {
       line.setAttribute('y1', this.top_offset + y * cell_size + 'px');
       line.setAttribute('y2', this.top_offset + y * cell_size + 'px');
       content.appendChild(line);
-      if (y == 0 || y == spec.height) {
+      if (y === 0 || y === spec.height) {
         outer.appendChild(line);
       } else if (y % divisions) {
         minor.appendChild(line);
@@ -298,7 +298,7 @@ class Renderer {
     if (this.highlightedColumn) {
       this.highlightedColumn.classList.remove('highlighted');
     }
-    if (column != -1) {
+    if (column !== -1) {
       this.highlightedColumn = this.columns.childNodes[column];
       this.highlightedColumn.classList.add('highlighted');
     }
@@ -308,7 +308,7 @@ class Renderer {
     if (this.highlightedRow) {
       this.highlightedRow.classList.remove('highlighted');
     }
-    if (row != -1) {
+    if (row !== -1) {
       this.highlightedRow = this.rows.childNodes[row];
       this.highlightedRow.classList.add('highlighted');
     }

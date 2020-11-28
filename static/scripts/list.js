@@ -13,7 +13,7 @@ class List {
         result.continue();
       } else {
         const list = document.getElementById('games');
-        if (gup('v', 'local') == 'local') {
+        if (gup('v', 'local') === 'local') {
           this.games_db.list(evt => {
             const result = evt.currentTarget.result;
             if (result) {

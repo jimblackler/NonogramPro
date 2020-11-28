@@ -37,7 +37,7 @@ function decode(spec, str) {
     while (x < spec.width) {
       let byte = binary.charCodeAt(pos++);
       for (let mask = 1 << 7; mask && x < spec.width; mask >>= 1) {
-        row.push((byte & mask) != 0);
+        row.push((byte & mask) !== 0);
         x++;
       }
     }

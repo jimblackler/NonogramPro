@@ -29,14 +29,14 @@ function generate(spec) {
     const y = random() * spec.height | 0;
     data[y][x] = true;
     const mode = random() * 4 | 0;
-    if (mode == 0) {
-      data[y][x] = data[y == 0 ? spec.height - 1 : y - 1][x];
-    } else if (mode == 1) {
-      data[y][x] = data[y][x == spec.width - 1 ? 0 : x + 1];
-    } else if (mode == 2) {
-      data[y][x] = data[y == spec.height - 1 ? 0 : y + 1][x];
-    } else if (mode == 3) {
-      data[y][x] = data[y][x == 0 ? spec.width - 1 : x - 1];
+    if (mode === 0) {
+      data[y][x] = data[y === 0 ? spec.height - 1 : y - 1][x];
+    } else if (mode === 1) {
+      data[y][x] = data[y][x === spec.width - 1 ? 0 : x + 1];
+    } else if (mode === 2) {
+      data[y][x] = data[y === spec.height - 1 ? 0 : y + 1][x];
+    } else if (mode === 3) {
+      data[y][x] = data[y][x === 0 ? spec.width - 1 : x - 1];
     }
   }
 
@@ -52,7 +52,7 @@ function clone(arr) {
 function equals(arr0, arr1) {
   return arr0.every((row, row_number) => {
     return row.every((value, column_number) => {
-      return value == arr1[row_number][column_number];
+      return value === arr1[row_number][column_number];
     });
   });
 }

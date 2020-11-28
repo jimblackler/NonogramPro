@@ -3,7 +3,7 @@
 function get_game_internet(games_db, game_id, resolve, reject) {
   request(`/games?id=${game_id}`, 'GET', {}, evt => {
     const obj = JSON.parse(evt.target.response);
-    if (obj.results.length == 1) {
+    if (obj.results.length === 1) {
       const game = obj.results[0].data;
       game.grid_data = decode(game.spec, game.grid_data);
       game.needs_publish = false;

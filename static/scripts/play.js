@@ -37,10 +37,10 @@ class Play {
   }
 
   fromScratch() {
-    for (let column = 0; column != this.spec.width; column++) {
+    for (let column = 0; column !== this.spec.width; column++) {
       this.checkColumn(column);
     }
-    for (let row = 0; row != this.spec.height; row++) {
+    for (let row = 0; row !== this.spec.height; row++) {
       this.checkRow(row);
     }
     this.repaint();
@@ -157,12 +157,12 @@ class Play {
         if (action_mode !== ActionMode.NOT_DRAWING && x >= 0 &&
             x < this.spec.width && y >= 0 && y < this.spec.height) {
           if (this.row_lock === false && this.column_lock === false) {
-            if (this.last_y != y) {
+            if (this.last_y !== y) {
               this.column_lock = x;
               this.renderer.setHighlightMode('locked');
               renderer.setHighlightColumn(x);
               renderer.setHighlightRow(-1);
-            } else if (this.last_x != x) {
+            } else if (this.last_x !== x) {
               this.row_lock = y;
               this.renderer.setHighlightMode('locked');
               renderer.setHighlightColumn(-1);

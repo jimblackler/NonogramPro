@@ -3,7 +3,7 @@
 
 function analyzeSequence(clue, clue_idx, on, off, start, max_start, u_size, v,
                          horizontal, infer_on, infer_off, complete) {
-  if (clue_idx == clue.length) {
+  if (clue_idx === clue.length) {
     /* We have a viable combination provided no 'on' blocks remain. */
     for (let u = start; u < u_size; u++) {
       if (horizontal ? on[v][u] : on[u][v]) {
@@ -62,9 +62,9 @@ function analyzeSequence(clue, clue_idx, on, off, start, max_start, u_size, v,
       }
       if (!filled) {
         complete[clue_idx] = -3;
-      } else if (complete[clue_idx] == -1) {
+      } else if (complete[clue_idx] === -1) {
         complete[clue_idx] = block_start;
-      } else if (complete[clue_idx] != block_start) {
+      } else if (complete[clue_idx] !== block_start) {
         complete[clue_idx] = -2;
       }
     }
@@ -189,7 +189,7 @@ function visualAnalyze(spec, clues) {
           div.appendChild(draw(spec, on, prior_on, off, prior_off)));
 
   let phrase;
-  if (difficulty == -1) {
+  if (difficulty === -1) {
     phrase = 'Cannot be completed with standard method.';
   } else {
     phrase = `Requires ${difficulty} rounds to complete with standard method.`;
@@ -204,7 +204,7 @@ function findHint(spec, clues, on, off) {
   let max_inferable = 0;
   let results = [-1, -1];
   for (let pass = 0; pass < 2; pass++) {
-    const horizontal = (pass == 0);
+    const horizontal = pass === 0;
     const u_size = horizontal ? spec.width : spec.height;
     const v_size = horizontal ? spec.height : spec.width;
     for (let v = 0; v < v_size; v++) {

@@ -64,7 +64,7 @@ class Edit {
     title.setAttribute('contenteditable', 'true');
 
     title.addEventListener('keypress', evt => {
-      if (evt.keyCode == 10 || evt.keyCode == 13) {
+      if (evt.keyCode === 10 || evt.keyCode === 13) {
         title.blur();
         evt.preventDefault();
       }
