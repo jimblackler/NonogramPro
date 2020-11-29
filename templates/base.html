@@ -1,4 +1,3 @@
-{% import 'macros/scripts.html' as scripts %}
 {% macro global_controls() %}
   <section id='global_controls'>
     <a id='product_name' href='/'><img src='images/Home_Icon.svg'>
@@ -35,9 +34,9 @@
 </div>
 
 {% block scripts %}
-  {{ scripts.include('db/completed_db') }}
-  {{ scripts.include('db/games_db') }}
-  {{ scripts.include('db/plays_db') }}
+  <script src='/scripts/db/completed_db.js'></script>
+  <script src='/scripts/db/games_db.js'></script>
+  <script src='/scripts/db/plays_db.js'></script>
 {% endblock %}
 
 </body>

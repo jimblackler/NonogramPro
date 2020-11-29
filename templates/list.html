@@ -23,8 +23,8 @@
 
 {% block scripts %}
   {{ super() }}
-  {{ scripts.include('gup') }}
-  {{ scripts.include('request') }}
-  {{ scripts.include('encoder_decoder') }}
-  {{ scripts.include('list') }}
+  <script src='/scripts/gup.js'></script>
+  <script src='/scripts/request.js'></script>
+  <script src='/scripts/encoder_decoder.js'></script>
+  <script src='/scripts/list.js'></script>
 {% endblock %}

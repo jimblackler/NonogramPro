@@ -29,17 +29,17 @@
 
 {% block scripts %}
   {{ super() }}
-  {{ scripts.include('third_party/classList') }}  {#  for IE #}
-  {{ scripts.include('third_party/alea') }}
-  {{ scripts.include('analyze') }}
-  {{ scripts.include('draggable') }}
-  {{ scripts.include('dialog') }}
-  {{ scripts.include('encoder_decoder') }}
-  {{ scripts.include('fetch_game') }}
-  {{ scripts.include('generate') }}
-  {{ scripts.include('generate_clues') }}
-  {{ scripts.include('gup') }}
-  {{ scripts.include('plot_line') }}
-  {{ scripts.include('renderer') }}
-  {{ scripts.include('request') }}
+  <script src='/scripts/third_party/classList.js'></script>  {#  for IE #}
+  <script src='/scripts/third_party/alea.js'></script>
+  <script src='/scripts/analyze.js'></script>
+  <script src='/scripts/draggable.js'></script>
+  <script src='/scripts/dialog.js'></script>
+  <script src='/scripts/encoder_decoder.js'></script>
+  <script src='/scripts/fetch_game.js'></script>
+  <script src='/scripts/generate.js'></script>
+  <script src='/scripts/generate_clues.js'></script>
+  <script src='/scripts/gup.js'></script>
+  <script src='/scripts/plot_line.js'></script>
+  <script src='/scripts/renderer.js'></script>
+  <script src='/scripts/request.js'></script>
 {% endblock %}
