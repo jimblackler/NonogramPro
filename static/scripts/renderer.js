@@ -1,5 +1,3 @@
-'use strict';
-
 const xmlns = 'http://www.w3.org/2000/svg';
 const divisions = 5;
 const cross_margin = 7;
@@ -7,12 +5,10 @@ const clue_to_grid_margin = 10;
 const vertical_clue_separation = 20;
 const horizontal_clue_baseline_position = 0.75;
 
-class Renderer {
+export class Renderer {
   constructor(svg, spec, dimensions) {
     if (!dimensions) {
-      dimensions = {
-        cell_size: 25, ratio_for_clues: 0.42
-      };
+      dimensions = {cell_size: 25, ratio_for_clues: 0.42};
     }
     const content = svg.getElementById('content') || svg;
     while (content.firstChild) {
@@ -29,8 +25,8 @@ class Renderer {
     this.top_offset = dimensions.ratio_for_clues * cell_size * spec.height;
 
     svg.setAttribute('width', this.left_offset + spec.width * cell_size + 'px');
-    svg.setAttribute('height',
-        this.top_offset + spec.height * cell_size + 'px');
+    svg.setAttribute(
+        'height', this.top_offset + spec.height * cell_size + 'px');
 
     const labels = document.createElementNS(xmlns, 'g');
     labels.classList.add('labels');
@@ -53,8 +49,8 @@ class Renderer {
       }
       row.setAttribute('x', '0');
       row.setAttribute('y', this.top_offset + y * cell_size + 'px');
-      row.setAttribute('width',
-          this.left_offset + spec.width * cell_size + 'px');
+      row.setAttribute(
+          'width', this.left_offset + spec.width * cell_size + 'px');
       row.setAttribute('height', cell_size + 'px');
       this.rows.appendChild(row);
     }
@@ -79,8 +75,8 @@ class Renderer {
       column.setAttribute('x', this.left_offset + x * cell_size + 'px');
       column.setAttribute('y', '0');
       column.setAttribute('width', cell_size + 'px');
-      column.setAttribute('height',
-          this.top_offset + spec.height * cell_size + 'px');
+      column.setAttribute(
+          'height', this.top_offset + spec.height * cell_size + 'px');
       this.columns.appendChild(column);
     }
 
@@ -181,10 +177,12 @@ class Renderer {
       const row_label_group = document.createElementNS(xmlns, 'g');
       row_label_group.classList.add('valid');
       const row_label = document.createElementNS(xmlns, 'text');
-      row_label.setAttribute('x',
-          this.left_offset - clue_to_grid_margin + 'px');
-      row_label.setAttribute('y', this.top_offset + y * cell_size +
-          cell_size * horizontal_clue_baseline_position + 'px');
+      row_label.setAttribute(
+          'x', this.left_offset - clue_to_grid_margin + 'px');
+      row_label.setAttribute(
+          'y',
+          this.top_offset + y * cell_size +
+              cell_size * horizontal_clue_baseline_position + 'px');
       const c2 = clues[0][y];
       for (let idx = 0; idx < c2.length; idx++) {
         const tspan = document.createElementNS(xmlns, 'tspan');
@@ -206,8 +204,8 @@ class Renderer {
       column_label_group.classList.add('valid');
       for (let idx = c.length - 1; idx >= 0; idx--) {
         const column_label = document.createElementNS(xmlns, 'text');
-        column_label.setAttribute('x',
-            this.left_offset + cell_size / 2 + x * cell_size + 'px');
+        column_label.setAttribute(
+            'x', this.left_offset + cell_size / 2 + x * cell_size + 'px');
         column_label.setAttribute('y', y_pos + 'px');
         let textNode = document.createTextNode('' + c[idx]);
         column_label.appendChild(textNode);
@@ -225,8 +223,9 @@ class Renderer {
     }
     for (let y = 0; y < this.spec.height; y++) {
       for (let x = 0; x < this.spec.width; x++) {
-        if (!on[y][x])
+        if (!on[y][x]) {
           continue;
+        }
         const rect = document.createElementNS(xmlns, 'rect');
         rect.setAttribute('x', this.left_offset + x * cell_size + 'px');
         rect.setAttribute('y', this.top_offset + y * cell_size + 'px');
@@ -249,16 +248,17 @@ class Renderer {
     }
     for (let y = 0; y < this.spec.height; y++) {
       for (let x = 0; x < this.spec.width; x++) {
-        if (!off[y][x])
-          continue;
+        if (!off[y][x]) continue;
         const line1 = document.createElementNS(xmlns, 'line');
-        line1.setAttribute('x1',
-            this.left_offset + x * cell_size + cross_margin + 'px');
-        line1.setAttribute('x2',
+        line1.setAttribute(
+            'x1', this.left_offset + x * cell_size + cross_margin + 'px');
+        line1.setAttribute(
+            'x2',
             this.left_offset + x * cell_size + cell_size - cross_margin + 'px');
-        line1.setAttribute('y1',
-            this.top_offset + y * cell_size + cross_margin + 'px');
-        line1.setAttribute('y2',
+        line1.setAttribute(
+            'y1', this.top_offset + y * cell_size + cross_margin + 'px');
+        line1.setAttribute(
+            'y2',
             this.top_offset + y * cell_size + cell_size - cross_margin + 'px');
         if (!prior_off || prior_off[y][x]) {
           line1.classList.add('prior');
@@ -268,13 +268,15 @@ class Renderer {
         this.crosses.appendChild(line1);
 
         const line2 = document.createElementNS(xmlns, 'line');
-        line2.setAttribute('x1',
+        line2.setAttribute(
+            'x1',
             this.left_offset + x * cell_size + cell_size - cross_margin + 'px');
-        line2.setAttribute('x2',
-            this.left_offset + x * cell_size + cross_margin + 'px');
-        line2.setAttribute('y1',
-            this.top_offset + y * cell_size + cross_margin + 'px');
-        line2.setAttribute('y2',
+        line2.setAttribute(
+            'x2', this.left_offset + x * cell_size + cross_margin + 'px');
+        line2.setAttribute(
+            'y1', this.top_offset + y * cell_size + cross_margin + 'px');
+        line2.setAttribute(
+            'y2',
             this.top_offset + y * cell_size + cell_size - cross_margin + 'px');
         if (!prior_off || prior_off[y][x]) {
           line2.classList.add('prior');
@@ -329,7 +331,6 @@ class Renderer {
         part.classList.remove('complete');
       }
     });
-
   }
 
   setRowValid(row, valid, complete) {
@@ -349,5 +350,4 @@ class Renderer {
       }
     });
   }
-
 }

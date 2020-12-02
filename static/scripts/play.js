@@ -1,51 +1,15 @@
-'use strict';
-
+import {Analyze} from '/scripts/analyze.js';
+import {CompletedDb} from '/scripts/db/completed_db.js';
+import {GamesDb} from '/scripts/db/games_db.js';
+import {PlaysDb} from '/scripts/db/plays_db.js';
+import {get_game} from '/scripts/fetch_game.js';
+import {Generate} from '/scripts/generate.js';
+import {generateClues} from '/scripts/generate_clues.js';
+import {gup} from '/scripts/gup.js';
+import {plotLine} from '/scripts/plot_line.js';
+import {Renderer} from '/scripts/renderer.js';
 
 class Play {
-  checkColumn(column) {
-    const clue = this.clues[1][column];
-    const complete = [];
-    while (complete.length < clue.length) {
-      complete.push(-1);
-    }
-    const valid =
-        checkColumn(this.spec, this.on, this.off, column, clue, complete);
-    this.renderer.setColumnValid(column, valid, complete);
-  }
-
-  checkRow(row) {
-    const clue = this.clues[0][row];
-    const complete = [];
-    while (complete.length < clue.length) {
-      complete.push(-1);
-    }
-    const valid = checkRow(this.spec, this.on, this.off, row, clue, complete);
-    this.renderer.setRowValid(row, valid, complete);
-  }
-
-  repaint() {
-    this.plays_db.set(this.game_id, {on: this.on, off: this.off});
-    this.renderer.paintOnSquares(this.on);
-    this.renderer.paintOffSquares(this.off);
-    /* Check is complete */
-    if (equals(this.on, this.data)) {
-      this.svg.classList.add('game_complete');
-      this.completed_db.set(this.game_id, {});
-    } else {
-      this.svg.classList.remove('game_complete');
-    }
-  }
-
-  fromScratch() {
-    for (let column = 0; column !== this.spec.width; column++) {
-      this.checkColumn(column);
-    }
-    for (let row = 0; row !== this.spec.height; row++) {
-      this.checkRow(row);
-    }
-    this.repaint();
-  }
-
   constructor() {
     this.games_db = new GamesDb();
     this.plays_db = new PlaysDb();
@@ -53,36 +17,40 @@ class Play {
     this.row_lock = false;
     this.column_lock = false;
     this.game_id = gup('game');
-    get_game(this.games_db, this.game_id, result => {
-      this.spec = result.spec;
-      this.data = result.grid_data;
-      this.style = result.style;
-      this.on = getEmpty(this.spec);
-      this.off = getEmpty(this.spec);
-      this.renderer = new Renderer(this.svg, this.spec);
-      const color_scheme_stylesheet =
-        document.getElementById('color_scheme_stylesheet');
-      color_scheme_stylesheet.href = `/styles/color_schemes/${this.style}.css`;
-      const title = document.getElementById('title');
-      title.textContent = result.name;
-      this.clues = generateClues(this.spec, this.data);
-      this.renderer.paintClues(this.clues);
-      this.plays_db.get(this.game_id).then(data => {
-        if (!data) {
-          return;
-        }
-        this.on = data.on;
-        this.off = data.off;
+    get_game(
+        this.games_db, this.game_id,
+        result => {
+          this.spec = result.spec;
+          this.data = result.grid_data;
+          this.style = result.style;
+          this.on = Generate.getEmpty(this.spec);
+          this.off = Generate.getEmpty(this.spec);
+          this.renderer = new Renderer(this.svg, this.spec);
+          const color_scheme_stylesheet =
+              document.getElementById('color_scheme_stylesheet');
+          color_scheme_stylesheet.href =
+              `/styles/color_schemes/${this.style}.css`;
+          const title = document.getElementById('title');
+          title.textContent = result.name;
+          this.clues = generateClues(this.spec, this.data);
+          this.renderer.paintClues(this.clues);
+          this.plays_db.get(this.game_id).then(data => {
+            if (!data) {
+              return;
+            }
+            this.on = data.on;
+            this.off = data.off;
 
-        this.fromScratch();
-      });
-    }, error => {
-      alert('bad game');
-    });
+            this.fromScratch();
+          });
+        },
+        error => {
+          alert('bad game');
+        });
 
     document.getElementById('replay').addEventListener('click', () => {
-      this.on = getEmpty(this.spec);
-      this.off = getEmpty(this.spec);
+      this.on = Generate.getEmpty(this.spec);
+      this.off = Generate.getEmpty(this.spec);
       this.fromScratch();
     });
 
@@ -92,17 +60,19 @@ class Play {
 
     document.getElementById('hint').addEventListener('click', () => {
       this.renderer.setHighlightMode('hint');
-      const hint = findHint(this.spec, this.clues, this.on, this.off);
+      const hint = Analyze.findHint(this.spec, this.clues, this.on, this.off);
       this.renderer.setHighlightRow(hint[0]);
       this.renderer.setHighlightColumn(hint[1]);
     });
 
     const ActionMode = {
-      NOT_DRAWING: 0, SETTING_ON: 1, SETTING_OFF: 2, SET_UNKNOWN: 3,
+      NOT_DRAWING: 0,
+      SETTING_ON: 1,
+      SETTING_OFF: 2,
+      SET_UNKNOWN: 3,
     };
 
     let action_mode = ActionMode.NOT_DRAWING;
-
 
     this.svg = document.getElementsByTagName('svg')[0];
     this.svg.addEventListener('contextmenu', evt => {
@@ -167,7 +137,6 @@ class Play {
               this.renderer.setHighlightMode('locked');
               renderer.setHighlightColumn(-1);
               renderer.setHighlightRow(y);
-
             }
           }
           if (this.column_lock !== false) {
@@ -246,6 +215,51 @@ class Play {
         this.renderer.setHighlightRow(this.last_y);
       }
     });
+  }
+
+  checkColumn(column) {
+    const clue = this.clues[1][column];
+    const complete = [];
+    while (complete.length < clue.length) {
+      complete.push(-1);
+    }
+    const valid = Analyze.checkColumn(
+        this.spec, this.on, this.off, column, clue, complete);
+    this.renderer.setColumnValid(column, valid, complete);
+  }
+
+  checkRow(row) {
+    const clue = this.clues[0][row];
+    const complete = [];
+    while (complete.length < clue.length) {
+      complete.push(-1);
+    }
+    const valid =
+        Analyze.checkRow(this.spec, this.on, this.off, row, clue, complete);
+    this.renderer.setRowValid(row, valid, complete);
+  }
+
+  repaint() {
+    this.plays_db.set(this.game_id, {on: this.on, off: this.off});
+    this.renderer.paintOnSquares(this.on);
+    this.renderer.paintOffSquares(this.off);
+    /* Check is complete */
+    if (Generate.equals(this.on, this.data)) {
+      this.svg.classList.add('game_complete');
+      this.completed_db.set(this.game_id, {});
+    } else {
+      this.svg.classList.remove('game_complete');
+    }
+  }
+
+  fromScratch() {
+    for (let column = 0; column !== this.spec.width; column++) {
+      this.checkColumn(column);
+    }
+    for (let row = 0; row !== this.spec.height; row++) {
+      this.checkRow(row);
+    }
+    this.repaint();
   }
 }
 

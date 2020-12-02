@@ -1,15 +1,39 @@
-'use strict';
+import {Alea} from '/scripts/third_party/alea.js';
 
-function getEmpty(spec) {
-  const data = [];
-  for (let y = 0; y < spec.height; y++) {
-    const row = [];
-    for (let x = 0; x < spec.width; x++) {
-      row.push(false);
+export class Generate {
+  static getEmpty(spec) {
+    const data = [];
+    for (let y = 0; y < spec.height; y++) {
+      const row = [];
+      for (let x = 0; x < spec.width; x++) {
+        row.push(false);
+      }
+      data.push(row);
     }
-    data.push(row);
+    return data;
   }
-  return data;
+
+  static clone(arr) {
+    const cloned = [];
+    arr.forEach(row => cloned.push(row.slice(0)));
+    return cloned;
+  }
+
+  static equals(arr0, arr1) {
+    return arr0.every((row, row_number) => {
+      return row.every((value, column_number) => {
+        return value === arr1[row_number][column_number];
+      });
+    });
+  }
+
+  static complete(on, off) {
+    return on.every((on_row, row_number) => {
+      return on_row.every((value, column_number) => {
+        return value || off[row_number][column_number];
+      });
+    });
+  }
 }
 
 function generate(spec) {
@@ -41,26 +65,4 @@ function generate(spec) {
   }
 
   return data;
-}
-
-function clone(arr) {
-  const cloned = [];
-  arr.forEach(row => cloned.push(row.slice(0)));
-  return cloned;
-}
-
-function equals(arr0, arr1) {
-  return arr0.every((row, row_number) => {
-    return row.every((value, column_number) => {
-      return value === arr1[row_number][column_number];
-    });
-  });
-}
-
-function complete(on, off) {
-  return on.every((on_row, row_number) => {
-    return on_row.every((value, column_number) => {
-      return value || off[row_number][column_number];
-    });
-  });
 }

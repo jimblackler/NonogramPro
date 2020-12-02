@@ -1,6 +1,4 @@
-'use strict';
-
-function makeDraggable(element) {
+export function makeDraggable(element) {
   let originalCoords;
   let originalLeft;
   let originalTop;
@@ -13,12 +11,10 @@ function makeDraggable(element) {
       pointerCoords = evt;
     }
     const zoom = document.body.style.zoom || 1;
-    element.style.left =
-        originalLeft + (pointerCoords.pageX - originalCoords.pageX) / zoom +
-        'px';
-    element.style.top =
-        originalTop + (pointerCoords.pageY - originalCoords.pageY) / zoom +
-        'px';
+    element.style.left = originalLeft +
+        (pointerCoords.pageX - originalCoords.pageX) / zoom + 'px';
+    element.style.top = originalTop +
+        (pointerCoords.pageY - originalCoords.pageY) / zoom + 'px';
   };
 
   function upHandler(evt) {
@@ -41,5 +37,4 @@ function makeDraggable(element) {
     document.addEventListener('mousemove', moveHandler);
     document.addEventListener('mouseup', upHandler);
   });
-
 }

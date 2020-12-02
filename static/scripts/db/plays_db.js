@@ -1,12 +1,10 @@
-'use strict';
-
-class PlaysDb {
+export class PlaysDb {
   withStore(type, callback) {
     if (!this.db) {
       this.db = new Promise((resolve, reject) => {
         const request = indexedDB.open('plays-store', 1);
-        request.onupgradeneeded =
-            () => request.result.createObjectStore('plays');
+        request.onupgradeneeded = () =>
+            request.result.createObjectStore('plays');
         request.onerror = () => reject(request.error);
         request.onsuccess = () => resolve(request.result);
       });

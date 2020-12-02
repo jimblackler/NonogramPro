@@ -1,7 +1,10 @@
-'use strict';
+import {GamesDb} from '/scripts/db/games_db.js';
+import {PlaysDb} from '/scripts/db/plays_db.js';
+import {decode} from '/scripts/decoder.js';
+import {gup} from '/scripts/gup.js';
+import {request} from '/scripts/request.js';
 
 class List {
-
   constructor() {
     this.games_db = new GamesDb();
     this.plays_db = new PlaysDb();
@@ -17,8 +20,8 @@ class List {
           this.games_db.list(evt => {
             const result = evt.currentTarget.result;
             if (result) {
-              List.addGame(result.primaryKey, result.value,
-                  plays.has(result.key), list);
+              List.addGame(
+                  result.primaryKey, result.value, plays.has(result.key), list);
               result.continue();
             }
           });
@@ -78,8 +81,8 @@ class List {
     {
       const dimensions = document.createElement('span');
       dimensions.classList.add('dimensions');
-      const text = document.createTextNode(
-          `${game.spec.width} x ${game.spec.height}`);
+      const text =
+          document.createTextNode(`${game.spec.width} x ${game.spec.height}`);
       dimensions.appendChild(text);
       anchor.appendChild(dimensions);
     }

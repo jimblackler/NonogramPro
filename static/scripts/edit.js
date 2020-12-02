@@ -1,63 +1,16 @@
-'use strict';
+import {Analyze} from '/scripts/analyze.js';
+import {GamesDb} from '/scripts/db/games_db.js';
+import {decode} from '/scripts/decoder.js';
+import {get_game} from '/scripts/fetch_game.js';
+import {Generate} from '/scripts/generate.js';
+import {generateClues} from '/scripts/generate_clues.js';
+import {gup} from '/scripts/gup.js';
+import {plotLine} from '/scripts/plot_line.js';
+import {Renderer} from '/scripts/renderer.js';
+import {request} from '/scripts/request.js';
+import {Alea} from '/scripts/third_party/alea.js';
 
 class Edit {
-  getData() {
-    return {
-      grid_data: this.data,
-      spec: this.spec,
-      name: this.name,
-      style: this.style
-    };
-  }
-
-  saveLocal() {
-    const data = this.getData();
-    data.needs_publish = this.needs_publish;
-    data.difficulty = analyze(this.spec,
-        generateClues(this.spec, this.data), () => {});
-    this.games_db.set(this.game_id, data);
-  }
-
-  repaint() {
-    const title = document.getElementById('title');
-    title.textContent = this.name;
-    this.renderer.paintOnSquares(this.data);
-    let clues = generateClues(this.spec, this.data);
-    this.renderer.paintClues(clues);
-    const grid_size = document.getElementById('grid_size');
-    grid_size.value =
-        `{"width": ${this.spec.width}, "height": ${this.spec.height}}`;
-    const color_scheme = document.getElementById('color_scheme');
-    color_scheme.value = this.style;
-    const publish = document.getElementById('publish');
-    if (this.needs_publish) {
-      publish.removeAttribute('disabled');
-    } else {
-      publish.setAttribute('disabled', '');
-    }
-    const color_scheme_stylesheet =
-        document.getElementById('color_scheme_stylesheet');
-    color_scheme_stylesheet.href = `/styles/color_schemes/${this.style}.css`;
-  }
-
-  makeNewGame(spec, replace) {
-    const random = new Alea();
-    this.game_id = `draft${random() * 10000 | 0}`;
-    const url = `edit?game=${this.game_id}`;
-    if (replace) {
-      window.history.replaceState({}, '', url);
-    } else {
-      window.history.pushState({}, '', url);
-    }
-    this.spec = spec;
-    this.style = 'midnight';
-    this.data = getEmpty(this.spec);
-    this.name = 'Untitled';
-    const svg = document.getElementsByTagName('svg')[0];
-    this.renderer = new Renderer(svg, this.spec);
-    this.repaint();
-  }
-
   constructor() {
     this.games_db = new GamesDb();
     const title = document.getElementById('title');
@@ -99,7 +52,7 @@ class Edit {
 
     document.getElementById('analyze').addEventListener('click', evt => {
       let clues = generateClues(this.spec, this.data);
-      visualAnalyze(this.spec, clues);
+      Analyze.visualAnalyze(this.spec, clues);
     });
 
     document.getElementById('publish').addEventListener('click', evt => {
@@ -155,8 +108,7 @@ class Edit {
         this.data = game.grid_data;
         this.name = game.name;
         this.repaint();
-      }, () => {
-      });
+      }, () => {});
     });
 
     document.getElementById('delete').addEventListener('click', evt => {
@@ -260,21 +212,81 @@ class Edit {
     const default_spec = {width: 20, height: 20};
 
     if (this.game_id) {
-      get_game(this.games_db, this.game_id, game => {
-        this.spec = game.spec;
-        this.data = game.grid_data;
-        this.name = game.name;
-        this.style = game.style;
-        this.needs_publish = game.needs_publish;
-        this.renderer = new Renderer(svg, this.spec);
-        this.repaint();
-      }, error => {
-        this.makeNewGame(default_spec, true);
-      });
+      get_game(
+          this.games_db, this.game_id,
+          game => {
+            this.spec = game.spec;
+            this.data = game.grid_data;
+            this.name = game.name;
+            this.style = game.style;
+            this.needs_publish = game.needs_publish;
+            this.renderer = new Renderer(svg, this.spec);
+            this.repaint();
+          },
+          error => {
+            this.makeNewGame(default_spec, true);
+          });
     } else {
       // Otherwise make a new game.
       this.makeNewGame(default_spec, true);
     }
+  }
+
+  getData() {
+    return {
+      grid_data: this.data,
+      spec: this.spec,
+      name: this.name,
+      style: this.style
+    };
+  }
+
+  saveLocal() {
+    const data = this.getData();
+    data.needs_publish = this.needs_publish;
+    data.difficulty = Analyze.analyze(
+        this.spec, generateClues(this.spec, this.data), () => {});
+    this.games_db.set(this.game_id, data);
+  }
+
+  repaint() {
+    const title = document.getElementById('title');
+    title.textContent = this.name;
+    this.renderer.paintOnSquares(this.data);
+    let clues = generateClues(this.spec, this.data);
+    this.renderer.paintClues(clues);
+    const grid_size = document.getElementById('grid_size');
+    grid_size.value =
+        `{"width": ${this.spec.width}, "height": ${this.spec.height}}`;
+    const color_scheme = document.getElementById('color_scheme');
+    color_scheme.value = this.style;
+    const publish = document.getElementById('publish');
+    if (this.needs_publish) {
+      publish.removeAttribute('disabled');
+    } else {
+      publish.setAttribute('disabled', '');
+    }
+    const color_scheme_stylesheet =
+        document.getElementById('color_scheme_stylesheet');
+    color_scheme_stylesheet.href = `/styles/color_schemes/${this.style}.css`;
+  }
+
+  makeNewGame(spec, replace) {
+    const random = new Alea();
+    this.game_id = `draft${random() * 10000 | 0}`;
+    const url = `edit?game=${this.game_id}`;
+    if (replace) {
+      window.history.replaceState({}, '', url);
+    } else {
+      window.history.pushState({}, '', url);
+    }
+    this.spec = spec;
+    this.style = 'midnight';
+    this.data = Generate.getEmpty(this.spec);
+    this.name = 'Untitled';
+    const svg = document.getElementsByTagName('svg')[0];
+    this.renderer = new Renderer(svg, this.spec);
+    this.repaint();
   }
 }
 

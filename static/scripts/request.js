@@ -1,6 +1,4 @@
-'use strict';
-
-function request(url, method, data, onloadend) {
+export function request(url, method, data, onloadend) {
   const xhr = new XMLHttpRequest();
   xhr.open(method, url, true);
   xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');

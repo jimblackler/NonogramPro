@@ -1,4 +1,5 @@
-'use strict';
+import {decode} from '/scripts/decoder.js';
+import {request} from '/scripts/request.js';
 
 function get_game_internet(games_db, game_id, resolve, reject) {
   request(`/games?id=${game_id}`, 'GET', {}, evt => {
@@ -15,7 +16,7 @@ function get_game_internet(games_db, game_id, resolve, reject) {
   });
 }
 
-function get_game(games_db, game_id, resolve, reject) {
+export function get_game(games_db, game_id, resolve, reject) {
   games_db.get(game_id).then(game => {
     if (game) {
       resolve(game);
@@ -24,4 +25,3 @@ function get_game(games_db, game_id, resolve, reject) {
     get_game_internet(games_db, game_id, resolve, reject);
   });
 }
-

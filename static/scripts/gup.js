@@ -1,7 +1,5 @@
-'use strict';
-
-function gup(name, default_) {
-  name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, '\\\]');
+export function gup(name, default_) {
+  name = name.replace(/[\[]/, '\\\[').replace(/[\]]/, '\\\]');
   const regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
   const results = regex.exec(window.location.href);
   if (results == null) {

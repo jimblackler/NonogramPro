@@ -1,18 +1,15 @@
-'use strict';
-
-class CompletedDb {
+export class CompletedDb {
   withStore(type, callback) {
     if (!this.db) {
       this.db = new Promise((resolve, reject) => {
         const request = indexedDB.open('completed-store', 1);
-        request.onupgradeneeded =
-            (event) => {
-              let objectStore;
-              if (event.oldVersion < 1) {
-                objectStore = request.result.createObjectStore('completed');
-              }
-              return objectStore;
-            };
+        request.onupgradeneeded = (event) => {
+          let objectStore;
+          if (event.oldVersion < 1) {
+            objectStore = request.result.createObjectStore('completed');
+          }
+          return objectStore;
+        };
         request.onerror = () => reject(request.error);
         request.onsuccess = () => resolve(request.result);
       });
@@ -37,5 +34,4 @@ class CompletedDb {
       store.openCursor.call(store).onsuccess = handler;
     })
   }
-
 }

@@ -1,6 +1,4 @@
-'use strict';
-
-function generateClues(spec, data) {
+export function generateClues(spec, data) {
   const rows = [];
   let sequence = 0;
   for (let y = 0; y < spec.height; y++) {
