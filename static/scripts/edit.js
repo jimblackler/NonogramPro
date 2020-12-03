@@ -266,9 +266,12 @@ class Edit {
     } else {
       publish.setAttribute('disabled', '');
     }
-    const color_scheme_stylesheet =
-        document.getElementById('color_scheme_stylesheet');
-    color_scheme_stylesheet.href = `/styles/color_schemes/${this.style}.css`;
+    if (this.setStyle !== this.style) {
+      const color_scheme_stylesheet =
+          document.getElementById('color_scheme_stylesheet');
+      color_scheme_stylesheet.href = `/styles/color_schemes/${this.style}.css`;
+      this.setStyle = this.style;
+    }
   }
 
   makeNewGame(spec, replace) {
