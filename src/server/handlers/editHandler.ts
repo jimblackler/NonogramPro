@@ -165,8 +165,8 @@ export const editHandler: RequestHandler = async (req, res, next) => {
     addScripts: (document, parent) => {
       const script = document.createElement('script');
       parent.append(script);
-      script.setAttribute('src', '/scripts/edit.js');
       script.setAttribute('type', 'module');
+      script.setAttribute('src', 'dist/edit.bundle.js');
     }
   })
 };

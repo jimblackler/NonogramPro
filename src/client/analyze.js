@@ -1,5 +1,5 @@
-import {Generate} from '/scripts/generate.js';
-import {Renderer} from '/scripts/renderer.js';
+import {Generate} from '/src/client/generate.js';
+import {Renderer} from '/src/client/renderer.js';
 
 function analyzeSequence(
     clue, clue_idx, on, off, start, max_start, u_size, v, horizontal, infer_on,

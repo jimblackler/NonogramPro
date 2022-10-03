@@ -1,13 +1,13 @@
-import {Analyze} from '/scripts/analyze.js';
-import {CompletedDb} from '/scripts/db/completed_db.js';
-import {GamesDb} from '/scripts/db/games_db.js';
-import {PlaysDb} from '/scripts/db/plays_db.js';
-import {get_game} from '/scripts/fetch_game.js';
-import {Generate} from '/scripts/generate.js';
-import {generateClues} from '/scripts/generate_clues.js';
-import {gup} from '/scripts/gup.js';
-import {plotLine} from '/scripts/plot_line.js';
-import {Renderer} from '/scripts/renderer.js';
+import {Analyze} from '/src/client/analyze.js';
+import {CompletedDb} from '/src/client/db/completed_db.js';
+import {GamesDb} from '/src/client/db/games_db.js';
+import {PlaysDb} from '/src/client/db/plays_db.js';
+import {get_game} from '/src/client/fetch_game.js';
+import {Generate} from '/src/client/generate.js';
+import {generateClues} from '/src/client/generate_clues.js';
+import {gup} from '/src/client/gup.js';
+import {plotLine} from '/src/client/plot_line.js';
+import {Renderer} from '/src/client/renderer.js';
 
 class Play {
   constructor() {

@@ -1,4 +1,4 @@
-import {Alea} from '/scripts/third_party/alea.js';
+import {Alea} from '/src/client/third_party/alea.js';
 
 export class Generate {
   static getEmpty(spec) {

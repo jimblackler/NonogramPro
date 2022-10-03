@@ -1,8 +1,8 @@
-import {GamesDb} from '/scripts/db/games_db.js';
-import {PlaysDb} from '/scripts/db/plays_db.js';
-import {decode} from '/scripts/decoder.js';
-import {gup} from '/scripts/gup.js';
-import {request} from '/scripts/request.js';
+import {GamesDb} from '/src/client/db/games_db.js';
+import {PlaysDb} from '/src/client/db/plays_db.js';
+import {decode} from '/src/client/decoder.js';
+import {gup} from '/src/client/gup.js';
+import {request} from '/src/client/request.js';
 
 class List {
   constructor() {

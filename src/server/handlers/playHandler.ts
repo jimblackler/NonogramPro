@@ -47,8 +47,8 @@ export const playHandler: RequestHandler = async (req, res, next) => {
     addScripts: (document, parent) => {
       const script = document.createElement('script');
       parent.append(script);
-      script.setAttribute('src', '/scripts/play.js');
       script.setAttribute('type', 'module');
+      script.setAttribute('src', 'dist/play.bundle.js');
     }
   })
 };

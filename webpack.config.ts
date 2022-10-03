@@ -4,8 +4,14 @@ import webpack from 'webpack';
 export default function config(env: any, argv: any) {
   const configuration: webpack.Configuration = {
     entry: {
-      main: {
-        import: './src/client/main.ts'
+      edit: {
+        import: './src/client/edit.js'
+      },
+      list: {
+        import: './src/client/list.js'
+      },
+      play: {
+        import: './src/client/play.js'
       }
     },
     module: {

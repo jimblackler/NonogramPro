@@ -1,15 +1,15 @@
-import {Analyze} from '/scripts/analyze.js';
-import {GamesDb} from '/scripts/db/games_db.js';
-import {decode} from '/scripts/decoder.js';
-import {encode} from '/scripts/encoder.js';
-import {get_game} from '/scripts/fetch_game.js';
-import {Generate} from '/scripts/generate.js';
-import {generateClues} from '/scripts/generate_clues.js';
-import {gup} from '/scripts/gup.js';
-import {plotLine} from '/scripts/plot_line.js';
-import {Renderer} from '/scripts/renderer.js';
-import {request} from '/scripts/request.js';
-import {Alea} from '/scripts/third_party/alea.js';
+import {Analyze} from '/src/client/analyze.js';
+import {GamesDb} from '/src/client/db/games_db.js';
+import {decode} from '/src/client/decoder.js';
+import {encode} from '/src/client/encoder.js';
+import {get_game} from '/src/client/fetch_game.js';
+import {Generate} from '/src/client/generate.js';
+import {generateClues} from '/src/client/generate_clues.js';
+import {gup} from '/src/client/gup.js';
+import {plotLine} from '/src/client/plot_line.js';
+import {Renderer} from '/src/client/renderer.js';
+import {request} from '/src/client/request.js';
+import {Alea} from '/src/client/third_party/alea.js';
 
 class Edit {
   constructor() {

@@ -1,5 +1,5 @@
-import {decode} from '/scripts/decoder.js';
-import {request} from '/scripts/request.js';
+import {decode} from '/src/client/decoder.js';
+import {request} from '/src/client/request.js';
 
 function get_game_internet(games_db, game_id, resolve, reject) {
   request(`/games?id=${game_id}`, 'GET', {}, evt => {

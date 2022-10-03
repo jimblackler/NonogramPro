@@ -67,10 +67,6 @@ export async function hasGridHtmlRespond(
       a.append('Click for game information and play guide');
     },
     addScripts: (document, parent) => {
-      const script = document.createElement('script');
-      parent.append(script);
-      script.setAttribute('src', '/scripts/dialog.js');
-      script.setAttribute('type', 'module');
       client.addScripts(document, parent);
     }
   });

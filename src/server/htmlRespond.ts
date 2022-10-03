@@ -66,11 +66,6 @@ export async function htmlRespond(req: Request, res: Response, client: HtmlRespo
   div.append(dialogContent);
   dialogContent.setAttribute('id', 'dialog_content');
 
-  const script = document.createElement('script');
-  body.append(script);
-  script.setAttribute('type', 'module');
-  script.setAttribute('src', 'dist/main.bundle.js');
-
   client.addScripts(document, body);
 
   domStream.end();
