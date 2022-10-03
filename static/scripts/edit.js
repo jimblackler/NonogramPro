@@ -1,6 +1,7 @@
 import {Analyze} from '/scripts/analyze.js';
 import {GamesDb} from '/scripts/db/games_db.js';
 import {decode} from '/scripts/decoder.js';
+import {encode} from '/scripts/encoder.js';
 import {get_game} from '/scripts/fetch_game.js';
 import {Generate} from '/scripts/generate.js';
 import {generateClues} from '/scripts/generate_clues.js';
