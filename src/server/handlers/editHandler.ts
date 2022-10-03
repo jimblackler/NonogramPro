@@ -1,5 +1,6 @@
 import {RequestHandler} from 'express';
 import {hasGridHtmlRespond} from '../hasGridHtmlRespond';
+import {addScripts} from '../manifest';
 
 export const editHandler: RequestHandler = async (req, res, next) => {
   await hasGridHtmlRespond(req, res, {
@@ -163,10 +164,7 @@ export const editHandler: RequestHandler = async (req, res, next) => {
       }
     },
     addScripts: (document, parent) => {
-      const script = document.createElement('script');
-      parent.append(script);
-      script.setAttribute('type', 'module');
-      script.setAttribute('src', 'dist/edit.bundle.js');
+      addScripts(document, parent, 'edit');
     }
   })
 };

@@ -3,6 +3,7 @@ import {addGlobalControls} from '../components/globalControls';
 import {getEmail} from '../getEmail';
 import {getOAuth2} from '../getOAuth2';
 import {htmlRespond} from '../htmlRespond';
+import {addScripts} from '../manifest';
 
 export const listHandler: RequestHandler = async (req, res, next) => {
   const oAuth = await getOAuth2(req);
@@ -63,10 +64,7 @@ export const listHandler: RequestHandler = async (req, res, next) => {
       ol.setAttribute('id', 'games');
     },
     addScripts: (document, parent) => {
-      const script = document.createElement('script');
-      parent.append(script);
-      script.setAttribute('type', 'module');
-      script.setAttribute('src', 'dist/list.bundle.js');
+      addScripts(document, parent, 'list');
     }
   });
 };

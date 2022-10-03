@@ -1,5 +1,6 @@
-import path from "path";
+import path from 'path';
 import webpack from 'webpack';
+import {WebpackManifestPlugin} from 'webpack-manifest-plugin';
 
 export default function config(env: any, argv: any) {
   const configuration: webpack.Configuration = {
@@ -31,9 +32,21 @@ export default function config(env: any, argv: any) {
       extensions: ['.js', '.ts'],
     },
     output: {
+      clean: true,
       filename: '[name].bundle.js',
       path: path.resolve('static/dist')
     },
+    optimization: {
+      splitChunks: {
+        chunks: 'all'
+      }
+    },
+    plugins: [
+      new WebpackManifestPlugin({
+        fileName: '../../out/webpack-manifest.json',
+        generate: (seed, files, entries) => ({entries})
+      })
+    ],
     watch: true
   };
 
