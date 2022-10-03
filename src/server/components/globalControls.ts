@@ -9,7 +9,7 @@ export function getSignInUrl(req: Request, oAuth: OAuth2Client) {
     scope: [
       'https://www.googleapis.com/auth/userinfo.email',
     ],
-    state: req.headers.referer
+    state: req.headers.referer || req.path
   });
 }
 
