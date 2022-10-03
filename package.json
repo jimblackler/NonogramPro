@@ -1,5 +1,5 @@
 {
-  "name": "list-manager",
+  "name": "nonogrampro",
   "version": "1.0.0",
   "scripts": {
     "build": "tsc --project tsconfig.json",
