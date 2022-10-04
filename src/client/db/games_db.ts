@@ -1,5 +1,9 @@
+import {ClientGame} from '../../common/clientGame';
+
 export class GamesDb {
-  withStore(type, callback) {
+  private db: Promise<IDBDatabase> | undefined;
+
+  withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
     if (!this.db) {
       this.db = new Promise((resolve, reject) => {
         const request = indexedDB.open('games-store', 2);
@@ -9,7 +13,11 @@ export class GamesDb {
             objectStore = request.result.createObjectStore('games');
           }
           if (event.oldVersion < 2) {
-            objectStore = request.transaction.objectStore('games');
+            const transaction = request.transaction;
+            if (!transaction) {
+              throw new Error();
+            }
+            objectStore = transaction.objectStore('games');
             objectStore.createIndex('by_difficulty', 'difficulty');
           }
           return objectStore;
@@ -20,7 +28,7 @@ export class GamesDb {
     }
 
     return this.db.then(db => {
-      return new Promise((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         const transaction = db.transaction('games', type);
         transaction.onerror = () => reject(transaction.error);
         transaction.oncomplete = () => resolve();
@@ -29,23 +37,23 @@ export class GamesDb {
     });
   }
 
-  set(game_id, data) {
+  set(game_id: string, data: ClientGame) {
     return this.withStore('readwrite', store => store.put(data, game_id));
   }
 
-  get(game_id) {
-    let request;
+  get(game_id: string) {
+    let request: any;  // TODO: replace with local promise.
     return this.withStore('readonly', store => request = store.get(game_id))
         .then(() => request.result);
   }
 
-  list(handler) {
+  list(handler: () => IDBRequest) {
     return this.withStore('readonly', store => {
       store.index('by_difficulty').openCursor().onsuccess = handler;
     })
   }
 
-  delete_item(game_id) {
+  delete_item(game_id: string) {
     return this.withStore('readwrite', store => store.delete(game_id));
   }
 }

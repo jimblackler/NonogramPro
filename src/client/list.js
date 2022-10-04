@@ -1,4 +1,4 @@
-import {GamesDb} from '/src/client/db/games_db.js';
+import {GamesDb} from './db/games_db';
 import {PlaysDb} from '/src/client/db/plays_db.js';
 import {decode} from './decoder';
 import {request} from './request';

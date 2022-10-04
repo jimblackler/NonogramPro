@@ -1,6 +1,7 @@
+import {ClientGame} from '../common/clientGame';
 import {datastore} from './main';
 
-export function gameToClientGame(game: any) {
+export function gameToClientGame(game: any): ClientGame {
   return {
     key: game[datastore.KEY].name,
     data: {

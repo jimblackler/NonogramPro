@@ -1,5 +1,5 @@
 import {Analyze} from '/src/client/analyze.js';
-import {GamesDb} from '/src/client/db/games_db.js';
+import {GamesDb} from './db/games_db';
 import {decode} from './decoder';
 import {encode} from './encoder';
 import {get_game} from '/src/client/fetch_game.js';
