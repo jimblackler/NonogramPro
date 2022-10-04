@@ -81,6 +81,9 @@ class Edit {
       const data = this.getData();
       // We don't technically need to uuencode the grid at this stage, but
       // big boolean arrays aren't transport or server friendly.
+      if (typeof data.grid_data !== 'object') {
+        throw new Error();
+      }
       data.grid_data = encode(data.grid_data);
       data.game_id = this.game_id;
       request('/publish', 'POST', data, evt => {
