@@ -1,4 +1,4 @@
-export function encode(data) {
+export function encode(data: string) {
   let binary = '';
 
   for (let y = 0; y < data.length; y++) {
