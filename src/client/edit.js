@@ -8,7 +8,7 @@ import {generateClues} from '/src/client/generate_clues.js';
 import {plotLine} from '/src/client/plot_line.js';
 import {Renderer} from '/src/client/renderer.js';
 import {request} from './request';
-import {Alea} from '/src/client/third_party/alea.js';
+import Alea from 'alea';
 
 class Edit {
   constructor() {
