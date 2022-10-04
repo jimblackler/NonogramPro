@@ -101,6 +101,10 @@ class Edit {
         } else {
           const game = obj.game.data;
           const new_id = obj.game.key;
+          if (typeof game.grid_data != 'string') {
+            throw new Error();
+          }
+
           game.grid_data = decode(game.spec, game.grid_data);
 
           this.needs_publish = false;
