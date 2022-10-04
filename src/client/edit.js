@@ -161,7 +161,6 @@ class Edit {
       this.makeNewGame(spec, false);
     });
 
-
     colorScheme.addEventListener('change', evt => {
       const target = evt.target;
       if (!(target instanceof HTMLElement)) {
