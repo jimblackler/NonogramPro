@@ -3,7 +3,7 @@ import {CompletedDb} from '/src/client/db/completed_db.js';
 import {GamesDb} from '/src/client/db/games_db.js';
 import {PlaysDb} from '/src/client/db/plays_db.js';
 import {get_game} from '/src/client/fetch_game.js';
-import {Generate} from '/src/client/generate.js';
+import {Generate} from './generate';
 import {generateClues} from '/src/client/generate_clues.js';
 import {plotLine} from './plot_line';
 import {Renderer} from '/src/client/renderer.js';

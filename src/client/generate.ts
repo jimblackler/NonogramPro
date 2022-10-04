@@ -1,7 +1,8 @@
 import Alea from 'alea';
+import {Spec} from '../common/spec';
 
 export class Generate {
-  static getEmpty(spec) {
+  static getEmpty(spec: Spec) {
     const data = [];
     for (let y = 0; y < spec.height; y++) {
       const row = [];
@@ -13,13 +14,13 @@ export class Generate {
     return data;
   }
 
-  static clone(arr) {
-    const cloned = [];
+  static clone(arr: boolean[][]) {
+    const cloned: boolean[][] = [];
     arr.forEach(row => cloned.push(row.slice(0)));
     return cloned;
   }
 
-  static equals(arr0, arr1) {
+  static equals(arr0: boolean[][], arr1: boolean[][]) {
     return arr0.every((row, row_number) => {
       return row.every((value, column_number) => {
         return value === arr1[row_number][column_number];
@@ -27,7 +28,7 @@ export class Generate {
     });
   }
 
-  static complete(on, off) {
+  static complete(on: boolean[][], off: boolean[][]) {
     return on.every((on_row, row_number) => {
       return on_row.every((value, column_number) => {
         return value || off[row_number][column_number];
@@ -36,8 +37,8 @@ export class Generate {
   }
 }
 
-function generate(spec) {
-  const random = new Alea();
+function generate(spec: Spec) {
+  const random = Alea();
 
   const data = [];
   for (let y = 0; y < spec.height; y++) {

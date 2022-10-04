@@ -1,4 +1,4 @@
-import {Generate} from '/src/client/generate.js';
+import {Generate} from './generate';
 import {Renderer} from '/src/client/renderer.js';
 require('./dialog');
 
