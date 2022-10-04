@@ -246,7 +246,7 @@ export class Renderer {
     }
   }
 
-  paintOnSquares(on: boolean[][], prior_on?: boolean[][]) {
+  paintOnSquares(on: boolean[][], priorOn?: boolean[][]) {
     const cell_size = this.dimensions.cell_size;
     while (this.squares.firstChild) {
       this.squares.removeChild(this.squares.firstChild);
@@ -261,7 +261,7 @@ export class Renderer {
         rect.setAttribute('y', this.top_offset + y * cell_size + 'px');
         rect.setAttribute('width', cell_size + 0.5 + 'px');
         rect.setAttribute('height', cell_size + 0.5 + 'px');
-        if (!prior_on || prior_on[y][x]) {
+        if (!priorOn || priorOn[y][x]) {
           rect.classList.add('prior');
         } else {
           rect.classList.add('new');
@@ -271,7 +271,7 @@ export class Renderer {
     }
   }
 
-  paintOffSquares(off: boolean[][], prior_off: boolean[][]) {
+  paintOffSquares(off: boolean[][], priorOff: boolean[][]) {
     const cell_size = this.dimensions.cell_size;
     while (this.crosses.firstChild) {
       this.crosses.removeChild(this.crosses.firstChild);
@@ -290,7 +290,7 @@ export class Renderer {
         line1.setAttribute(
             'y2',
             this.top_offset + y * cell_size + cell_size - cross_margin + 'px');
-        if (!prior_off || prior_off[y][x]) {
+        if (!priorOff || priorOff[y][x]) {
           line1.classList.add('prior');
         } else {
           line1.classList.add('new');
@@ -308,7 +308,7 @@ export class Renderer {
         line2.setAttribute(
             'y2',
             this.top_offset + y * cell_size + cell_size - cross_margin + 'px');
-        if (!prior_off || prior_off[y][x]) {
+        if (!priorOff || priorOff[y][x]) {
           line2.classList.add('prior');
         } else {
           line2.classList.add('new');

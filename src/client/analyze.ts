@@ -146,19 +146,19 @@ function analyzePass(
 }
 
 function draw(
-    spec: Spec, on: boolean[][], prior_on: boolean[][], off: boolean[][], prior_off: boolean[][]) {
+    spec: Spec, on: boolean[][], priorOn: boolean[][], off: boolean[][], priorOff: boolean[][]) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.classList.add('mini');
   const renderer = new Renderer(svg, spec, {cell_size: 10, ratio_for_clues: 0});
-  renderer.paintOnSquares(on, prior_on);
-  renderer.paintOffSquares(off, prior_off);
+  renderer.paintOnSquares(on, priorOn);
+  renderer.paintOffSquares(off, priorOff);
   return svg;
 }
 
 export class Analyze {
   static analyze(spec: Spec, clues: number[][][],
-                 per_round: (on: boolean[][], prior_on: boolean[][], off: boolean[][],
-                             prior_off: boolean[][]) => void) {
+                 per_round: (on: boolean[][], priorOn: boolean[][], off: boolean[][],
+                             priorOff: boolean[][]) => void) {
     const on = Generate.getEmpty(spec);
     const off = Generate.getEmpty(spec);
     let failed = 0;
@@ -166,10 +166,10 @@ export class Analyze {
     let rounds = 0;
 
     while (true) {
-      const prior_on = Generate.clone(on);
-      const prior_off = Generate.clone(off);
+      const priorOn = Generate.clone(on);
+      const priorOff = Generate.clone(off);
       analyzePass(spec, clues, on, off, horizontal);
-      if (Generate.equals(on, prior_on) && Generate.equals(off, prior_off)) {
+      if (Generate.equals(on, priorOn) && Generate.equals(off, priorOff)) {
         failed++;
         if (failed === 2) {
           return -1;
@@ -177,7 +177,7 @@ export class Analyze {
       } else {
         failed = 0;
       }
-      per_round(on, prior_on, off, prior_off);
+      per_round(on, priorOn, off, priorOff);
 
       if (Generate.complete(on, off)) {
         return rounds;
@@ -207,8 +207,8 @@ export class Analyze {
 
     let difficulty = Analyze.analyze(
         spec, clues,
-        (on, prior_on, off, prior_off) =>
-            div.appendChild(draw(spec, on, prior_on, off, prior_off)));
+        (on, priorOn, off, priorOff) =>
+            div.appendChild(draw(spec, on, priorOn, off, priorOff)));
 
     let phrase;
     if (difficulty === -1) {
