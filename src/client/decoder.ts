@@ -1,4 +1,6 @@
-export function decode(spec, str) {
+import {Spec} from '../common/spec';
+
+export function decode(spec: Spec, str: string) {
   const binary = atob(str);
   let pos = 0;
   let data = [];

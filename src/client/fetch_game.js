@@ -1,4 +1,4 @@
-import {decode} from '/src/client/decoder.js';
+import {decode} from './decoder';
 import {request} from './request';
 
 function get_game_internet(games_db, game_id, resolve, reject) {

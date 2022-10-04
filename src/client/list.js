@@ -1,6 +1,6 @@
 import {GamesDb} from '/src/client/db/games_db.js';
 import {PlaysDb} from '/src/client/db/plays_db.js';
-import {decode} from '/src/client/decoder.js';
+import {decode} from './decoder';
 import {request} from './request';
 
 class List {
