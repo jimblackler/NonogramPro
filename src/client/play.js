@@ -5,7 +5,6 @@ import {PlaysDb} from '/src/client/db/plays_db.js';
 import {get_game} from '/src/client/fetch_game.js';
 import {Generate} from '/src/client/generate.js';
 import {generateClues} from '/src/client/generate_clues.js';
-import {gup} from '/src/client/gup.js';
 import {plotLine} from '/src/client/plot_line.js';
 import {Renderer} from '/src/client/renderer.js';
 
@@ -16,7 +15,7 @@ class Play {
     this.completed_db = new CompletedDb();
     this.row_lock = false;
     this.column_lock = false;
-    this.game_id = gup('game');
+    this.game_id = new URL(window.location.href).searchParams.get('game') || undefined;
     get_game(
         this.games_db, this.game_id,
         result => {

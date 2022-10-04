@@ -5,7 +5,6 @@ import {encode} from '/src/client/encoder.js';
 import {get_game} from '/src/client/fetch_game.js';
 import {Generate} from '/src/client/generate.js';
 import {generateClues} from '/src/client/generate_clues.js';
-import {gup} from '/src/client/gup.js';
 import {plotLine} from '/src/client/plot_line.js';
 import {Renderer} from '/src/client/renderer.js';
 import {request} from '/src/client/request.js';
@@ -208,7 +207,7 @@ class Edit {
       }
     });
 
-    this.game_id = gup('game');
+    this.game_id = new URL(window.location.href).searchParams.get('game') || undefined;
     this.needs_publish = false;
     const default_spec = {width: 20, height: 20};
 

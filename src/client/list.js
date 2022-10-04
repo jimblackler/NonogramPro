@@ -1,7 +1,6 @@
 import {GamesDb} from '/src/client/db/games_db.js';
 import {PlaysDb} from '/src/client/db/plays_db.js';
 import {decode} from '/src/client/decoder.js';
-import {gup} from '/src/client/gup.js';
 import {request} from '/src/client/request.js';
 
 class List {
@@ -16,7 +15,7 @@ class List {
         result.continue();
       } else {
         const list = document.getElementById('games');
-        if (gup('v', 'local') === 'local') {
+        if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
           this.games_db.list(evt => {
             const result = evt.currentTarget.result;
             if (result) {
