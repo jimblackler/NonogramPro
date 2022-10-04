@@ -5,7 +5,7 @@ export interface ClientGame {
   data: {
     creator: string;
     difficulty: number;
-    grid_data: string;
+    grid_data: boolean[][];
     spec: Spec;
     name: string;
     style: string;
