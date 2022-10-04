@@ -143,6 +143,9 @@ class Edit {
       this.games_db.delete_item(this.game_id);
       // Remove delete
       request('/delete', 'POST', {game_id: this.game_id}, evt => {
+        if (!(evt.target instanceof XMLHttpRequest)) {
+          throw new Error();
+        }
         if (!evt.target.response) {
           alert('failure');
         }
