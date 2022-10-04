@@ -1,4 +1,4 @@
-export function encode(data: string) {
+export function encode(data: boolean[][]) {
   let binary = '';
 
   for (let y = 0; y < data.length; y++) {
