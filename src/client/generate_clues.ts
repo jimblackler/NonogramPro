@@ -1,4 +1,6 @@
-export function generateClues(spec, data) {
+import {Spec} from '../common/spec';
+
+export function generateClues(spec: Spec, data: number[][][]) {
   const rows = [];
   let sequence = 0;
   for (let y = 0; y < spec.height; y++) {
