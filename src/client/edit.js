@@ -5,7 +5,7 @@ import {encode} from './encoder';
 import {get_game} from '/src/client/fetch_game.js';
 import {Generate} from '/src/client/generate.js';
 import {generateClues} from '/src/client/generate_clues.js';
-import {plotLine} from '/src/client/plot_line.js';
+import {plotLine} from './plot_line';
 import {Renderer} from '/src/client/renderer.js';
 import {request} from './request';
 import Alea from 'alea';

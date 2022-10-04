@@ -1,9 +1,9 @@
-function rangeAdjust(r, r0, r1, n0, n1) {
+function rangeAdjust(r: number, r0: number, r1: number, n0: number, n1: number) {
   const t = (r - r0) / (r1 - r0);
   return t * (n1 - n0) + n0;
 }
 
-export function* plotLine(x0, y0, x1, y1) {
+export function* plotLine(x0: number, y0: number, x1: number, y1: number) {
   const dx = x1 - x0;
   const dy = y1 - y0;
   if (Math.abs(dx) > Math.abs(dy)) {
