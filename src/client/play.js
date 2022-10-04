@@ -30,8 +30,10 @@ class Play {
           this.renderer = new Renderer(this.svg, this.spec);
           const color_scheme_stylesheet =
               document.getElementById('color_scheme_stylesheet');
-          color_scheme_stylesheet.href =
-              `/styles/color_schemes/${this.style}.css`;
+          if (!color_scheme_stylesheet) {
+            throw new Error();
+          }
+          color_scheme_stylesheet.setAttribute('href', `/styles/color_schemes/${this.style}.css`);
           const title = document.getElementById('title');
           title.textContent = result.name;
           this.clues = generateClues(this.spec, this.data);
@@ -50,17 +52,25 @@ class Play {
           alert('bad game');
         });
 
-    document.getElementById('replay').addEventListener('click', () => {
+    const replay = document.getElementById('replay');
+    const edit = document.getElementById('edit');
+    const hint = document.getElementById('hint');
+
+    if (!replay || !edit || !hint) {
+      throw new Error();
+    }
+
+    replay.addEventListener('click', () => {
       this.on = Generate.getEmpty(this.spec);
       this.off = Generate.getEmpty(this.spec);
       this.fromScratch();
     });
 
-    document.getElementById('edit').addEventListener('click', () => {
+    edit.addEventListener('click', () => {
       window.location.href = `edit?game=${this.game_id}`;
     });
 
-    document.getElementById('hint').addEventListener('click', () => {
+    hint.addEventListener('click', () => {
       this.renderer.setHighlightMode('hint');
       const hint = Analyze.findHint(this.spec, this.clues, this.on, this.off);
       this.renderer.setHighlightRow(hint[0]);
