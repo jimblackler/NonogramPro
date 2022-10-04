@@ -28,12 +28,11 @@ class Play {
           this.on = Generate.getEmpty(this.spec);
           this.off = Generate.getEmpty(this.spec);
           this.renderer = new Renderer(this.svg, this.spec);
-          const color_scheme_stylesheet =
-              document.getElementById('color_scheme_stylesheet');
-          if (!color_scheme_stylesheet) {
+          const color_scheme_stylesheet = document.getElementById('color_scheme_stylesheet');
+          if (!(color_scheme_stylesheet instanceof HTMLLinkElement)) {
             throw new Error();
           }
-          color_scheme_stylesheet.setAttribute('href', `/styles/color_schemes/${this.style}.css`);
+          color_scheme_stylesheet.href = `/styles/color_schemes/${this.style}.css`;
           const title = document.getElementById('title');
           title.textContent = result.name;
           this.clues = generateClues(this.spec, this.data);
