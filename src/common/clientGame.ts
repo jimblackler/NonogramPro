@@ -1,7 +1,7 @@
 import {Spec} from './spec';
 
 export interface ClientGameData {
-  creator: string;
+  creator?: string;
   difficulty: number;
   grid_data: string | boolean[][];
   spec: Spec;

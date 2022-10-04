@@ -154,13 +154,21 @@ class Edit {
     });
 
     gridSize.addEventListener('change', evt => {
-      const spec = JSON.parse(evt.target.value);
+      const target = evt.target;
+      if (!(target instanceof HTMLElement)) {
+        throw new Error();
+      }
+      const spec = JSON.parse(target.value);
       this.makeNewGame(spec, false);
     });
 
 
     colorScheme.addEventListener('change', evt => {
-      this.style = evt.target.value;
+      const target = evt.target;
+      if (!(target instanceof HTMLElement)) {
+        throw new Error();
+      }
+      this.style = target.value;
       this.needs_publish = true;
       this.repaint();
       this.saveLocal();
@@ -268,15 +276,18 @@ class Edit {
       grid_data: this.data,
       spec: this.spec,
       name: this.name,
-      style: this.style
+      style: this.style,
     };
   }
 
   saveLocal() {
-    const data = this.getData();
-    data.needs_publish = this.needs_publish;
-    data.difficulty = Analyze.analyze(
-        this.spec, generateClues(this.spec, this.data), () => {});
+    const data = {
+      ...this.getData(),
+      needs_publish: this.needs_publish,
+      difficulty: Analyze.analyze(
+          this.spec, generateClues(this.spec, this.data), () => {
+          })
+    };
     this.games_db.set(this.game_id, data);
   }
 
