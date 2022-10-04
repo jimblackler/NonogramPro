@@ -1,4 +1,4 @@
-import {Analyze} from '/src/client/analyze.js';
+import {Analyze} from './analyze';
 import {CompletedDb} from './db/completed_db';
 import {GamesDb} from './db/games_db';
 import {PlaysDb} from './db/plays_db';

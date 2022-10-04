@@ -1,10 +1,12 @@
+import {Spec} from '../common/spec';
 import {Generate} from './generate';
 import {Renderer} from './renderer';
 require('./dialog');
 
 function analyzeSequence(
-    clue, clue_idx, on, off, start, max_start, u_size, v, horizontal, infer_on,
-    infer_off, complete) {
+    clue: number[], clue_idx: number, on: boolean[][], off: boolean[][], start: number,
+    max_start: number, u_size: number, v: number, horizontal: boolean, infer_on: boolean[] | undefined,
+    infer_off: boolean[] | undefined, complete?: number[]) {
   if (clue_idx === clue.length) {
     /* We have a viable combination provided no 'on' blocks remain. */
     for (let u = start; u < u_size; u++) {
@@ -74,6 +76,10 @@ function analyzeSequence(
       continue;
     }
 
+    if (!infer_off) {
+      throw new Error();
+    }
+
     if (u + 1 < u_size) {
       infer_on[u + 1] = false;
     }
@@ -91,7 +97,8 @@ function analyzeSequence(
 }
 
 function analyzeLine(
-    clue, on, off, v, u_size, horizontal, infer_on, infer_off, complete) {
+    clue: number[], on: boolean[][], off: boolean[][], v: number, u_size: number, horizontal: boolean,
+    infer_on: boolean[] | undefined, infer_off: boolean[] | undefined, complete?: number[]) {
   let max_start = u_size;
   let spacer = 0;
   for (let idx = 0; idx < clue.length; idx++) {
@@ -105,7 +112,8 @@ function analyzeLine(
       infer_off, complete);
 }
 
-function analyzePass(spec, clues, on, off, horizontal) {
+function analyzePass(
+    spec: Spec, clues: number[][][], on: boolean[][], off: boolean[][], horizontal: boolean) {
   const u_size = horizontal ? spec.width : spec.height;
   const v_size = horizontal ? spec.height : spec.width;
   for (let v = 0; v < v_size; v++) {
@@ -137,7 +145,8 @@ function analyzePass(spec, clues, on, off, horizontal) {
   }
 }
 
-function draw(spec, on, prior_on, off, prior_off) {
+function draw(
+    spec: Spec, on: boolean[][], prior_on: boolean[][], off: boolean[][], prior_off: boolean[][]) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.classList.add('mini');
   const renderer = new Renderer(svg, spec, {cell_size: 10, ratio_for_clues: 0});
@@ -147,7 +156,9 @@ function draw(spec, on, prior_on, off, prior_off) {
 }
 
 export class Analyze {
-  static analyze(spec, clues, per_round) {
+  static analyze(spec: Spec, clues: number[][][],
+                 per_round: (on: boolean[][], prior_on: boolean[][], off: boolean[][],
+                             prior_off: boolean[][]) => void) {
     const on = Generate.getEmpty(spec);
     const off = Generate.getEmpty(spec);
     let failed = 0;
@@ -177,10 +188,17 @@ export class Analyze {
     }
   }
 
-  static visualAnalyze(spec, clues) {
-    document.getElementById('dialog').style.visibility = 'visible';
+  static visualAnalyze(spec: Spec, clues: number[][][]) {
+    const dialog = document.getElementById('dialog');
+    if (!(dialog instanceof HTMLElement)) {
+      throw new Error();
+    }
+    dialog.style.visibility = 'visible';
     const div = document.getElementById('dialog_content');
 
+    if (!(div instanceof HTMLElement)) {
+      throw new Error();
+    }
     while (div.firstChild) {
       div.removeChild(div.firstChild);
     }
@@ -205,18 +223,18 @@ export class Analyze {
     div.style.width = div.offsetWidth + 'px';  // Fix width for dragging.
   }
 
-  static checkRow(spec, on, off, row, clue, complete) {
+  static checkRow(spec: Spec, on: boolean[][], off: boolean[][], row: number, clue: number[], complete: number[]) {
     return analyzeLine(
         clue, on, off, row, spec.height, true, undefined, undefined, complete);
   }
 
-  static checkColumn(spec, on, off, column, clue, complete) {
+  static checkColumn(spec: Spec, on: boolean[][], off: boolean[][], column: number, clue: number[], complete: number[]) {
     return analyzeLine(
         clue, on, off, column, spec.width, false, undefined, undefined,
         complete);
   }
 
-  static findHint(spec, clues, on, off) {
+  static findHint(spec: Spec, clues: number[][][], on: boolean[][], off: boolean[][]) {
     let max_inferable = 0;
     let results = [-1, -1];
     for (let pass = 0; pass < 2; pass++) {

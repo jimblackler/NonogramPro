@@ -1,4 +1,4 @@
-import {Analyze} from '/src/client/analyze.js';
+import {Analyze} from './analyze';
 import {GamesDb} from './db/games_db';
 import {decode} from './decoder';
 import {encode} from './encoder';
