@@ -1,5 +1,9 @@
+import {ClientGame} from '../../common/clientGame';
+
 export class PlaysDb {
-  withStore(type, callback) {
+  private db: Promise<IDBDatabase> | undefined;
+
+  withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
     if (!this.db) {
       this.db = new Promise((resolve, reject) => {
         const request = indexedDB.open('plays-store', 1);
@@ -11,7 +15,7 @@ export class PlaysDb {
     }
 
     return this.db.then(db => {
-      return new Promise((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         const transaction = db.transaction('plays', type);
         transaction.onerror = () => reject(transaction.error);
         transaction.oncomplete = () => resolve();
@@ -20,17 +24,17 @@ export class PlaysDb {
     });
   }
 
-  set(game_id, data) {
+  set(game_id: string, data: ClientGame) {
     return this.withStore('readwrite', store => store.put(data, game_id));
   }
 
-  get(game_id) {
-    let request;
+  get(game_id: string) {
+    let request: any;  // TODO: replace with local promise.
     return this.withStore('readonly', store => request = store.get(game_id))
         .then(() => request.result);
   }
 
-  list(handler) {
+  list(handler: () => IDBRequest) {
     return this.withStore('readonly', store => {
       store.openCursor.call(store).onsuccess = handler;
     })

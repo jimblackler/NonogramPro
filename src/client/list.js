@@ -1,5 +1,5 @@
 import {GamesDb} from './db/games_db';
-import {PlaysDb} from '/src/client/db/plays_db.js';
+import {PlaysDb} from './db/plays_db';
 import {decode} from './decoder';
 import {request} from './request';
 
