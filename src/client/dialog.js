@@ -1,4 +1,4 @@
-import {makeDraggable} from '/src/client/draggable.js';
+import {makeDraggable} from './draggable';
 
 document.getElementById('close').addEventListener('click', evt => {
   document.getElementById('dialog').style.visibility = 'hidden';
