@@ -44,7 +44,7 @@ export class GamesDb {
   get(game_id: string) {
     let request: any;  // TODO: replace with local promise.
     return this.withStore('readonly', store => request = store.get(game_id))
-        .then(() => request.result as ClientGame);
+        .then(() => request.result as ClientGameData);
   }
 
   list(handler: () => IDBRequest) {

@@ -7,6 +7,7 @@ export interface ClientGameData {
   spec: Spec;
   name: string;
   style: string;
+  needs_publish?: boolean;
 }
 
 export interface ClientGame {
