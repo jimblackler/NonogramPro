@@ -275,7 +275,7 @@ class Edit {
   }
 
   makeNewGame(spec, replace) {
-    const random = new Alea();
+    const random = Alea();
     this.game_id = `draft${random() * 10000 | 0}`;
     const url = `edit?game=${this.game_id}`;
     if (replace) {
