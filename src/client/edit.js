@@ -14,6 +14,20 @@ class Edit {
   constructor() {
     this.games_db = new GamesDb();
     const title = document.getElementById('title');
+    const status = document.getElementById('status');
+    const createNew = document.getElementById('create_new');
+    const play = document.getElementById('play');
+    const analyze = document.getElementById('analyze');
+    const publish = document.getElementById('publish');
+    const cancel = document.getElementById('cancel');
+    const delete_ = document.getElementById('delete');
+    const gridSize = document.getElementById('grid_size');
+    const colorScheme = document.getElementById('color_scheme');
+
+    if (!title || !status || !createNew || !play || !analyze || !publish || !cancel || !delete_ ||
+        !gridSize || !colorScheme) {
+      throw new Error();
+    }
     title.setAttribute('contenteditable', 'true');
 
     title.addEventListener('keypress', evt => {
@@ -27,6 +41,9 @@ class Edit {
       const range = document.createRange();
       range.selectNodeContents(title);
       const selection = window.getSelection();
+      if (!selection) {
+        throw new Error();
+      }
       selection.removeAllRanges();
       selection.addRange(range);
     });
@@ -40,22 +57,22 @@ class Edit {
       }
     });
 
-    document.getElementById('status').innerText = 'Edit mode';
+    status.innerText = 'Edit mode';
 
-    document.getElementById('create_new').addEventListener('click', evt => {
+    createNew.addEventListener('click', evt => {
       window.location.href = 'edit';
     });
-
-    document.getElementById('play').addEventListener('click', evt => {
+    play.addEventListener('click', evt => {
       window.location.href = `/play?game=${this.game_id}`;
     });
 
-    document.getElementById('analyze').addEventListener('click', evt => {
+
+    analyze.addEventListener('click', evt => {
       let clues = generateClues(this.spec, this.data);
       Analyze.visualAnalyze(this.spec, clues);
     });
 
-    document.getElementById('publish').addEventListener('click', evt => {
+    publish.addEventListener('click', evt => {
       if (this.name === 'Untitled' || this.name === '') {
         this.name = prompt('Enter a name for your puzzle');
         this.saveLocal();
@@ -89,7 +106,6 @@ class Edit {
             window.history.replaceState({}, '', `edit?game=${this.game_id}`);
           }
           this.games_db.set(this.game_id, game);
-          const publish = document.getElementById('publish');
           publish.setAttribute('disabled', '');
 
           alert(`Difficulty ${game.difficulty}`);
@@ -97,7 +113,7 @@ class Edit {
       });
     });
 
-    document.getElementById('cancel').addEventListener('click', evt => {
+    cancel.addEventListener('click', evt => {
       // Defined as 'delete any local changes and restore to the published
       // version'.
 
@@ -111,7 +127,7 @@ class Edit {
       }, () => {});
     });
 
-    document.getElementById('delete').addEventListener('click', evt => {
+    delete_.addEventListener('click', evt => {
       // Local delete
       this.games_db.delete_item(this.game_id);
       // Remove delete
@@ -123,12 +139,13 @@ class Edit {
       });
     });
 
-    document.getElementById('grid_size').addEventListener('change', evt => {
+    gridSize.addEventListener('change', evt => {
       const spec = JSON.parse(evt.target.value);
       this.makeNewGame(spec, false);
     });
 
-    document.getElementById('color_scheme').addEventListener('change', evt => {
+
+    colorScheme.addEventListener('change', evt => {
       this.style = evt.target.value;
       this.needs_publish = true;
       this.repaint();
@@ -251,11 +268,16 @@ class Edit {
 
   repaint() {
     const title = document.getElementById('title');
+    const grid_size = document.getElementById('grid_size');
+
+    if (!title || !grid_size) {
+      throw new Error();
+    }
     title.textContent = this.name;
     this.renderer.paintOnSquares(this.data);
     let clues = generateClues(this.spec, this.data);
     this.renderer.paintClues(clues);
-    const grid_size = document.getElementById('grid_size');
+
     grid_size.value =
         `{"width": ${this.spec.width}, "height": ${this.spec.height}}`;
     const color_scheme = document.getElementById('color_scheme');
