@@ -1,3 +1,5 @@
+import {Spec} from '../common/spec';
+
 const xmlns = 'http://www.w3.org/2000/svg';
 const divisions = 5;
 const cross_margin = 7;
@@ -5,12 +7,33 @@ const clue_to_grid_margin = 10;
 const vertical_clue_separation = 20;
 const horizontal_clue_baseline_position = 0.75;
 
+interface Dimensions {
+  cell_size: number;
+  ratio_for_clues: number;
+}
+
 export class Renderer {
-  constructor(svg, spec, dimensions) {
+  private spec: Spec;
+  private dimensions: Dimensions;
+  private highlightedColumn: SVGElement | false;
+  private highlightedRow: SVGElement | false;
+  private highlightMode: string | undefined;
+
+  private readonly left_offset: number;
+  private readonly top_offset: number;
+  private readonly rowsAndColumns: SVGGElement;
+  private readonly rows: SVGGElement;
+  private readonly row_labels: SVGGElement;
+  private readonly columns: SVGGElement;
+  private readonly column_labels: SVGGElement;
+  private readonly squares: SVGGElement;
+  private readonly crosses: SVGGElement;
+
+  constructor(svg: SVGElement, spec: Spec, dimensions?: Dimensions) {
     if (!dimensions) {
       dimensions = {cell_size: 25, ratio_for_clues: 0.42};
     }
-    const content = svg.getElementById('content') || svg;
+    const content = svg.querySelector('#content') || svg;
     while (content.firstChild) {
       content.removeChild(content.firstChild);
     }
@@ -143,8 +166,12 @@ export class Renderer {
     content.appendChild(major);
   }
 
-  mousedown(evt, func) {
+  mousedown(evt: MouseEvent,
+            func: (arg0: this, x: number, y: number, which: number, shift: boolean) => void) {
     const svg = evt.currentTarget;
+    if (!(svg instanceof SVGElement)) {
+      throw new Error();
+    }
     const cell_size = this.dimensions.cell_size;
     let client_rect = svg.getBoundingClientRect();
     let x = evt.clientX - client_rect.left;
@@ -155,8 +182,11 @@ export class Renderer {
     evt.preventDefault();
   }
 
-  mousemove(evt, func) {
+  mousemove(evt: MouseEvent, func: (arg0: this, x: number, y: number) => void) {
     const svg = evt.currentTarget;
+    if (!(svg instanceof SVGElement)) {
+      throw new Error();
+    }
     const cell_size = this.dimensions.cell_size;
     let client_rect = svg.getBoundingClientRect();
     let x = evt.clientX - client_rect.left;
@@ -167,7 +197,7 @@ export class Renderer {
     evt.preventDefault();
   }
 
-  paintClues(clues) {
+  paintClues(clues: number[][][]) {
     const cell_size = this.dimensions.cell_size;
     while (this.row_labels.firstChild) {
       this.row_labels.removeChild(this.row_labels.firstChild);
@@ -182,7 +212,7 @@ export class Renderer {
       row_label.setAttribute(
           'y',
           this.top_offset + y * cell_size +
-              cell_size * horizontal_clue_baseline_position + 'px');
+          cell_size * horizontal_clue_baseline_position + 'px');
       const c2 = clues[0][y];
       for (let idx = 0; idx < c2.length; idx++) {
         const tspan = document.createElementNS(xmlns, 'tspan');
@@ -216,7 +246,7 @@ export class Renderer {
     }
   }
 
-  paintOnSquares(on, prior_on) {
+  paintOnSquares(on: boolean[][], prior_on: boolean[][]) {
     const cell_size = this.dimensions.cell_size;
     while (this.squares.firstChild) {
       this.squares.removeChild(this.squares.firstChild);
@@ -241,7 +271,7 @@ export class Renderer {
     }
   }
 
-  paintOffSquares(off, prior_off) {
+  paintOffSquares(off: boolean[][], prior_off: boolean[][]) {
     const cell_size = this.dimensions.cell_size;
     while (this.crosses.firstChild) {
       this.crosses.removeChild(this.crosses.firstChild);
@@ -288,7 +318,7 @@ export class Renderer {
     }
   }
 
-  setHighlightMode(mode) {
+  setHighlightMode(mode: string) {
     if (this.highlightMode) {
       this.rowsAndColumns.classList.remove(this.highlightMode);
     }
@@ -296,28 +326,39 @@ export class Renderer {
     this.highlightMode = mode;
   }
 
-  setHighlightColumn(column) {
+  setHighlightColumn(column: number) {
     if (this.highlightedColumn) {
       this.highlightedColumn.classList.remove('highlighted');
     }
     if (column !== -1) {
-      this.highlightedColumn = this.columns.childNodes[column];
+      const childNode = this.columns.childNodes[column];
+      if (!(childNode instanceof SVGElement)) {
+        throw new Error();
+      }
+      this.highlightedColumn = childNode;
       this.highlightedColumn.classList.add('highlighted');
     }
   }
 
-  setHighlightRow(row) {
+  setHighlightRow(row: number) {
     if (this.highlightedRow) {
       this.highlightedRow.classList.remove('highlighted');
     }
     if (row !== -1) {
-      this.highlightedRow = this.rows.childNodes[row];
+      const childNode = this.rows.childNodes[row];
+      if (!(childNode instanceof SVGElement)) {
+        throw new Error();
+      }
+      this.highlightedRow = childNode;
       this.highlightedRow.classList.add('highlighted');
     }
   }
 
-  setColumnValid(column, valid, complete) {
+  setColumnValid(column:number, valid:boolean, complete:number[]) {
     const group = this.column_labels.childNodes[column];
+    if (!(group instanceof SVGElement)) {
+      throw new Error();
+    }
     if (valid) {
       group.classList.add('valid');
     } else {
@@ -325,6 +366,9 @@ export class Renderer {
     }
     complete.forEach((v, i) => {
       const part = group.childNodes[group.childNodes.length - 1 - i];
+      if (!(part instanceof SVGElement)) {
+        throw new Error();
+      }
       if (v >= 0) {
         part.classList.add('complete');
       } else {
@@ -333,8 +377,11 @@ export class Renderer {
     });
   }
 
-  setRowValid(row, valid, complete) {
+  setRowValid(row:number, valid:boolean, complete:number[]) {
     const group = this.row_labels.childNodes[row];
+    if (!(group instanceof SVGElement)) {
+      throw new Error();
+    }
     if (valid) {
       group.classList.add('valid');
     } else {
@@ -343,6 +390,9 @@ export class Renderer {
     const elements = group.childNodes[0].childNodes;
     complete.forEach((v, i) => {
       const part = elements[i];
+      if (!(part instanceof SVGElement)) {
+        throw new Error();
+      }
       if (v >= 0) {
         part.classList.add('complete');
       } else {

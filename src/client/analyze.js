@@ -1,5 +1,5 @@
 import {Generate} from './generate';
-import {Renderer} from '/src/client/renderer.js';
+import {Renderer} from './renderer';
 require('./dialog');
 
 function analyzeSequence(
