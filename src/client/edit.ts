@@ -1,3 +1,4 @@
+import {Spec} from '../common/spec';
 import {Analyze} from './analyze';
 import {GamesDb} from './db/games_db';
 import {decode} from './decoder';
@@ -11,6 +12,19 @@ import {request} from './request';
 import Alea from 'alea';
 
 class Edit {
+  private readonly games_db: GamesDb;
+
+  private renderer: Renderer | undefined;
+  private data: boolean[][] = [];
+  private game_id = '';
+  private name = '';
+  private needs_publish = false;
+  private spec: Spec = {width: 0, height: 0};
+  private style = '';
+  private setStyle = '';
+  private last_x = 0;
+  private last_y = 0;
+
   constructor() {
     this.games_db = new GamesDb();
     const title = document.getElementById('title');
@@ -49,7 +63,7 @@ class Edit {
     });
 
     title.addEventListener('blur', evt => {
-      this.name = title.textContent;
+      this.name = title.textContent || '';
       if (title.textContent === this.name) {
         title.textContent = this.name;
         this.needs_publish = true;
@@ -73,18 +87,20 @@ class Edit {
 
     publish.addEventListener('click', evt => {
       if (this.name === 'Untitled' || this.name === '') {
-        this.name = prompt('Enter a name for your puzzle');
+        this.name = prompt('Enter a name for your puzzle') || '';
         this.saveLocal();
         this.repaint();
       }
-      const data = this.getData();
+      const data = {
+        ...this.getData(),
+        game_id: this.game_id
+      };
       // We don't technically need to uuencode the grid at this stage, but
       // big boolean arrays aren't transport or server friendly.
       if (typeof data.grid_data !== 'object') {
         throw new Error();
       }
       data.grid_data = encode(data.grid_data);
-      data.game_id = this.game_id;
       request('/publish', 'POST', data, evt => {
         const target = evt.target;
         if (!(target instanceof XMLHttpRequest)) {
@@ -130,6 +146,9 @@ class Edit {
       // We don't have a local copy so must refresh from server. Requires
       // internet. May not be the best solution.
       get_game(this.games_db, this.game_id, game => {
+        if (typeof game.grid_data !== 'object') {
+          throw new Error();
+        }
         this.spec = game.spec;
         this.data = game.grid_data;
         this.name = game.name;
@@ -154,7 +173,7 @@ class Edit {
 
     gridSize.addEventListener('change', evt => {
       const target = evt.target;
-      if (!(target instanceof HTMLElement)) {
+      if (!(target instanceof HTMLSelectElement)) {
         throw new Error();
       }
       const spec = JSON.parse(target.value);
@@ -163,7 +182,7 @@ class Edit {
 
     colorScheme.addEventListener('change', evt => {
       const target = evt.target;
-      if (!(target instanceof HTMLElement)) {
+      if (!(target instanceof HTMLSelectElement)) {
         throw new Error();
       }
       this.style = target.value;
@@ -185,6 +204,9 @@ class Edit {
       evt.preventDefault();
     });
     svg.addEventListener('mousedown', evt => {
+      if (!this.renderer) {
+        throw new Error();
+      }
       this.renderer.mousedown(evt, (renderer, x, y, which) => {
         if (x >= 0 && x < this.spec.width && y >= 0 && y < this.spec.height) {
           if (this.data[y][x]) {
@@ -244,7 +266,11 @@ class Edit {
       }
     });
 
-    this.game_id = new URL(window.location.href).searchParams.get('game') || undefined;
+    const gameId = new URL(window.location.href).searchParams.get('game');
+    if (!gameId) {
+      throw new Error();
+    }
+    this.game_id = gameId;
     this.needs_publish = false;
     const default_spec = {width: 20, height: 20};
 
@@ -253,14 +279,17 @@ class Edit {
           this.games_db, this.game_id,
           game => {
             this.spec = game.spec;
+            if (typeof game.grid_data !== 'object') {
+              throw new Error();
+            }
             this.data = game.grid_data;
             this.name = game.name;
             this.style = game.style;
-            this.needs_publish = game.needs_publish;
+            this.needs_publish = game.needs_publish || false;
             this.renderer = new Renderer(svg, this.spec);
             this.repaint();
           },
-          error => {
+          () => {
             this.makeNewGame(default_spec, true);
           });
     } else {
@@ -271,7 +300,7 @@ class Edit {
 
   getData() {
     return {
-      grid_data: this.data,
+      grid_data: this.data as string | boolean[][],
       spec: this.spec,
       name: this.name,
       style: this.style,
@@ -292,8 +321,13 @@ class Edit {
   repaint() {
     const title = document.getElementById('title');
     const grid_size = document.getElementById('grid_size');
+    const color_scheme = document.getElementById('color_scheme');
+    const publish = document.getElementById('publish');
+    const color_scheme_stylesheet = document.getElementById('color_scheme_stylesheet');
 
-    if (!title || !grid_size) {
+    if (!title || !(grid_size instanceof HTMLSelectElement) ||
+        !(color_scheme instanceof HTMLSelectElement) || !this.renderer || !publish ||
+        !(color_scheme_stylesheet instanceof HTMLLinkElement)) {
       throw new Error();
     }
     title.textContent = this.name;
@@ -303,23 +337,21 @@ class Edit {
 
     grid_size.value =
         `{"width": ${this.spec.width}, "height": ${this.spec.height}}`;
-    const color_scheme = document.getElementById('color_scheme');
+
     color_scheme.value = this.style;
-    const publish = document.getElementById('publish');
+
     if (this.needs_publish) {
       publish.removeAttribute('disabled');
     } else {
       publish.setAttribute('disabled', '');
     }
     if (this.setStyle !== this.style) {
-      const color_scheme_stylesheet =
-          document.getElementById('color_scheme_stylesheet');
       color_scheme_stylesheet.href = `/styles/color_schemes/${this.style}.css`;
       this.setStyle = this.style;
     }
   }
 
-  makeNewGame(spec, replace) {
+  makeNewGame(spec: Spec, replace: boolean) {
     const random = Alea();
     this.game_id = `draft${random() * 10000 | 0}`;
     const url = `edit?game=${this.game_id}`;

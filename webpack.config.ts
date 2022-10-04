@@ -6,7 +6,7 @@ export default function config(env: any, argv: any) {
   const configuration: webpack.Configuration = {
     entry: {
       edit: {
-        import: './src/client/edit.js'
+        import: './src/client/edit.ts'
       },
       list: {
         import: './src/client/list.js'
