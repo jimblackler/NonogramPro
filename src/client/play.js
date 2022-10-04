@@ -1,5 +1,5 @@
 import {Analyze} from '/src/client/analyze.js';
-import {CompletedDb} from '/src/client/db/completed_db.js';
+import {CompletedDb} from './db/completed_db';
 import {GamesDb} from './db/games_db';
 import {PlaysDb} from './db/plays_db';
 import {get_game} from '/src/client/fetch_game.js';

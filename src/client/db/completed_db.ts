@@ -1,5 +1,9 @@
+import {ClientGame} from '../../common/clientGame';
+
 export class CompletedDb {
-  withStore(type, callback) {
+  private db: Promise<IDBDatabase> | undefined;
+
+  withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
     if (!this.db) {
       this.db = new Promise((resolve, reject) => {
         const request = indexedDB.open('completed-store', 1);
@@ -16,7 +20,7 @@ export class CompletedDb {
     }
 
     return this.db.then(db => {
-      return new Promise((resolve, reject) => {
+      return new Promise<void>((resolve, reject) => {
         const transaction = db.transaction('completed', type);
         transaction.onerror = () => reject(transaction.error);
         transaction.oncomplete = () => resolve();
@@ -25,11 +29,11 @@ export class CompletedDb {
     });
   }
 
-  set(game_id, data) {
+  set(game_id: string, data: ClientGame) {
     return this.withStore('readwrite', store => store.put(data, game_id));
   }
 
-  list(handler) {
+  list(handler: () => IDBRequest) {
     return this.withStore('readonly', store => {
       store.openCursor.call(store).onsuccess = handler;
     })
