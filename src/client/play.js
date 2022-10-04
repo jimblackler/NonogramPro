@@ -2,7 +2,7 @@ import {Analyze} from './analyze';
 import {CompletedDb} from './db/completed_db';
 import {GamesDb} from './db/games_db';
 import {PlaysDb} from './db/plays_db';
-import {get_game} from '/src/client/fetch_game.js';
+import {get_game} from './fetch_game';
 import {Generate} from './generate';
 import {generateClues} from '/src/client/generate_clues.js';
 import {plotLine} from './plot_line';

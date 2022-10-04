@@ -2,7 +2,7 @@ import {Analyze} from './analyze';
 import {GamesDb} from './db/games_db';
 import {decode} from './decoder';
 import {encode} from './encoder';
-import {get_game} from '/src/client/fetch_game.js';
+import {get_game} from './fetch_game';
 import {Generate} from './generate';
 import {generateClues} from '/src/client/generate_clues.js';
 import {plotLine} from './plot_line';

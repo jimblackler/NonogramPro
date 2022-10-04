@@ -1,9 +1,16 @@
+import {ClientGame} from '../common/clientGame';
+import {GamesDb} from './db/games_db';
 import {decode} from './decoder';
 import {request} from './request';
 
-function get_game_internet(games_db, game_id, resolve, reject) {
+function get_game_internet(
+    games_db: GamesDb, game_id: string, resolve: (game: ClientGame) => void, reject: () => void) {
   request(`/games?id=${game_id}`, 'GET', {}, evt => {
-    const obj = JSON.parse(evt.target.response);
+    const target = evt.target;
+    if (!(target instanceof XMLHttpRequest)) {
+      throw new Error();
+    }
+    const obj = JSON.parse(target.response);
     if (obj.results.length === 1) {
       const game = obj.results[0].data;
       game.grid_data = decode(game.spec, game.grid_data);
@@ -16,7 +23,8 @@ function get_game_internet(games_db, game_id, resolve, reject) {
   });
 }
 
-export function get_game(games_db, game_id, resolve, reject) {
+export function get_game(
+    games_db: GamesDb, game_id: string, resolve: (game: ClientGame) => void, reject: () => void) {
   games_db.get(game_id).then(game => {
     if (game) {
       resolve(game);

@@ -1,6 +1,6 @@
 // TODO: replace with 'axios'.
 export function request(url: string, method: string, data: any,
-                        onloadend: (ev: ProgressEvent) => void) {
+                        onloadend: (ev: ProgressEvent<EventTarget>) => void) {
   const xhr = new XMLHttpRequest();
   xhr.open(method, url, true);
   xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
