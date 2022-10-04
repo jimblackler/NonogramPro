@@ -29,7 +29,7 @@ export class Renderer {
   private readonly squares: SVGGElement;
   private readonly crosses: SVGGElement;
 
-  constructor(svg: SVGElement, spec: Spec, dimensions?: Dimensions) {
+  constructor(svg: SVGSVGElement, spec: Spec, dimensions?: Dimensions) {
     if (!dimensions) {
       dimensions = {cell_size: 25, ratio_for_clues: 0.42};
     }
@@ -246,7 +246,7 @@ export class Renderer {
     }
   }
 
-  paintOnSquares(on: boolean[][], prior_on: boolean[][]) {
+  paintOnSquares(on: boolean[][], prior_on?: boolean[][]) {
     const cell_size = this.dimensions.cell_size;
     while (this.squares.firstChild) {
       this.squares.removeChild(this.squares.firstChild);
