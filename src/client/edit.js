@@ -66,7 +66,6 @@ class Edit {
       window.location.href = `/play?game=${this.game_id}`;
     });
 
-
     analyze.addEventListener('click', evt => {
       let clues = generateClues(this.spec, this.data);
       Analyze.visualAnalyze(this.spec, clues);
