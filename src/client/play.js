@@ -19,6 +19,9 @@ class Play {
     get_game(
         this.games_db, this.game_id,
         result => {
+          if (typeof result.grid_data !== 'object') {
+            throw new Error();
+          }
           this.spec = result.spec;
           this.data = result.grid_data;
           this.style = result.style;

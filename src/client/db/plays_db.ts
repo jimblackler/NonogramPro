@@ -1,4 +1,7 @@
-import {ClientGame} from '../../common/clientGame';
+interface PlayInDb {
+  on: boolean[][];
+  off: boolean[][];
+}
 
 export class PlaysDb {
   private db: Promise<IDBDatabase> | undefined;
@@ -24,14 +27,14 @@ export class PlaysDb {
     });
   }
 
-  set(game_id: string, data: ClientGame) {
+  set(game_id: string, data: PlayInDb) {
     return this.withStore('readwrite', store => store.put(data, game_id));
   }
 
   get(game_id: string) {
     let request: any;  // TODO: replace with local promise.
     return this.withStore('readonly', store => request = store.get(game_id))
-        .then(() => request.result);
+        .then(() => request.result as PlayInDb);
   }
 
   list(handler: () => IDBRequest) {

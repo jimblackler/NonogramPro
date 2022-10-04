@@ -271,7 +271,7 @@ export class Renderer {
     }
   }
 
-  paintOffSquares(off: boolean[][], priorOff: boolean[][]) {
+  paintOffSquares(off: boolean[][], priorOff?: boolean[][]) {
     const cell_size = this.dimensions.cell_size;
     while (this.crosses.firstChild) {
       this.crosses.removeChild(this.crosses.firstChild);

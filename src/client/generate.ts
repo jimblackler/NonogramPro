@@ -2,7 +2,7 @@ import Alea from 'alea';
 import {Spec} from '../common/spec';
 
 export class Generate {
-  static getEmpty(spec: Spec) {
+  static getEmpty(spec: Spec): boolean[][] {
     const data = [];
     for (let y = 0; y < spec.height; y++) {
       const row = [];

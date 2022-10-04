@@ -1,4 +1,6 @@
-import {ClientGame} from '../../common/clientGame';
+interface Complete {
+
+}
 
 export class CompletedDb {
   private db: Promise<IDBDatabase> | undefined;
@@ -29,7 +31,7 @@ export class CompletedDb {
     });
   }
 
-  set(game_id: string, data: ClientGame) {
+  set(game_id: string, data: Complete) {
     return this.withStore('readwrite', store => store.put(data, game_id));
   }
 
