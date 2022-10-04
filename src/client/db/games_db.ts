@@ -1,4 +1,4 @@
-import {ClientGame} from '../../common/clientGame';
+import {ClientGame, ClientGameData} from '../../common/clientGame';
 
 export class GamesDb {
   private db: Promise<IDBDatabase> | undefined;
@@ -37,7 +37,7 @@ export class GamesDb {
     });
   }
 
-  set(game_id: string, data: ClientGame) {
+  set(game_id: string, data: ClientGameData) {
     return this.withStore('readwrite', store => store.put(data, game_id));
   }
 
