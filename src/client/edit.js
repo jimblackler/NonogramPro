@@ -84,12 +84,16 @@ class Edit {
       data.grid_data = encode(data.grid_data);
       data.game_id = this.game_id;
       request('/publish', 'POST', data, evt => {
-        if (!evt.target.response) {
+        const target = evt.target;
+        if (!(target instanceof XMLHttpRequest)) {
+          throw new Error();
+        }
+        if (!target.response) {
           alert('failure');
           return;
         }
 
-        const obj = JSON.parse(evt.target.response);
+        const obj = JSON.parse(target.response);
         if (obj.login) {
           window.location.href = obj.login;
         } else if (obj.exception) {
