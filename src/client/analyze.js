@@ -1,5 +1,6 @@
 import {Generate} from '/src/client/generate.js';
 import {Renderer} from '/src/client/renderer.js';
+require('/src/client/dialog.js');
 
 function analyzeSequence(
     clue, clue_idx, on, off, start, max_start, u_size, v, horizontal, infer_on,
