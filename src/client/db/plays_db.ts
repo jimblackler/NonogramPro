@@ -27,13 +27,13 @@ export class PlaysDb {
     });
   }
 
-  set(game_id: string, data: PlayInDb) {
-    return this.withStore('readwrite', store => store.put(data, game_id));
+  set(gameId: string, data: PlayInDb) {
+    return this.withStore('readwrite', store => store.put(data, gameId));
   }
 
-  get(game_id: string) {
+  get(gameId: string) {
     let request: any;  // TODO: replace with local promise.
-    return this.withStore('readonly', store => request = store.get(game_id))
+    return this.withStore('readonly', store => request = store.get(gameId))
         .then(() => request.result as PlayInDb);
   }
 
