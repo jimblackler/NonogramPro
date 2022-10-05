@@ -98,9 +98,10 @@ function analyzeSequence(
 }
 
 function analyzeLine(
-    clue: number[], on: boolean[][], off: boolean[][], v: number, u_size: number, horizontal: boolean,
-    infer_on: boolean[] | undefined, infer_off: boolean[] | undefined, complete?: number[]) {
-  let max_start = u_size;
+    clue: number[], on: boolean[][], off: boolean[][], v: number, uSize: number,
+    horizontal: boolean, inferOn: boolean[] | undefined, inferOff: boolean[] | undefined,
+    complete?: number[]) {
+  let max_start = uSize;
   let spacer = 0;
   for (let idx = 0; idx < clue.length; idx++) {
     max_start -= clue[idx];
@@ -109,8 +110,8 @@ function analyzeLine(
   }
 
   return analyzeSequence(
-      clue, 0, on, off, 0, max_start, u_size, v, horizontal, infer_on,
-      infer_off, complete);
+      clue, 0, on, off, 0, max_start, uSize, v, horizontal, inferOn,
+      inferOff, complete);
 }
 
 function analyzePass(
