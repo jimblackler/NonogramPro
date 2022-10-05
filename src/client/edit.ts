@@ -1,3 +1,4 @@
+import Alea from 'alea';
 import {Spec} from '../common/spec';
 import {Analyze} from './analyze';
 import {GamesDb} from './db/games_db';
@@ -9,7 +10,6 @@ import {generateClues} from './generate_clues';
 import {plotLine} from './plot_line';
 import {Renderer} from './renderer';
 import {request} from './request';
-import Alea from 'alea';
 
 class Edit {
   private readonly games_db: GamesDb;
