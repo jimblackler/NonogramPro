@@ -25,22 +25,22 @@ function analyzeSequence(
   }
 
   let viable = false;
-  const block_length = clue[clueIdx];
-  let run_length = 0;
-  let stop_scan = maxStart + block_length;
-  for (let u = start; u < stop_scan; u++) {
+  const blockLength = clue[clueIdx];
+  let runLength = 0;
+  let stopScan = maxStart + blockLength;
+  for (let u = start; u < stopScan; u++) {
     if (horizontal ? off[v][u] : off[u][v]) {
-      run_length = 0;
+      runLength = 0;
       continue;
     }
     if (horizontal ? on[v][u] : on[u][v]) {
-      if (u + block_length < stop_scan) {
-        stop_scan = u + block_length;
+      if (u + blockLength < stopScan) {
+        stopScan = u + blockLength;
       }
     }
 
-    run_length += 1;
-    if (run_length < block_length) {
+    runLength += 1;
+    if (runLength < blockLength) {
       // Block not long enough.
       continue;
     }
@@ -49,7 +49,7 @@ function analyzeSequence(
       continue;
     }
     if (!analyzeSequence(
-        clue, clueIdx + 1, on, off, u + 2, maxStart + block_length + 1,
+        clue, clueIdx + 1, on, off, u + 2, maxStart + blockLength + 1,
         uSize, v, horizontal, inferOn, inferOff, complete)) {
       // No solutions for the rest of the sequence.
       continue;
@@ -57,10 +57,10 @@ function analyzeSequence(
 
     viable = true;
 
-    const block_start = u - block_length + 1;
+    const blockStart = u - blockLength + 1;
     if (complete) {
       let filled = true;
-      for (let u0 = block_start; u0 <= u && filled; u0++) {
+      for (let u0 = blockStart; u0 <= u && filled; u0++) {
         if (horizontal ? !on[v][u0] : !on[u0][v]) {
           filled = false;
         }
@@ -68,8 +68,8 @@ function analyzeSequence(
       if (!filled) {
         complete[clueIdx] = -3;
       } else if (complete[clueIdx] === -1) {
-        complete[clueIdx] = block_start;
-      } else if (complete[clueIdx] !== block_start) {
+        complete[clueIdx] = blockStart;
+      } else if (complete[clueIdx] !== blockStart) {
         complete[clueIdx] = -2;
       }
     }
@@ -85,7 +85,7 @@ function analyzeSequence(
       inferOn[u + 1] = false;
     }
     let u0 = u;
-    while (u0 >= block_start) {
+    while (u0 >= blockStart) {
       inferOff[u0] = false;
       u0--;
     }
@@ -101,42 +101,40 @@ function analyzeLine(
     clue: number[], on: boolean[][], off: boolean[][], v: number, uSize: number,
     horizontal: boolean, inferOn: boolean[] | undefined, inferOff: boolean[] | undefined,
     complete?: number[]) {
-  let max_start = uSize;
+  let maxStart = uSize;
   let spacer = 0;
   for (let idx = 0; idx < clue.length; idx++) {
-    max_start -= clue[idx];
-    max_start -= spacer;
+    maxStart -= clue[idx];
+    maxStart -= spacer;
     spacer = 1;
   }
 
   return analyzeSequence(
-      clue, 0, on, off, 0, max_start, uSize, v, horizontal, inferOn,
+      clue, 0, on, off, 0, maxStart, uSize, v, horizontal, inferOn,
       inferOff, complete);
 }
 
 function analyzePass(
     spec: Spec, clues: number[][][], on: boolean[][], off: boolean[][], horizontal: boolean) {
-  const u_size = horizontal ? spec.width : spec.height;
-  const v_size = horizontal ? spec.height : spec.width;
-  for (let v = 0; v < v_size; v++) {
-    const infer_on = [];
-    const infer_off = [];
-    for (let u = 0; u < u_size; u++) {
-      infer_on.push(true);
-      infer_off.push(true);
+  const uSize = horizontal ? spec.width : spec.height;
+  const vSize = horizontal ? spec.height : spec.width;
+  for (let v = 0; v < vSize; v++) {
+    const inferOn = [];
+    const inferOff = [];
+    for (let u = 0; u < uSize; u++) {
+      inferOn.push(true);
+      inferOff.push(true);
     }
-    analyzeLine(
-        clues[horizontal ? 0 : 1][v], on, off, v, u_size, horizontal, infer_on,
-        infer_off);
-    for (let u = 0; u < u_size; u++) {
-      if (infer_on[u]) {
-        console.assert(!infer_off[u]);
+    analyzeLine(clues[horizontal ? 0 : 1][v], on, off, v, uSize, horizontal, inferOn, inferOff);
+    for (let u = 0; u < uSize; u++) {
+      if (inferOn[u]) {
+        console.assert(!inferOff[u]);
         if (horizontal) {
           on[v][u] = true;
         } else {
           on[u][v] = true;
         }
-      } else if (infer_off[u]) {
+      } else if (inferOff[u]) {
         if (horizontal) {
           off[v][u] = true;
         } else {
@@ -159,8 +157,8 @@ function draw(
 
 export class Analyze {
   static analyze(spec: Spec, clues: number[][][],
-                 per_round: (on: boolean[][], priorOn: boolean[][], off: boolean[][],
-                             priorOff: boolean[][]) => void) {
+                 perRound: (on: boolean[][], priorOn: boolean[][], off: boolean[][],
+                            priorOff: boolean[][]) => void) {
     const on = Generate.getEmpty(spec);
     const off = Generate.getEmpty(spec);
     let failed = 0;
@@ -179,7 +177,7 @@ export class Analyze {
       } else {
         failed = 0;
       }
-      per_round(on, priorOn, off, priorOff);
+      perRound(on, priorOn, off, priorOff);
 
       if (Generate.complete(on, off)) {
         return rounds;
@@ -207,10 +205,8 @@ export class Analyze {
     const header = document.createElement('header');
     div.appendChild(header);
 
-    let difficulty = Analyze.analyze(
-        spec, clues,
-        (on, priorOn, off, priorOff) =>
-            div.appendChild(draw(spec, on, priorOn, off, priorOff)));
+    let difficulty = Analyze.analyze(spec, clues,
+        (on, priorOn, off, priorOff) => div.appendChild(draw(spec, on, priorOn, off, priorOff)));
 
     let phrase;
     if (difficulty === -1) {
@@ -225,38 +221,37 @@ export class Analyze {
     div.style.width = div.offsetWidth + 'px';  // Fix width for dragging.
   }
 
-  static checkRow(spec: Spec, on: boolean[][], off: boolean[][], row: number, clue: number[], complete: number[]) {
-    return analyzeLine(
-        clue, on, off, row, spec.height, true, undefined, undefined, complete);
+  static checkRow(spec: Spec, on: boolean[][], off: boolean[][], row: number, clue: number[],
+                  complete: number[]) {
+    return analyzeLine(clue, on, off, row, spec.height, true, undefined, undefined, complete);
   }
 
-  static checkColumn(spec: Spec, on: boolean[][], off: boolean[][], column: number, clue: number[], complete: number[]) {
-    return analyzeLine(
-        clue, on, off, column, spec.width, false, undefined, undefined,
-        complete);
+  static checkColumn(spec: Spec, on: boolean[][], off: boolean[][], column: number, clue: number[],
+                     complete: number[]) {
+    return analyzeLine(clue, on, off, column, spec.width, false, undefined, undefined, complete);
   }
 
   static findHint(spec: Spec, clues: number[][][], on: boolean[][], off: boolean[][]) {
-    let max_inferable = 0;
+    let maxInferable = 0;
     let results = [-1, -1];
     for (let pass = 0; pass < 2; pass++) {
       const horizontal = pass === 0;
-      const u_size = horizontal ? spec.width : spec.height;
-      const v_size = horizontal ? spec.height : spec.width;
-      for (let v = 0; v < v_size; v++) {
-        const infer_on = [];
-        const infer_off = [];
-        for (let u = 0; u < u_size; u++) {
-          infer_on.push(true);
-          infer_off.push(true);
+      const uSize = horizontal ? spec.width : spec.height;
+      const vSize = horizontal ? spec.height : spec.width;
+      for (let v = 0; v < vSize; v++) {
+        const inferOn = [];
+        const inferOff = [];
+        for (let u = 0; u < uSize; u++) {
+          inferOn.push(true);
+          inferOff.push(true);
         }
         analyzeLine(
-            clues[horizontal ? 0 : 1][v], on, off, v, u_size, horizontal,
-            infer_on, infer_off);
+            clues[horizontal ? 0 : 1][v], on, off, v, uSize, horizontal,
+            inferOn, inferOff);
         let inferable = 0;
-        for (let u = 0; u < u_size; u++) {
-          if (infer_on[u]) {
-            console.assert(!infer_off[u]);
+        for (let u = 0; u < uSize; u++) {
+          if (inferOn[u]) {
+            console.assert(!inferOff[u]);
             if (horizontal) {
               if (!on[v][u]) {
                 inferable++;
@@ -266,7 +261,7 @@ export class Analyze {
                 inferable++;
               }
             }
-          } else if (infer_off[u]) {
+          } else if (inferOff[u]) {
             if (horizontal) {
               if (!off[v][u]) {
                 inferable++;
@@ -278,8 +273,8 @@ export class Analyze {
             }
           }
         }
-        if (inferable > max_inferable) {
-          max_inferable = inferable;
+        if (inferable > maxInferable) {
+          maxInferable = inferable;
           if (horizontal) {
             results = [v, -1];
           } else {
