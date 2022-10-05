@@ -53,7 +53,7 @@ export class GamesDb {
     })
   }
 
-  delete_item(gameId: string) {
+  deleteItem(gameId: string) {
     return this.withStore('readwrite', store => store.delete(gameId));
   }
 }

@@ -127,7 +127,7 @@ class Edit {
 
           this.needs_publish = false;
           if (this.game_id !== new_id) {
-            this.games_db.delete_item(this.game_id);
+            this.games_db.deleteItem(this.game_id);
             this.game_id = new_id;
             window.history.replaceState({}, '', `edit?game=${this.game_id}`);
           }
@@ -158,7 +158,7 @@ class Edit {
 
     delete_.addEventListener('click', evt => {
       // Local delete
-      this.games_db.delete_item(this.game_id);
+      this.games_db.deleteItem(this.game_id);
       // Remove delete
       request('/delete', 'POST', {game_id: this.game_id}, evt => {
         if (!(evt.target instanceof XMLHttpRequest)) {
