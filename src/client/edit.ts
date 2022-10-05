@@ -1,4 +1,5 @@
 import Alea from 'alea';
+import axios from 'axios';
 import {Spec} from '../common/spec';
 import {Analyze} from './analyze';
 import {GamesDb} from './db/gamesDb';
@@ -9,7 +10,6 @@ import {Generate} from './generate';
 import {generateClues} from './generateClues';
 import {plotLine} from './plotLine';
 import {Renderer} from './renderer';
-import {request} from './request';
 
 class Edit {
   private readonly gamesDb: GamesDb;
@@ -101,42 +101,34 @@ class Edit {
         throw new Error();
       }
       data.grid_data = encode(data.grid_data);
-      request('/publish', 'POST', data, evt => {
-        const target = evt.target;
-        if (!(target instanceof XMLHttpRequest)) {
-          throw new Error();
-        }
-        if (!target.response) {
-          alert('failure');
-          return;
-        }
+      axios.post('/publish', data)
+          .then(response => response.data)
+          .then(obj => {
+            if (obj.login) {
+              window.location.href = obj.login;
+            } else if (obj.exception) {
+              alert(obj.exception);
+            } else {
+              const game = obj.game.data;
+              const newId = obj.game.key;
+              if (typeof game.grid_data != 'string') {
+                throw new Error();
+              }
 
-        const obj = JSON.parse(target.response);
-        if (obj.login) {
-          window.location.href = obj.login;
-        } else if (obj.exception) {
-          alert(obj.exception);
-        } else {
-          const game = obj.game.data;
-          const newId = obj.game.key;
-          if (typeof game.grid_data != 'string') {
-            throw new Error();
-          }
+              game.grid_data = decode(game.spec, game.grid_data);
 
-          game.grid_data = decode(game.spec, game.grid_data);
+              this.needsPublish = false;
+              if (this.gameId !== newId) {
+                this.gamesDb.deleteItem(this.gameId);
+                this.gameId = newId;
+                window.history.replaceState({}, '', `edit?game=${this.gameId}`);
+              }
+              this.gamesDb.set(this.gameId, game);
+              publish.setAttribute('disabled', '');
 
-          this.needsPublish = false;
-          if (this.gameId !== newId) {
-            this.gamesDb.deleteItem(this.gameId);
-            this.gameId = newId;
-            window.history.replaceState({}, '', `edit?game=${this.gameId}`);
-          }
-          this.gamesDb.set(this.gameId, game);
-          publish.setAttribute('disabled', '');
-
-          alert(`Difficulty ${game.difficulty}`);
-        }
-      });
+              alert(`Difficulty ${game.difficulty}`);
+            }
+          });
     });
 
     cancel.addEventListener('click', evt => {
@@ -161,15 +153,11 @@ class Edit {
       // Local delete
       this.gamesDb.deleteItem(this.gameId);
       // Remove delete
-      request('/delete', 'POST', {game_id: this.gameId}, evt => {
-        if (!(evt.target instanceof XMLHttpRequest)) {
-          throw new Error();
-        }
-        if (!evt.target.response) {
-          alert('failure');
-        }
-        window.location.href = window.location.origin;
-      });
+      axios.post('/delete', {game_id: this.gameId})
+          .then(response => response.data)
+          .then(obj => {
+            window.location.href = window.location.origin;
+          });
     });
 
     gridSize.addEventListener('change', evt => {
