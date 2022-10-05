@@ -5,14 +5,14 @@ import {decode} from './decoder';
 import {request} from './request';
 
 class List {
-  private games_db: GamesDb;
-  private plays_db: PlaysDb;
+  private gamesDb: GamesDb;
+  private playsDb: PlaysDb;
 
   constructor() {
-    this.games_db = new GamesDb();
-    this.plays_db = new PlaysDb();
+    this.gamesDb = new GamesDb();
+    this.playsDb = new PlaysDb();
     const plays = new Set();
-    this.plays_db.list(evt => {
+    this.playsDb.list(evt => {
       const currentTarget = evt.currentTarget;
       if (!(currentTarget instanceof IDBRequest)) {
         throw new Error();
@@ -27,7 +27,7 @@ class List {
           throw new Error();
         }
         if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
-          this.games_db.list(evt => {
+          this.gamesDb.list(evt => {
             const currentTarget = evt.currentTarget;
             if (!(currentTarget instanceof IDBRequest)) {
               throw new Error();
@@ -51,7 +51,7 @@ class List {
               // We write the incoming games to the local database (which needs
               // the grid decoding). Might not always be desirable.
               game.data.grid_data = decode(game.data.spec, game.data.grid_data);
-              this.games_db.set(game.key, game.data);
+              this.gamesDb.set(game.key, game.data);
             }
           });
         }
