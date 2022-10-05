@@ -30,14 +30,12 @@ export class GamesDb {
   }
 
   private withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
-    return this.dbPromise().then(db => {
-      return new Promise<void>((resolve, reject) => {
-        const transaction = db.transaction('games', type);
-        transaction.onerror = () => reject(transaction.error);
-        transaction.oncomplete = () => resolve();
-        callback(transaction.objectStore('games'));
-      });
-    });
+    return this.dbPromise().then(db => new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction('games', type);
+      transaction.onerror = () => reject(transaction.error);
+      transaction.oncomplete = () => resolve();
+      callback(transaction.objectStore('games'));
+    }));
   }
 
   set(gameId: string, data: ClientGameData) {

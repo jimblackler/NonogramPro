@@ -21,15 +21,12 @@ export class PlaysDb {
   }
 
   private withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
-    const db1 = this.dbPromise();
-    return db1.then(db => {
-      return new Promise<void>((resolve, reject) => {
-        const transaction = db.transaction('plays', type);
-        transaction.onerror = () => reject(transaction.error);
-        transaction.oncomplete = () => resolve();
-        callback(transaction.objectStore('plays'));
-      });
-    });
+    return this.dbPromise().then(db => new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction('plays', type);
+      transaction.onerror = () => reject(transaction.error);
+      transaction.oncomplete = () => resolve();
+      callback(transaction.objectStore('plays'));
+    }));
   }
 
   set(gameId: string, data: PlayInDb) {

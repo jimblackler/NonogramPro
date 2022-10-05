@@ -24,14 +24,12 @@ export class CompletedDb {
   }
 
   private withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
-    return this.dbPromise().then(db => {
-      return new Promise<void>((resolve, reject) => {
-        const transaction = db.transaction('completed', type);
-        transaction.onerror = () => reject(transaction.error);
-        transaction.oncomplete = () => resolve();
-        callback(transaction.objectStore('completed'));
-      });
-    });
+    return this.dbPromise().then(db => new Promise<void>((resolve, reject) => {
+      const transaction = db.transaction('completed', type);
+      transaction.onerror = () => reject(transaction.error);
+      transaction.oncomplete = () => resolve();
+      callback(transaction.objectStore('completed'));
+    }));
   }
 
   set(gameId: string, data: Complete) {
