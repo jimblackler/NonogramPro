@@ -12,7 +12,7 @@ export default function config(env: any, argv: any) {
         import: './src/client/list.ts'
       },
       play: {
-        import: './src/client/play.js'
+        import: './src/client/play.ts'
       }
     },
     module: {

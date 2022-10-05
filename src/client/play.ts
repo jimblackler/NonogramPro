@@ -1,3 +1,4 @@
+import {Spec} from '../common/spec';
 import {Analyze} from './analyze';
 import {CompletedDb} from './db/completed_db';
 import {GamesDb} from './db/games_db';
@@ -9,13 +10,34 @@ import {plotLine} from './plot_line';
 import {Renderer} from './renderer';
 
 class Play {
+  private readonly games_db: GamesDb;
+  private readonly plays_db: PlaysDb;
+  private readonly completed_db: CompletedDb;
+  private readonly game_id: string;
+  private row_lock: number | false = false;
+  private column_lock: number | false = false;
+  private spec: Spec = {width: 0, height: 0};
+  private clues: number[][][] = [];
+  private data: boolean[][] = [];
+  private style = '';
+  private renderer: Renderer | undefined;
+  private on: boolean[][] = [];
+  private off: boolean[][] = [];
+  private last_x = -1;
+  private last_y = -1;
+
   constructor() {
     this.games_db = new GamesDb();
     this.plays_db = new PlaysDb();
     this.completed_db = new CompletedDb();
     this.row_lock = false;
     this.column_lock = false;
-    this.game_id = new URL(window.location.href).searchParams.get('game') || undefined;
+    this.game_id = new URL(window.location.href).searchParams.get('game') || '';
+
+    const svg = document.getElementsByTagName('svg')[0];
+    if (!(svg instanceof SVGSVGElement)) {
+      throw new Error();
+    }
     get_game(
         this.games_db, this.game_id,
         result => {
@@ -27,13 +49,16 @@ class Play {
           this.style = result.style;
           this.on = Generate.getEmpty(this.spec);
           this.off = Generate.getEmpty(this.spec);
-          this.renderer = new Renderer(this.svg, this.spec);
+          this.renderer = new Renderer(svg, this.spec);
           const color_scheme_stylesheet = document.getElementById('color_scheme_stylesheet');
           if (!(color_scheme_stylesheet instanceof HTMLLinkElement)) {
             throw new Error();
           }
           color_scheme_stylesheet.href = `/styles/color_schemes/${this.style}.css`;
           const title = document.getElementById('title');
+          if (!title) {
+            throw new Error();
+          }
           title.textContent = result.name;
           this.clues = generateClues(this.spec, this.data);
           this.renderer.paintClues(this.clues);
@@ -47,7 +72,7 @@ class Play {
             this.fromScratch();
           });
         },
-        error => {
+        () => {
           alert('bad game');
         });
 
@@ -70,6 +95,9 @@ class Play {
     });
 
     hint.addEventListener('click', () => {
+      if (!this.renderer) {
+        throw new Error();
+      }
       this.renderer.setHighlightMode('hint');
       const hint = Analyze.findHint(this.spec, this.clues, this.on, this.off);
       this.renderer.setHighlightRow(hint[0]);
@@ -85,12 +113,14 @@ class Play {
 
     let action_mode = ActionMode.NOT_DRAWING;
 
-    this.svg = document.getElementsByTagName('svg')[0];
-    this.svg.addEventListener('contextmenu', evt => {
+    svg.addEventListener('contextmenu', evt => {
       evt.preventDefault();
     });
 
-    this.svg.addEventListener('mousedown', evt => {
+    svg.addEventListener('mousedown', evt => {
+      if (!this.renderer) {
+        throw new Error();
+      }
       this.renderer.mousedown(evt, (renderer, x, y, which, shiftKey) => {
         if (x >= 0 && x < this.spec.width && y >= 0 && y < this.spec.height) {
           if (which === 3 || shiftKey) {
@@ -130,11 +160,14 @@ class Play {
       });
     });
 
-    this.svg.addEventListener('mousemove', evt => {
+    svg.addEventListener('mousemove', evt => {
       if (!this.renderer) {
         return;
       }
       this.renderer.mousemove(evt, (renderer, x, y) => {
+        if (!this.renderer) {
+          throw new Error();
+        }
         if (action_mode !== ActionMode.NOT_DRAWING && x >= 0 &&
             x < this.spec.width && y >= 0 && y < this.spec.height) {
           if (this.row_lock === false && this.column_lock === false) {
@@ -156,8 +189,8 @@ class Play {
             y = this.row_lock;
           }
 
-          let column_modified = new Set();
-          let row_modified = new Set();
+          let column_modified = new Set<number>();
+          let row_modified = new Set<number>();
           let modified = false;
           for (let p of plotLine(this.last_x, this.last_y, x, y)) {
             if (action_mode === ActionMode.SETTING_ON) {
@@ -212,6 +245,9 @@ class Play {
     });
 
     document.addEventListener('mouseup', evt => {
+      if (!this.renderer) {
+        throw new Error();
+      }
       action_mode = ActionMode.NOT_DRAWING;
       this.row_lock = false;
       this.column_lock = false;
@@ -228,7 +264,10 @@ class Play {
     });
   }
 
-  checkColumn(column) {
+  checkColumn(column: number) {
+    if (!this.renderer) {
+      throw new Error();
+    }
     const clue = this.clues[1][column];
     const complete = [];
     while (complete.length < clue.length) {
@@ -239,7 +278,10 @@ class Play {
     this.renderer.setColumnValid(column, valid, complete);
   }
 
-  checkRow(row) {
+  checkRow(row: number) {
+    if (!this.renderer) {
+      throw new Error();
+    }
     const clue = this.clues[0][row];
     const complete = [];
     while (complete.length < clue.length) {
@@ -251,15 +293,22 @@ class Play {
   }
 
   repaint() {
+    if (!this.renderer) {
+      throw new Error();
+    }
+    const svg = document.getElementsByTagName('svg')[0];
+    if (!(svg instanceof SVGSVGElement)) {
+      throw new Error();
+    }
     this.plays_db.set(this.game_id, {on: this.on, off: this.off});
     this.renderer.paintOnSquares(this.on);
     this.renderer.paintOffSquares(this.off);
     /* Check is complete */
     if (Generate.equals(this.on, this.data)) {
-      this.svg.classList.add('game_complete');
+      svg.classList.add('game_complete');
       this.completed_db.set(this.game_id, {});
     } else {
-      this.svg.classList.remove('game_complete');
+      svg.classList.remove('game_complete');
     }
   }
 
