@@ -7,7 +7,7 @@ body {
 }
 
 body, button, a, select {
-    color: white;
+  color: white;
 }
 
 button, a.link_button, select {
@@ -40,7 +40,7 @@ text.complete, tspan.complete {
 }
 
 rect.even, rect.odd {
-    opacity: 0.4;
+  opacity: 0.4;
 }
 
 rect.even, rect.odd {
