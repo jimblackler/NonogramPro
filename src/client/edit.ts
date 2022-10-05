@@ -22,8 +22,8 @@ class Edit {
   private spec: Spec = {width: 0, height: 0};
   private style = '';
   private setStyle = '';
-  private lastX = 0;
-  private lastY = 0;
+  private lastX = -1;
+  private lastY = -1;
 
   constructor() {
     this.games_db = new GamesDb();
