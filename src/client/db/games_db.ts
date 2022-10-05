@@ -1,4 +1,4 @@
-import {ClientGame, ClientGameData} from '../../common/clientGame';
+import {ClientGameData} from '../../common/clientGame';
 
 export class GamesDb {
   private db: Promise<IDBDatabase> | undefined;
