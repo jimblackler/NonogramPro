@@ -1,8 +1,8 @@
+import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
 import {GamesDb} from './db/gamesDb';
 import {PlaysDb} from './db/playsDb';
 import {decode} from './decoder';
-import {request} from './request';
 
 class List {
   private gamesDb: GamesDb;
@@ -40,20 +40,17 @@ class List {
             }
           });
         } else {
-          request('/games', 'GET', {}, evt => {
-            const target = evt.target;
-            if (!(target instanceof XMLHttpRequest)) {
-              throw new Error();
-            }
-            const obj = JSON.parse(target.response);
-            for (let game of obj.results) {
-              List.addGame(game.key, game.data, plays.has(game.key), list);
-              // We write the incoming games to the local database (which needs
-              // the grid decoding). Might not always be desirable.
-              game.data.grid_data = decode(game.data.spec, game.data.grid_data);
-              this.gamesDb.set(game.key, game.data);
-            }
-          });
+          axios.get('/games')
+              .then(response => response.data)
+              .then(obj => {
+                for (let game of obj.results) {
+                  List.addGame(game.key, game.data, plays.has(game.key), list);
+                  // We write the incoming games to the local database (which needs
+                  // the grid decoding). Might not always be desirable.
+                  game.data.grid_data = decode(game.data.spec, game.data.grid_data);
+                  this.gamesDb.set(game.key, game.data);
+                }
+              });
         }
       }
     });
