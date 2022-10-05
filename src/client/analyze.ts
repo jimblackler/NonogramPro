@@ -1,6 +1,7 @@
 import {Spec} from '../common/spec';
 import {Generate} from './generate';
 import {Renderer} from './renderer';
+
 require('./dialog');
 
 function analyzeSequence(
@@ -48,8 +49,8 @@ function analyzeSequence(
       continue;
     }
     if (!analyzeSequence(
-            clue, clue_idx + 1, on, off, u + 2, max_start + block_length + 1,
-            u_size, v, horizontal, infer_on, infer_off, complete)) {
+        clue, clue_idx + 1, on, off, u + 2, max_start + block_length + 1,
+        u_size, v, horizontal, infer_on, infer_off, complete)) {
       // No solutions for the rest of the sequence.
       continue;
     }
