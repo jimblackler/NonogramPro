@@ -12,7 +12,7 @@ import {Renderer} from './renderer';
 import {request} from './request';
 
 class Edit {
-  private readonly games_db: GamesDb;
+  private readonly gamesDb: GamesDb;
 
   private renderer: Renderer | undefined;
   private data: boolean[][] = [];
@@ -26,7 +26,7 @@ class Edit {
   private lastY = -1;
 
   constructor() {
-    this.games_db = new GamesDb();
+    this.gamesDb = new GamesDb();
     const title = document.getElementById('title');
     const status = document.getElementById('status');
     const createNew = document.getElementById('create_new');
@@ -127,11 +127,11 @@ class Edit {
 
           this.needsPublish = false;
           if (this.gameId !== newId) {
-            this.games_db.deleteItem(this.gameId);
+            this.gamesDb.deleteItem(this.gameId);
             this.gameId = newId;
             window.history.replaceState({}, '', `edit?game=${this.gameId}`);
           }
-          this.games_db.set(this.gameId, game);
+          this.gamesDb.set(this.gameId, game);
           publish.setAttribute('disabled', '');
 
           alert(`Difficulty ${game.difficulty}`);
@@ -145,7 +145,7 @@ class Edit {
 
       // We don't have a local copy so must refresh from server. Requires
       // internet. May not be the best solution.
-      getGame(this.games_db, this.gameId, game => {
+      getGame(this.gamesDb, this.gameId, game => {
         if (typeof game.grid_data !== 'object') {
           throw new Error();
         }
@@ -159,7 +159,7 @@ class Edit {
 
     delete_.addEventListener('click', evt => {
       // Local delete
-      this.games_db.deleteItem(this.gameId);
+      this.gamesDb.deleteItem(this.gameId);
       // Remove delete
       request('/delete', 'POST', {game_id: this.gameId}, evt => {
         if (!(evt.target instanceof XMLHttpRequest)) {
@@ -273,7 +273,7 @@ class Edit {
 
     if (this.gameId) {
       getGame(
-          this.games_db, this.gameId,
+          this.gamesDb, this.gameId,
           game => {
             this.spec = game.spec;
             if (typeof game.grid_data !== 'object') {
@@ -312,7 +312,7 @@ class Edit {
           this.spec, generateClues(this.spec, this.data), () => {
           })
     };
-    this.games_db.set(this.gameId, data);
+    this.gamesDb.set(this.gameId, data);
   }
 
   repaint() {
