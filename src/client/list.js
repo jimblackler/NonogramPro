@@ -26,7 +26,11 @@ class List {
           });
         } else {
           request('/games', 'GET', {}, evt => {
-            const obj = JSON.parse(evt.currentTarget.response);
+            const target = evt.target;
+            if (!(target instanceof XMLHttpRequest)) {
+              throw new Error();
+            }
+            const obj = JSON.parse(target.response);
             for (let game of obj.results) {
               List.addGame(game.key, game.data, plays.has(game.key), list);
               // We write the incoming games to the local database (which needs
