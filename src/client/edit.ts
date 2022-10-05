@@ -267,11 +267,7 @@ class Edit {
       }
     });
 
-    const gameId = new URL(window.location.href).searchParams.get('game');
-    if (!gameId) {
-      throw new Error();
-    }
-    this.gameId = gameId;
+    this.gameId = new URL(window.location.href).searchParams.get('game') || '';
     this.needsPublish = false;
     const defaultSpec = {width: 20, height: 20};
 
