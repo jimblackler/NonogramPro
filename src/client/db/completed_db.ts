@@ -31,8 +31,8 @@ export class CompletedDb {
     });
   }
 
-  set(game_id: string, data: Complete) {
-    return this.withStore('readwrite', store => store.put(data, game_id));
+  set(gameId: string, data: Complete) {
+    return this.withStore('readwrite', store => store.put(data, gameId));
   }
 
   list(handler: () => IDBRequest) {

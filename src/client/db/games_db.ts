@@ -37,13 +37,13 @@ export class GamesDb {
     });
   }
 
-  set(game_id: string, data: ClientGameData) {
-    return this.withStore('readwrite', store => store.put(data, game_id));
+  set(gameId: string, data: ClientGameData) {
+    return this.withStore('readwrite', store => store.put(data, gameId));
   }
 
-  get(game_id: string) {
+  get(gameId: string) {
     let request: any;  // TODO: replace with local promise.
-    return this.withStore('readonly', store => request = store.get(game_id))
+    return this.withStore('readonly', store => request = store.get(gameId))
         .then(() => request.result as ClientGameData);
   }
 
@@ -53,7 +53,7 @@ export class GamesDb {
     })
   }
 
-  delete_item(game_id: string) {
-    return this.withStore('readwrite', store => store.delete(game_id));
+  delete_item(gameId: string) {
+    return this.withStore('readwrite', store => store.delete(gameId));
   }
 }
