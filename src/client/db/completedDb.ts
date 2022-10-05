@@ -23,7 +23,7 @@ export class CompletedDb {
     return this.db;
   }
 
-  withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
+  private withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
     return this.dbPromise().then(db => {
       return new Promise<void>((resolve, reject) => {
         const transaction = db.transaction('completed', type);

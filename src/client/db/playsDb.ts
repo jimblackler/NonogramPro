@@ -20,7 +20,7 @@ export class PlaysDb {
     return this.db;
   }
 
-  withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
+  private withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
     const db1 = this.dbPromise();
     return db1.then(db => {
       return new Promise<void>((resolve, reject) => {
