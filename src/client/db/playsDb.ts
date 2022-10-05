@@ -6,7 +6,7 @@ interface PlayInDb {
 export class PlaysDb {
   private db: Promise<IDBDatabase> | undefined;
 
-  withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
+  private dbPromise() {
     if (!this.db) {
       this.db = new Promise((resolve, reject) => {
         const request = indexedDB.open('plays-store', 1);
@@ -17,7 +17,12 @@ export class PlaysDb {
       });
     }
 
-    return this.db.then(db => {
+    return this.db;
+  }
+
+  withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
+    const db1 = this.dbPromise();
+    return db1.then(db => {
       return new Promise<void>((resolve, reject) => {
         const transaction = db.transaction('plays', type);
         transaction.onerror = () => reject(transaction.error);

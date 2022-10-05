@@ -5,7 +5,7 @@ interface Complete {
 export class CompletedDb {
   private db: Promise<IDBDatabase> | undefined;
 
-  withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
+  private dbPromise() {
     if (!this.db) {
       this.db = new Promise((resolve, reject) => {
         const request = indexedDB.open('completed-store', 1);
@@ -20,8 +20,11 @@ export class CompletedDb {
         request.onsuccess = () => resolve(request.result);
       });
     }
+    return this.db;
+  }
 
-    return this.db.then(db => {
+  withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
+    return this.dbPromise().then(db => {
       return new Promise<void>((resolve, reject) => {
         const transaction = db.transaction('completed', type);
         transaction.onerror = () => reject(transaction.error);

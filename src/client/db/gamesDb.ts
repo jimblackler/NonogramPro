@@ -3,7 +3,7 @@ import {ClientGameData} from '../../common/clientGame';
 export class GamesDb {
   private db: Promise<IDBDatabase> | undefined;
 
-  withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
+  private dbPromise() {
     if (!this.db) {
       this.db = new Promise((resolve, reject) => {
         const request = indexedDB.open('games-store', 2);
@@ -26,8 +26,11 @@ export class GamesDb {
         request.onsuccess = () => resolve(request.result);
       });
     }
+    return this.db;
+  }
 
-    return this.db.then(db => {
+  withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
+    return this.dbPromise().then(db => {
       return new Promise<void>((resolve, reject) => {
         const transaction = db.transaction('games', type);
         transaction.onerror = () => reject(transaction.error);
