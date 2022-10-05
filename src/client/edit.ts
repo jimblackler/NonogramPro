@@ -16,14 +16,14 @@ class Edit {
 
   private renderer: Renderer | undefined;
   private data: boolean[][] = [];
-  private game_id = '';
+  private gameId = '';
   private name = '';
-  private needs_publish = false;
+  private needsPublish = false;
   private spec: Spec = {width: 0, height: 0};
   private style = '';
   private setStyle = '';
-  private last_x = 0;
-  private last_y = 0;
+  private lastX = 0;
+  private lastY = 0;
 
   constructor() {
     this.games_db = new GamesDb();
@@ -66,7 +66,7 @@ class Edit {
       this.name = title.textContent || '';
       if (title.textContent === this.name) {
         title.textContent = this.name;
-        this.needs_publish = true;
+        this.needsPublish = true;
         this.saveLocal();
       }
     });
@@ -77,7 +77,7 @@ class Edit {
       window.location.href = 'edit';
     });
     play.addEventListener('click', evt => {
-      window.location.href = `/play?game=${this.game_id}`;
+      window.location.href = `/play?game=${this.gameId}`;
     });
 
     analyze.addEventListener('click', evt => {
@@ -93,7 +93,7 @@ class Edit {
       }
       const data = {
         ...this.getData(),
-        game_id: this.game_id
+        game_id: this.gameId
       };
       // We don't technically need to uuencode the grid at this stage, but
       // big boolean arrays aren't transport or server friendly.
@@ -125,13 +125,13 @@ class Edit {
 
           game.grid_data = decode(game.spec, game.grid_data);
 
-          this.needs_publish = false;
-          if (this.game_id !== new_id) {
-            this.games_db.deleteItem(this.game_id);
-            this.game_id = new_id;
-            window.history.replaceState({}, '', `edit?game=${this.game_id}`);
+          this.needsPublish = false;
+          if (this.gameId !== new_id) {
+            this.games_db.deleteItem(this.gameId);
+            this.gameId = new_id;
+            window.history.replaceState({}, '', `edit?game=${this.gameId}`);
           }
-          this.games_db.set(this.game_id, game);
+          this.games_db.set(this.gameId, game);
           publish.setAttribute('disabled', '');
 
           alert(`Difficulty ${game.difficulty}`);
@@ -145,7 +145,7 @@ class Edit {
 
       // We don't have a local copy so must refresh from server. Requires
       // internet. May not be the best solution.
-      get_game(this.games_db, this.game_id, game => {
+      get_game(this.games_db, this.gameId, game => {
         if (typeof game.grid_data !== 'object') {
           throw new Error();
         }
@@ -158,9 +158,9 @@ class Edit {
 
     delete_.addEventListener('click', evt => {
       // Local delete
-      this.games_db.deleteItem(this.game_id);
+      this.games_db.deleteItem(this.gameId);
       // Remove delete
-      request('/delete', 'POST', {game_id: this.game_id}, evt => {
+      request('/delete', 'POST', {game_id: this.gameId}, evt => {
         if (!(evt.target instanceof XMLHttpRequest)) {
           throw new Error();
         }
@@ -186,7 +186,7 @@ class Edit {
         throw new Error();
       }
       this.style = target.value;
-      this.needs_publish = true;
+      this.needsPublish = true;
       this.repaint();
       this.saveLocal();
     });
@@ -212,14 +212,14 @@ class Edit {
           if (this.data[y][x]) {
             drawMode = DrawMode.DELETING;
             this.data[y][x] = false;
-            this.needs_publish = true;
+            this.needsPublish = true;
           } else {
             drawMode = DrawMode.SETTING;
             this.data[y][x] = true;
-            this.needs_publish = true;
+            this.needsPublish = true;
           }
-          this.last_x = x;
-          this.last_y = y;
+          this.lastX = x;
+          this.lastY = y;
           this.repaint();
         }
       });
@@ -235,23 +235,23 @@ class Edit {
         }
         let modified = false;
         if (x >= 0 && x < this.spec.width && y >= 0 && y < this.spec.height) {
-          for (let p of plotLine(this.last_x, this.last_y, x, y)) {
+          for (let p of plotLine(this.lastX, this.lastY, x, y)) {
             if (drawMode === DrawMode.SETTING) {
               if (!this.data[p.y][p.x]) {
                 this.data[p.y][p.x] = true;
                 modified = true;
-                this.needs_publish = true;
+                this.needsPublish = true;
               }
             } else if (drawMode === DrawMode.DELETING) {
               if (this.data[p.y][p.x]) {
                 this.data[p.y][p.x] = false;
                 modified = true;
-                this.needs_publish = true;
+                this.needsPublish = true;
               }
             }
           }
-          this.last_x = x;
-          this.last_y = y;
+          this.lastX = x;
+          this.lastY = y;
           if (modified) {
             this.repaint();
           }
@@ -261,7 +261,7 @@ class Edit {
 
     document.addEventListener('mouseup', evt => {
       drawMode = DrawMode.NOT_DRAWING;
-      if (this.needs_publish) {
+      if (this.needsPublish) {
         this.saveLocal();
       }
     });
@@ -270,13 +270,13 @@ class Edit {
     if (!gameId) {
       throw new Error();
     }
-    this.game_id = gameId;
-    this.needs_publish = false;
+    this.gameId = gameId;
+    this.needsPublish = false;
     const default_spec = {width: 20, height: 20};
 
-    if (this.game_id) {
+    if (this.gameId) {
       get_game(
-          this.games_db, this.game_id,
+          this.games_db, this.gameId,
           game => {
             this.spec = game.spec;
             if (typeof game.grid_data !== 'object') {
@@ -285,7 +285,7 @@ class Edit {
             this.data = game.grid_data;
             this.name = game.name;
             this.style = game.style;
-            this.needs_publish = game.needs_publish || false;
+            this.needsPublish = game.needs_publish || false;
             this.renderer = new Renderer(svg, this.spec);
             this.repaint();
           },
@@ -310,12 +310,12 @@ class Edit {
   saveLocal() {
     const data = {
       ...this.getData(),
-      needs_publish: this.needs_publish,
+      needs_publish: this.needsPublish,
       difficulty: Analyze.analyze(
           this.spec, generateClues(this.spec, this.data), () => {
           })
     };
-    this.games_db.set(this.game_id, data);
+    this.games_db.set(this.gameId, data);
   }
 
   repaint() {
@@ -340,7 +340,7 @@ class Edit {
 
     color_scheme.value = this.style;
 
-    if (this.needs_publish) {
+    if (this.needsPublish) {
       publish.removeAttribute('disabled');
     } else {
       publish.setAttribute('disabled', '');
@@ -353,8 +353,8 @@ class Edit {
 
   makeNewGame(spec: Spec, replace: boolean) {
     const random = Alea();
-    this.game_id = `draft${random() * 10000 | 0}`;
-    const url = `edit?game=${this.game_id}`;
+    this.gameId = `draft${random() * 10000 | 0}`;
+    const url = `edit?game=${this.gameId}`;
     if (replace) {
       window.history.replaceState({}, '', url);
     } else {
