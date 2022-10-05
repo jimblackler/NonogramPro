@@ -3,9 +3,9 @@ import {GamesDb} from './db/games_db';
 import {decode} from './decoder';
 import {request} from './request';
 
-function get_game_internet(games_db: GamesDb, game_id: string,
-                           resolve: (game: ClientGameData) => void, reject: () => void) {
-  request(`/games?id=${game_id}`, 'GET', {}, evt => {
+function getGameInternet(gamesDb: GamesDb, gameId: string,
+                         resolve: (game: ClientGameData) => void, reject: () => void) {
+  request(`/games?id=${gameId}`, 'GET', {}, evt => {
     const target = evt.target;
     if (!(target instanceof XMLHttpRequest)) {
       throw new Error();
@@ -18,20 +18,20 @@ function get_game_internet(games_db: GamesDb, game_id: string,
       }
       game.grid_data = decode(game.spec, game.grid_data);
       game.needs_publish = false;
-      games_db.set(game_id, game).then(() => resolve(game));
+      gamesDb.set(gameId, game).then(() => resolve(game));
     } else {
       reject();
     }
   });
 }
 
-export function get_game(games_db: GamesDb, game_id: string,
-                         resolve: (game: ClientGameData) => void, reject: () => void) {
-  games_db.get(game_id).then(game => {
+export function getGame(gamesDb: GamesDb, gameId: string,
+                        resolve: (game: ClientGameData) => void, reject: () => void) {
+  gamesDb.get(gameId).then(game => {
     if (game) {
       resolve(game);
       return;
     }
-    get_game_internet(games_db, game_id, resolve, reject);
+    getGameInternet(gamesDb, gameId, resolve, reject);
   });
 }

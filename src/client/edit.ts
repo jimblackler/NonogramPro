@@ -4,7 +4,7 @@ import {Analyze} from './analyze';
 import {GamesDb} from './db/games_db';
 import {decode} from './decoder';
 import {encode} from './encoder';
-import {get_game} from './fetch_game';
+import {getGame} from './fetch_game';
 import {Generate} from './generate';
 import {generateClues} from './generate_clues';
 import {plotLine} from './plot_line';
@@ -145,7 +145,7 @@ class Edit {
 
       // We don't have a local copy so must refresh from server. Requires
       // internet. May not be the best solution.
-      get_game(this.games_db, this.gameId, game => {
+      getGame(this.games_db, this.gameId, game => {
         if (typeof game.grid_data !== 'object') {
           throw new Error();
         }
@@ -275,7 +275,7 @@ class Edit {
     const defaultSpec = {width: 20, height: 20};
 
     if (this.gameId) {
-      get_game(
+      getGame(
           this.games_db, this.gameId,
           game => {
             this.spec = game.spec;
