@@ -48,8 +48,7 @@ export class Renderer {
     this.topOffset = dimensions.ratio_for_clues * cellSize * spec.height;
 
     svg.setAttribute('width', this.leftOffset + spec.width * cellSize + 'px');
-    svg.setAttribute(
-        'height', this.topOffset + spec.height * cellSize + 'px');
+    svg.setAttribute('height', this.topOffset + spec.height * cellSize + 'px');
 
     const labels = document.createElementNS(xmlns, 'g');
     labels.classList.add('labels');
@@ -206,8 +205,8 @@ export class Renderer {
       rowLabelGroup.classList.add('valid');
       const rowLabel = document.createElementNS(xmlns, 'text');
       rowLabel.setAttribute('x', this.leftOffset - clue_to_grid_margin + 'px');
-      rowLabel.setAttribute('y', this.topOffset + y * cellSize +
-          cellSize * horizontal_clue_baseline_position + 'px');
+      rowLabel.setAttribute('y',
+          this.topOffset + y * cellSize + cellSize * horizontal_clue_baseline_position + 'px');
       const c2 = clues[0][y];
       for (let idx = 0; idx < c2.length; idx++) {
         const tspan = document.createElementNS(xmlns, 'tspan');
