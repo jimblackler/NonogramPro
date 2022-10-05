@@ -59,7 +59,7 @@ class List {
     });
   }
 
-  static addGame(key: string, game:ClientGameData, playing: boolean, list: HTMLElement) {
+  static addGame(key: string, game: ClientGameData, playing: boolean, list: HTMLElement) {
     const li = document.createElement('li');
     const anchor = document.createElement('a');
     anchor.setAttribute('href', `/play?game=${key}`);
