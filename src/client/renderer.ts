@@ -354,7 +354,7 @@ export class Renderer {
     }
   }
 
-  setColumnValid(column:number, valid:boolean, complete:number[]) {
+  setColumnValid(column: number, valid: boolean, complete: number[]) {
     const group = this.column_labels.childNodes[column];
     if (!(group instanceof SVGElement)) {
       throw new Error();
@@ -377,7 +377,7 @@ export class Renderer {
     });
   }
 
-  setRowValid(row:number, valid:boolean, complete:number[]) {
+  setRowValid(row: number, valid: boolean, complete: number[]) {
     const group = this.row_labels.childNodes[row];
     if (!(group instanceof SVGElement)) {
       throw new Error();
