@@ -253,12 +253,12 @@ class Play {
       this.columnLock = false;
 
       this.renderer.setHighlightMode('hover');
-      if (this.lastX !== undefined) {
+      if (this.lastX !== -1) {
         this.renderer.setHighlightColumn(this.lastX);
       }
 
       this.renderer.setHighlightMode('hover');
-      if (this.lastY !== undefined) {
+      if (this.lastY !== -1) {
         this.renderer.setHighlightRow(this.lastY);
       }
     });
