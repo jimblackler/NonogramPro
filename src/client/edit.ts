@@ -283,7 +283,7 @@ class Edit {
     }
   }
 
-  getData() {
+  private getData() {
     return {
       grid_data: this.data as string | boolean[][],
       spec: this.spec,
@@ -292,7 +292,7 @@ class Edit {
     };
   }
 
-  saveLocal() {
+  private saveLocal() {
     const data = {
       ...this.getData(),
       needs_publish: this.needsPublish,
@@ -303,7 +303,7 @@ class Edit {
     this.gamesDb.set(this.gameId, data);
   }
 
-  repaint() {
+  private repaint() {
     const title = document.getElementById('title');
     const gridSize = document.getElementById('grid_size');
     const colorScheme = document.getElementById('color_scheme');
@@ -335,7 +335,7 @@ class Edit {
     }
   }
 
-  makeNewGame(spec: Spec, replace: boolean) {
+  private makeNewGame(spec: Spec, replace: boolean) {
     const random = Alea();
     this.gameId = `draft${random() * 10000 | 0}`;
     const url = `edit?game=${this.gameId}`;
