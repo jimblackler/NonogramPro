@@ -118,7 +118,7 @@ class Edit {
           alert(obj.exception);
         } else {
           const game = obj.game.data;
-          const new_id = obj.game.key;
+          const newId = obj.game.key;
           if (typeof game.grid_data != 'string') {
             throw new Error();
           }
@@ -126,9 +126,9 @@ class Edit {
           game.grid_data = decode(game.spec, game.grid_data);
 
           this.needsPublish = false;
-          if (this.gameId !== new_id) {
+          if (this.gameId !== newId) {
             this.games_db.deleteItem(this.gameId);
-            this.gameId = new_id;
+            this.gameId = newId;
             window.history.replaceState({}, '', `edit?game=${this.gameId}`);
           }
           this.games_db.set(this.gameId, game);
@@ -272,7 +272,7 @@ class Edit {
     }
     this.gameId = gameId;
     this.needsPublish = false;
-    const default_spec = {width: 20, height: 20};
+    const defaultSpec = {width: 20, height: 20};
 
     if (this.gameId) {
       get_game(
@@ -290,11 +290,11 @@ class Edit {
             this.repaint();
           },
           () => {
-            this.makeNewGame(default_spec, true);
+            this.makeNewGame(defaultSpec, true);
           });
     } else {
       // Otherwise make a new game.
-      this.makeNewGame(default_spec, true);
+      this.makeNewGame(defaultSpec, true);
     }
   }
 
@@ -320,14 +320,14 @@ class Edit {
 
   repaint() {
     const title = document.getElementById('title');
-    const grid_size = document.getElementById('grid_size');
-    const color_scheme = document.getElementById('color_scheme');
+    const gridSize = document.getElementById('grid_size');
+    const colorScheme = document.getElementById('color_scheme');
     const publish = document.getElementById('publish');
-    const color_scheme_stylesheet = document.getElementById('color_scheme_stylesheet');
+    const colorSchemeStylesheet = document.getElementById('color_scheme_stylesheet');
 
-    if (!title || !(grid_size instanceof HTMLSelectElement) ||
-        !(color_scheme instanceof HTMLSelectElement) || !this.renderer || !publish ||
-        !(color_scheme_stylesheet instanceof HTMLLinkElement)) {
+    if (!title || !(gridSize instanceof HTMLSelectElement) ||
+        !(colorScheme instanceof HTMLSelectElement) || !this.renderer || !publish ||
+        !(colorSchemeStylesheet instanceof HTMLLinkElement)) {
       throw new Error();
     }
     title.textContent = this.name;
@@ -335,10 +335,9 @@ class Edit {
     let clues = generateClues(this.spec, this.data);
     this.renderer.paintClues(clues);
 
-    grid_size.value =
-        `{"width": ${this.spec.width}, "height": ${this.spec.height}}`;
+    gridSize.value = `{"width": ${this.spec.width}, "height": ${this.spec.height}}`;
 
-    color_scheme.value = this.style;
+    colorScheme.value = this.style;
 
     if (this.needsPublish) {
       publish.removeAttribute('disabled');
@@ -346,7 +345,7 @@ class Edit {
       publish.setAttribute('disabled', '');
     }
     if (this.setStyle !== this.style) {
-      color_scheme_stylesheet.href = `/styles/color_schemes/${this.style}.css`;
+      colorSchemeStylesheet.href = `/styles/color_schemes/${this.style}.css`;
       this.setStyle = this.style;
     }
   }
