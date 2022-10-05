@@ -1,12 +1,12 @@
 import {Spec} from '../common/spec';
 import {Analyze} from './analyze';
-import {CompletedDb} from './db/completed_db';
-import {GamesDb} from './db/games_db';
-import {PlaysDb} from './db/plays_db';
-import {getGame} from './fetch_game';
+import {CompletedDb} from './db/completedDb';
+import {GamesDb} from './db/gamesDb';
+import {PlaysDb} from './db/playsDb';
+import {getGame} from './fetchGame';
 import {Generate} from './generate';
-import {generateClues} from './generate_clues';
-import {plotLine} from './plot_line';
+import {generateClues} from './generateClues';
+import {plotLine} from './plotLine';
 import {Renderer} from './renderer';
 
 class Play {

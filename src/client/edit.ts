@@ -1,13 +1,13 @@
 import Alea from 'alea';
 import {Spec} from '../common/spec';
 import {Analyze} from './analyze';
-import {GamesDb} from './db/games_db';
+import {GamesDb} from './db/gamesDb';
 import {decode} from './decoder';
 import {encode} from './encoder';
-import {getGame} from './fetch_game';
+import {getGame} from './fetchGame';
 import {Generate} from './generate';
-import {generateClues} from './generate_clues';
-import {plotLine} from './plot_line';
+import {generateClues} from './generateClues';
+import {plotLine} from './plotLine';
 import {Renderer} from './renderer';
 import {request} from './request';
 
@@ -153,7 +153,8 @@ class Edit {
         this.data = game.grid_data;
         this.name = game.name;
         this.repaint();
-      }, () => {});
+      }, () => {
+      });
     });
 
     delete_.addEventListener('click', evt => {

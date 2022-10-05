@@ -1,5 +1,5 @@
 import {ClientGameData} from '../common/clientGame';
-import {GamesDb} from './db/games_db';
+import {GamesDb} from './db/gamesDb';
 import {decode} from './decoder';
 import {request} from './request';
 
