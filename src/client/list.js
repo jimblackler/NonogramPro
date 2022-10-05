@@ -9,7 +9,11 @@ class List {
     this.plays_db = new PlaysDb();
     const plays = new Set();
     this.plays_db.list(evt => {
-      const result = evt.currentTarget.result;
+      const currentTarget = evt.currentTarget;
+      if (!(currentTarget instanceof IDBRequest)) {
+        throw new Error();
+      }
+      const result = currentTarget.result;
       if (result) {
         plays.add(result.key);
         result.continue();
