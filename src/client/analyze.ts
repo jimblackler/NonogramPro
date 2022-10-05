@@ -5,29 +5,29 @@ import {Renderer} from './renderer';
 require('./dialog');
 
 function analyzeSequence(
-    clue: number[], clue_idx: number, on: boolean[][], off: boolean[][], start: number,
-    max_start: number, u_size: number, v: number, horizontal: boolean, infer_on: boolean[] | undefined,
-    infer_off: boolean[] | undefined, complete?: number[]) {
-  if (clue_idx === clue.length) {
+    clue: number[], clueIdx: number, on: boolean[][], off: boolean[][], start: number,
+    maxStart: number, uSize: number, v: number, horizontal: boolean, inferOn: boolean[] | undefined,
+    inferOff: boolean[] | undefined, complete?: number[]) {
+  if (clueIdx === clue.length) {
     /* We have a viable combination provided no 'on' blocks remain. */
-    for (let u = start; u < u_size; u++) {
+    for (let u = start; u < uSize; u++) {
       if (horizontal ? on[v][u] : on[u][v]) {
         return false;
       }
     }
     /* We have end of a viable combination. */
-    if (infer_on) {
-      for (let u = start; u < u_size; u++) {
-        infer_on[u] = false;
+    if (inferOn) {
+      for (let u = start; u < uSize; u++) {
+        inferOn[u] = false;
       }
     }
     return true;
   }
 
   let viable = false;
-  const block_length = clue[clue_idx];
+  const block_length = clue[clueIdx];
   let run_length = 0;
-  let stop_scan = max_start + block_length;
+  let stop_scan = maxStart + block_length;
   for (let u = start; u < stop_scan; u++) {
     if (horizontal ? off[v][u] : off[u][v]) {
       run_length = 0;
@@ -44,13 +44,13 @@ function analyzeSequence(
       // Block not long enough.
       continue;
     }
-    if (u + 1 < u_size && (horizontal ? on[v][u + 1] : on[u + 1][v])) {
+    if (u + 1 < uSize && (horizontal ? on[v][u + 1] : on[u + 1][v])) {
       // No spacer.
       continue;
     }
     if (!analyzeSequence(
-        clue, clue_idx + 1, on, off, u + 2, max_start + block_length + 1,
-        u_size, v, horizontal, infer_on, infer_off, complete)) {
+        clue, clueIdx + 1, on, off, u + 2, maxStart + block_length + 1,
+        uSize, v, horizontal, inferOn, inferOff, complete)) {
       // No solutions for the rest of the sequence.
       continue;
     }
@@ -66,31 +66,31 @@ function analyzeSequence(
         }
       }
       if (!filled) {
-        complete[clue_idx] = -3;
-      } else if (complete[clue_idx] === -1) {
-        complete[clue_idx] = block_start;
-      } else if (complete[clue_idx] !== block_start) {
-        complete[clue_idx] = -2;
+        complete[clueIdx] = -3;
+      } else if (complete[clueIdx] === -1) {
+        complete[clueIdx] = block_start;
+      } else if (complete[clueIdx] !== block_start) {
+        complete[clueIdx] = -2;
       }
     }
-    if (!infer_on) {
+    if (!inferOn) {
       continue;
     }
 
-    if (!infer_off) {
+    if (!inferOff) {
       throw new Error();
     }
 
-    if (u + 1 < u_size) {
-      infer_on[u + 1] = false;
+    if (u + 1 < uSize) {
+      inferOn[u + 1] = false;
     }
     let u0 = u;
     while (u0 >= block_start) {
-      infer_off[u0] = false;
+      inferOff[u0] = false;
       u0--;
     }
     while (u0 >= start) {
-      infer_on[u0] = false;
+      inferOn[u0] = false;
       u0--;
     }
   }
