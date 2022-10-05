@@ -9,7 +9,7 @@ export default function config(env: any, argv: any) {
         import: './src/client/edit.ts'
       },
       list: {
-        import: './src/client/list.js'
+        import: './src/client/list.ts'
       },
       play: {
         import: './src/client/play.js'

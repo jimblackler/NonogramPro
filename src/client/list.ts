@@ -1,9 +1,13 @@
+import {ClientGameData} from '../common/clientGame';
 import {GamesDb} from './db/games_db';
 import {PlaysDb} from './db/plays_db';
 import {decode} from './decoder';
 import {request} from './request';
 
 class List {
+  private games_db: GamesDb;
+  private plays_db: PlaysDb;
+
   constructor() {
     this.games_db = new GamesDb();
     this.plays_db = new PlaysDb();
@@ -19,9 +23,16 @@ class List {
         result.continue();
       } else {
         const list = document.getElementById('games');
+        if (!(list instanceof HTMLElement)) {
+          throw new Error();
+        }
         if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
           this.games_db.list(evt => {
-            const result = evt.currentTarget.result;
+            const currentTarget = evt.currentTarget;
+            if (!(currentTarget instanceof IDBRequest)) {
+              throw new Error();
+            }
+            const result = currentTarget.result;
             if (result) {
               List.addGame(
                   result.primaryKey, result.value, plays.has(result.key), list);
@@ -48,7 +59,7 @@ class List {
     });
   }
 
-  static addGame(key, game, playing, list) {
+  static addGame(key: string, game:ClientGameData, playing: boolean, list: HTMLElement) {
     const li = document.createElement('li');
     const anchor = document.createElement('a');
     anchor.setAttribute('href', `/play?game=${key}`);

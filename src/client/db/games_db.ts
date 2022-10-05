@@ -47,7 +47,7 @@ export class GamesDb {
         .then(() => request.result as ClientGameData);
   }
 
-  list(handler: () => IDBRequest) {
+  list(handler: (ev: Event) => void) {
     return this.withStore('readonly', store => {
       store.index('by_difficulty').openCursor().onsuccess = handler;
     })

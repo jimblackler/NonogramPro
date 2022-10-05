@@ -37,7 +37,7 @@ export class PlaysDb {
         .then(() => request.result as PlayInDb);
   }
 
-  list(handler: () => IDBRequest) {
+  list(handler: (ev: Event) => void) {
     return this.withStore('readonly', store => {
       store.openCursor.call(store).onsuccess = handler;
     })
