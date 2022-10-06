@@ -7,6 +7,12 @@ interface Complete {
 export class CompletedDb {
   private db: Promise<IDBDatabase> | undefined;
 
+  set(gameId: string, data: Complete) {
+    return this.dbPromise()
+        .then(db => db.transaction('games', 'readwrite').objectStore('completed').put(data, gameId))
+        .then(transactionToPromise);
+  }
+
   private dbPromise() {
     if (!this.db) {
       this.db = new Promise((resolve, reject) => {
@@ -23,11 +29,5 @@ export class CompletedDb {
       });
     }
     return this.db;
-  }
-
-  set(gameId: string, data: Complete) {
-    return this.dbPromise()
-        .then(db => db.transaction('games', 'readwrite').objectStore('completed').put(data, gameId))
-        .then(transactionToPromise);
   }
 }
