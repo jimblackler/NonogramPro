@@ -1,5 +1,5 @@
 export function makeDraggable(element: HTMLElement) {
-  let originalCoords: {pageX: number, pageY: number};
+  let originalCoords: { pageX: number, pageY: number };
   let originalLeft: number;
   let originalTop: number;
 
