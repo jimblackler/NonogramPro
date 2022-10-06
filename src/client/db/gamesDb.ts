@@ -1,4 +1,6 @@
 import {ClientGameData} from '../../common/clientGame';
+import {requestToAsyncGenerator} from '../requestToAsyncGenerator';
+import {transactionToPromise} from '../transactionToPromise';
 
 export class GamesDb {
   private db: Promise<IDBDatabase> | undefined;
@@ -29,32 +31,29 @@ export class GamesDb {
     return this.db;
   }
 
-  private withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
-    return this.dbPromise().then(db => new Promise<void>((resolve, reject) => {
-      const transaction = db.transaction('games', type);
-      transaction.onerror = () => reject(transaction.error);
-      transaction.oncomplete = () => resolve();
-      callback(transaction.objectStore('games'));
-    }));
-  }
-
   set(gameId: string, data: ClientGameData) {
-    return this.withStore('readwrite', store => store.put(data, gameId));
+    return this.dbPromise()
+        .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data, gameId))
+        .then(transactionToPromise);
   }
 
   get(gameId: string) {
-    let request: any;  // TODO: replace with local promise.
-    return this.withStore('readonly', store => request = store.get(gameId))
-        .then(() => request.result as ClientGameData);
+    return this.dbPromise()
+        .then(db => db.transaction('games', 'readonly').objectStore('games').get(gameId))
+        .then(transactionToPromise)
+        .then(result => result as ClientGameData);
   }
 
-  list(handler: (ev: Event) => void) {
-    return this.withStore('readonly', store => {
-      store.index('by_difficulty').openCursor().onsuccess = handler;
-    })
+  list() {
+    return this.dbPromise()
+        .then(db => db.transaction('games', 'readonly').objectStore('games').index('by_difficulty')
+            .openCursor())
+        .then(requestToAsyncGenerator);
   }
 
   deleteItem(gameId: string) {
-    return this.withStore('readwrite', store => store.delete(gameId));
+    return this.dbPromise()
+        .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
+        .then(transactionToPromise);
   }
 }

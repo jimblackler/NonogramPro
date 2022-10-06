@@ -11,49 +11,6 @@ class List {
   constructor() {
     this.gamesDb = new GamesDb();
     this.playsDb = new PlaysDb();
-    const plays = new Set();
-    this.playsDb.list(evt => {
-      const currentTarget = evt.currentTarget;
-      if (!(currentTarget instanceof IDBRequest)) {
-        throw new Error();
-      }
-      const result = currentTarget.result;
-      if (result) {
-        plays.add(result.key);
-        result.continue();
-      } else {
-        const list = document.getElementById('games');
-        if (!(list instanceof HTMLElement)) {
-          throw new Error();
-        }
-        if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
-          this.gamesDb.list(evt => {
-            const currentTarget = evt.currentTarget;
-            if (!(currentTarget instanceof IDBRequest)) {
-              throw new Error();
-            }
-            const result = currentTarget.result;
-            if (result) {
-              List.addGame(
-                  result.primaryKey, result.value, plays.has(result.key), list);
-              result.continue();
-            }
-          });
-        } else {
-          axios.get('/games')
-              .then(response => response.data)
-              .then(obj => {
-                for (let game of obj.results) {
-                  List.addGame(game.key, game.data, plays.has(game.key), list);
-                  // We write the incoming games to the local database (which needs
-                  // the grid decoding). Might not always be desirable.
-                  game.data.grid_data = decode(game.data.spec, game.data.grid_data);
-                  this.gamesDb.set(game.key, game.data);
-                }
-              });
-        }
-      }
-    });
   }
 
   static addGame(key: string, game: ClientGameData, playing: boolean, list: HTMLElement) {
@@ -111,6 +68,35 @@ class List {
 
     list.appendChild(li);
   }
+
+  async populate() {
+    const plays = new Set();
+    for await (const currentTarget of await this.playsDb.list()) {
+      plays.add(currentTarget.key);
+    }
+
+    const list = document.getElementById('games');
+    if (!(list instanceof HTMLElement)) {
+      throw new Error();
+    }
+    if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
+      for await (const result of await this.gamesDb.list()) {
+        List.addGame(result.primaryKey.toString(), result.value, plays.has(result.key), list);
+      }
+    } else {
+      axios.get('/games')
+          .then(response => response.data)
+          .then(obj => {
+            for (let game of obj.results) {
+              List.addGame(game.key, game.data, plays.has(game.key), list);
+              // We write the incoming games to the local database (which needs
+              // the grid decoding). Might not always be desirable.
+              game.data.grid_data = decode(game.data.spec, game.data.grid_data);
+              this.gamesDb.set(game.key, game.data);
+            }
+          });
+    }
+  }
 }
 
-new List();
+new List().populate();

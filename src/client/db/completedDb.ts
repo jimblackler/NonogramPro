@@ -1,3 +1,5 @@
+import {transactionToPromise} from '../transactionToPromise';
+
 interface Complete {
 
 }
@@ -23,22 +25,9 @@ export class CompletedDb {
     return this.db;
   }
 
-  private withStore(type: IDBTransactionMode, callback: (value: IDBObjectStore) => void) {
-    return this.dbPromise().then(db => new Promise<void>((resolve, reject) => {
-      const transaction = db.transaction('completed', type);
-      transaction.onerror = () => reject(transaction.error);
-      transaction.oncomplete = () => resolve();
-      callback(transaction.objectStore('completed'));
-    }));
-  }
-
   set(gameId: string, data: Complete) {
-    return this.withStore('readwrite', store => store.put(data, gameId));
-  }
-
-  list(handler: () => IDBRequest) {
-    return this.withStore('readonly', store => {
-      store.openCursor.call(store).onsuccess = handler;
-    })
+    return this.dbPromise()
+        .then(db => db.transaction('games', 'readwrite').objectStore('completed').put(data, gameId))
+        .then(transactionToPromise);
   }
 }
