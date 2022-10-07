@@ -5,8 +5,8 @@ import {WebpackManifestPlugin} from 'webpack-manifest-plugin';
 export default function config(env: any, argv: any) {
   const configuration: webpack.Configuration = {
     entry: {
-      edit: {
-        import: './src/client/edit.ts'
+      main: {
+        import: './src/client/main.ts'
       },
       list: {
         import: './src/client/list.ts'
