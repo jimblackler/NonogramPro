@@ -48,9 +48,8 @@ function analyzeSequence(
       // No spacer.
       continue;
     }
-    if (!analyzeSequence(
-        clue, clueIdx + 1, on, off, u + 2, maxStart + blockLength + 1,
-        uSize, v, horizontal, inferOn, inferOff, complete)) {
+    if (!analyzeSequence(clue, clueIdx + 1, on, off, u + 2, maxStart + blockLength + 1, uSize, v,
+        horizontal, inferOn, inferOff, complete)) {
       // No solutions for the rest of the sequence.
       continue;
     }
@@ -97,10 +96,9 @@ function analyzeSequence(
   return viable;
 }
 
-function analyzeLine(
-    clue: number[], on: boolean[][], off: boolean[][], v: number, uSize: number,
-    horizontal: boolean, inferOn: boolean[] | undefined, inferOff: boolean[] | undefined,
-    complete?: number[]) {
+function analyzeLine(clue: number[], on: boolean[][], off: boolean[][], v: number, uSize: number,
+                     horizontal: boolean, inferOn: boolean[] | undefined,
+                     inferOff: boolean[] | undefined, complete?: number[]) {
   let maxStart = uSize;
   let spacer = 0;
   for (let idx = 0; idx < clue.length; idx++) {
@@ -211,8 +209,7 @@ export class Analyze {
     if (difficulty === -1) {
       phrase = 'Cannot be completed with standard method.';
     } else {
-      phrase =
-          `Requires ${difficulty} rounds to complete with standard method.`;
+      phrase = `Requires ${difficulty} rounds to complete with standard method.`;
     }
     const text = document.createTextNode(phrase);
     header.appendChild(text);
