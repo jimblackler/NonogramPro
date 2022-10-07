@@ -5,3 +5,4 @@
 /out
 /package-lock.json
 /static/dist
+.DS_Store
