@@ -1,4 +1,5 @@
 import {editorEnhanced} from './components/editorEnhanced';
+import {playControlEnhanced} from './components/playControlEnhanced';
 
 function is(object: any, type: any) {
   if (object instanceof type) {
@@ -9,6 +10,7 @@ function is(object: any, type: any) {
 
 const enhancers: { [key: string]: (element: Element) => void } = {
   'editor': element => editorEnhanced(is(element, HTMLElement)),
+  'playControl': element => playControlEnhanced(is(element, HTMLElement))
 };
 
 function enhance(toEnhance: Element) {
