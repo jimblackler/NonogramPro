@@ -18,7 +18,6 @@ export function addEditor(document: Document, parent: HTMLElement) {
 
   const editSection = document.createElement('section');
   section.append(editSection);
-  editSection.setAttribute('id', 'edit_section');
 
   {
     const bordered = document.createElement('section');
@@ -42,7 +41,7 @@ export function addEditor(document: Document, parent: HTMLElement) {
     {
       const button = document.createElement('button');
       bordered.append(button);
-      button.setAttribute('id', 'create_new');
+      button.setAttribute('id', 'createNew');
       button.append('New');
     }
   }
@@ -83,7 +82,7 @@ export function addEditor(document: Document, parent: HTMLElement) {
     {
       const select = document.createElement('select');
       bordered.append(select);
-      select.setAttribute('id', 'grid_size');
+      select.setAttribute('id', 'gridSize');
 
       {
         const option = document.createElement('option');
@@ -117,7 +116,7 @@ export function addEditor(document: Document, parent: HTMLElement) {
     {
       const select = document.createElement('select');
       bordered.append(select);
-      select.setAttribute('id', 'color_scheme');
+      select.setAttribute('id', 'ColorScheme');
 
       {
         const option = document.createElement('option');

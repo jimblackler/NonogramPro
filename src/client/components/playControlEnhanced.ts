@@ -45,7 +45,7 @@ export function playControlEnhanced(section: HTMLElement) {
     off = Generate.getEmpty(spec);
     renderer = new Renderer(svg, spec);
 
-    const colorSchemeStylesheet = document.getElementById('color_scheme_stylesheet');
+    const colorSchemeStylesheet = document.getElementById('colorSchemeStylesheet');
     if (!(colorSchemeStylesheet instanceof HTMLLinkElement)) {
       throw new Error();
     }

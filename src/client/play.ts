@@ -50,7 +50,7 @@ class Play {
           this.on = Generate.getEmpty(this.spec);
           this.off = Generate.getEmpty(this.spec);
           this.renderer = new Renderer(svg, this.spec);
-          const colorSchemeStylesheet = document.getElementById('color_scheme_stylesheet');
+          const colorSchemeStylesheet = document.getElementById('colorSchemeStylesheet');
           if (!(colorSchemeStylesheet instanceof HTMLLinkElement)) {
             throw new Error();
           }

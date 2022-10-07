@@ -28,7 +28,7 @@ export async function hasGridHtmlRespond(
       const style2 = document.createElement('link');
       parent.append(style2);
       style2.setAttribute('rel', 'stylesheet');
-      style2.setAttribute('id', 'color_scheme_stylesheet');
+      style2.setAttribute('id', 'colorSchemeStylesheet');
       client.addStyles(document, parent);
     },
     addHeader: (document, parent) => {

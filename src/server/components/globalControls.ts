@@ -17,11 +17,10 @@ export function addGlobalControls(document: Document, parent: HTMLElement, req: 
                                   oAuth: OAuth2Client, email?: string) {
   const section = document.createElement('section');
   parent.append(section);
-  section.setAttribute('id', 'global_controls');
 
   const a = document.createElement('a');
   section.append(a);
-  a.setAttribute('id', 'product_name');
+  a.setAttribute('id', 'productName');
   a.setAttribute('href', '/');
 
   const img = document.createElement('img');

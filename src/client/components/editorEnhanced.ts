@@ -28,14 +28,14 @@ export function editorEnhanced(section: HTMLElement) {
 
   const title = section.querySelector('h1#title');
   const status = section.querySelector('section#status');
-  const createNew = section.querySelector('#create_new');
+  const createNew = section.querySelector('#createNew');
   const play = section.querySelector('#play');
   const analyze = section.querySelector('#analyze');
   const publish = section.querySelector('#publish');
   const cancel = section.querySelector('#cancel');
   const delete_ = section.querySelector('#delete');
-  const gridSize = section.querySelector('#grid_size');
-  const colorScheme = section.querySelector('#color_scheme');
+  const gridSize = section.querySelector('#gridSize');
+  const colorScheme = section.querySelector('#ColorScheme');
 
   if (!(title instanceof HTMLHeadingElement) || !(status instanceof HTMLElement) || !createNew
       || !play || !analyze || !publish || !cancel || !delete_ || !gridSize || !colorScheme) {
@@ -307,10 +307,10 @@ export function editorEnhanced(section: HTMLElement) {
 
   function repaint() {
     const title = document.getElementById('title');
-    const gridSize = document.getElementById('grid_size');
-    const colorScheme = document.getElementById('color_scheme');
+    const gridSize = document.getElementById('gridSize');
+    const colorScheme = document.getElementById('ColorScheme');
     const publish = document.getElementById('publish');
-    const colorSchemeStylesheet = document.getElementById('color_scheme_stylesheet');
+    const colorSchemeStylesheet = document.getElementById('colorSchemeStylesheet');
 
     if (!title || !(gridSize instanceof HTMLSelectElement) ||
         !(colorScheme instanceof HTMLSelectElement) || !renderer || !publish ||
