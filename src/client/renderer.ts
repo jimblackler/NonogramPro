@@ -1,11 +1,11 @@
 import {Spec} from '../common/spec';
 
-const xmlns = 'http://www.w3.org/2000/svg';
-const divisions = 5;
-const cross_margin = 7;
-const clue_to_grid_margin = 10;
-const vertical_clue_separation = 20;
-const horizontal_clue_baseline_position = 0.75;
+const XMLNS = 'http://www.w3.org/2000/svg';
+const DIVISIONS = 5;
+const CROSS_MARGIN = 7;
+const CLUE_TO_GRID_MARGIN = 10;
+const VERTICAL_CLUE_SEPARATION = 20;
+const HORIZONTAL_CLUE_BASELINE_POSITION = 0.75;
 
 interface Dimensions {
   cell_size: number;
@@ -50,19 +50,19 @@ export class Renderer {
     svg.setAttribute('width', this.leftOffset + spec.width * cellSize + 'px');
     svg.setAttribute('height', this.topOffset + spec.height * cellSize + 'px');
 
-    const labels = document.createElementNS(xmlns, 'g');
+    const labels = document.createElementNS(XMLNS, 'g');
     labels.classList.add('labels');
 
-    this.rowsAndColumns = document.createElementNS(xmlns, 'g');
+    this.rowsAndColumns = document.createElementNS(XMLNS, 'g');
 
     /* Build rows */
-    this.rows = document.createElementNS(xmlns, 'g');
+    this.rows = document.createElementNS(XMLNS, 'g');
     this.rows.classList.add('rows');
-    this.rowLabels = document.createElementNS(xmlns, 'g');
+    this.rowLabels = document.createElementNS(XMLNS, 'g');
     this.rowLabels.classList.add('row_labels');
 
     for (let y = 0; y < spec.height; y++) {
-      const row = document.createElementNS(xmlns, 'rect');
+      const row = document.createElementNS(XMLNS, 'rect');
       row.classList.add('row');
       if (y % 2) {
         row.classList.add('odd');
@@ -80,13 +80,13 @@ export class Renderer {
     labels.appendChild(this.rowLabels);
 
     /* Build columns */
-    this.columns = document.createElementNS(xmlns, 'g');
+    this.columns = document.createElementNS(XMLNS, 'g');
     this.columns.classList.add('columns');
-    this.columnLabels = document.createElementNS(xmlns, 'g');
+    this.columnLabels = document.createElementNS(XMLNS, 'g');
     this.columnLabels.setAttribute('class', 'column_labels');
 
     for (let x = 0; x < spec.width; x++) {
-      const column = document.createElementNS(xmlns, 'rect');
+      const column = document.createElementNS(XMLNS, 'rect');
       column.classList.add('column');
       if (x % 2) {
         column.classList.add('odd');
@@ -108,34 +108,34 @@ export class Renderer {
 
     content.appendChild(labels);
 
-    this.squares = document.createElementNS(xmlns, 'g');
+    this.squares = document.createElementNS(XMLNS, 'g');
     this.squares.classList.add('squares');
     content.appendChild(this.squares);
 
-    this.crosses = document.createElementNS(xmlns, 'g');
+    this.crosses = document.createElementNS(XMLNS, 'g');
     this.crosses.classList.add('crosses');
     content.appendChild(this.crosses);
 
     /* Build grid lines */
-    const outer = document.createElementNS(xmlns, 'g');
+    const outer = document.createElementNS(XMLNS, 'g');
     outer.classList.add('outer');
 
-    const major = document.createElementNS(xmlns, 'g');
+    const major = document.createElementNS(XMLNS, 'g');
     major.classList.add('major');
 
-    const minor = document.createElementNS(xmlns, 'g');
+    const minor = document.createElementNS(XMLNS, 'g');
     minor.classList.add('minor');
 
     /* Vertical */
     for (let x = 0; x <= spec.width; x++) {
-      const line = document.createElementNS(xmlns, 'line');
+      const line = document.createElementNS(XMLNS, 'line');
       line.setAttribute('x1', this.leftOffset + x * cellSize + 'px');
       line.setAttribute('x2', this.leftOffset + x * cellSize + 'px');
       line.setAttribute('y1', this.topOffset + 'px');
       line.setAttribute('y2', this.topOffset + spec.height * cellSize + 'px');
       if (x === 0 || x === spec.width) {
         outer.appendChild(line);
-      } else if (x % divisions) {
+      } else if (x % DIVISIONS) {
         minor.appendChild(line);
       } else {
         major.appendChild(line);
@@ -144,7 +144,7 @@ export class Renderer {
 
     /* Horizontal */
     for (let y = 0; y <= spec.height; y++) {
-      const line = document.createElementNS(xmlns, 'line');
+      const line = document.createElementNS(XMLNS, 'line');
       line.setAttribute('x1', this.leftOffset + 'px');
       line.setAttribute('x2', this.leftOffset + spec.width * cellSize + 'px');
       line.setAttribute('y1', this.topOffset + y * cellSize + 'px');
@@ -152,7 +152,7 @@ export class Renderer {
       content.appendChild(line);
       if (y === 0 || y === spec.height) {
         outer.appendChild(line);
-      } else if (y % divisions) {
+      } else if (y % DIVISIONS) {
         minor.appendChild(line);
       } else {
         major.appendChild(line);
@@ -201,15 +201,15 @@ export class Renderer {
     }
 
     for (let y = 0; y < this.spec.height; y++) {
-      const rowLabelGroup = document.createElementNS(xmlns, 'g');
+      const rowLabelGroup = document.createElementNS(XMLNS, 'g');
       rowLabelGroup.classList.add('valid');
-      const rowLabel = document.createElementNS(xmlns, 'text');
-      rowLabel.setAttribute('x', this.leftOffset - clue_to_grid_margin + 'px');
+      const rowLabel = document.createElementNS(XMLNS, 'text');
+      rowLabel.setAttribute('x', this.leftOffset - CLUE_TO_GRID_MARGIN + 'px');
       rowLabel.setAttribute('y',
-          this.topOffset + y * cellSize + cellSize * horizontal_clue_baseline_position + 'px');
+          this.topOffset + y * cellSize + cellSize * HORIZONTAL_CLUE_BASELINE_POSITION + 'px');
       const c2 = clues[0][y];
       for (let idx = 0; idx < c2.length; idx++) {
-        const tspan = document.createElementNS(xmlns, 'tspan');
+        const tspan = document.createElementNS(XMLNS, 'tspan');
         let textNode = document.createTextNode(' ' + c2[idx]);
         tspan.appendChild(textNode);
         rowLabel.appendChild(tspan);
@@ -223,17 +223,17 @@ export class Renderer {
     }
     for (let x = 0; x < this.spec.width; x++) {
       const c = clues[1][x];
-      let yPos = this.topOffset - clue_to_grid_margin;
-      const columnLabelGroup = document.createElementNS(xmlns, 'g');
+      let yPos = this.topOffset - CLUE_TO_GRID_MARGIN;
+      const columnLabelGroup = document.createElementNS(XMLNS, 'g');
       columnLabelGroup.classList.add('valid');
       for (let idx = c.length - 1; idx >= 0; idx--) {
-        const columnLabel = document.createElementNS(xmlns, 'text');
+        const columnLabel = document.createElementNS(XMLNS, 'text');
         columnLabel.setAttribute('x', this.leftOffset + cellSize / 2 + x * cellSize + 'px');
         columnLabel.setAttribute('y', yPos + 'px');
         let textNode = document.createTextNode('' + c[idx]);
         columnLabel.appendChild(textNode);
         columnLabelGroup.appendChild(columnLabel);
-        yPos -= vertical_clue_separation;
+        yPos -= VERTICAL_CLUE_SEPARATION;
       }
       this.columnLabels.appendChild(columnLabelGroup);
     }
@@ -249,7 +249,7 @@ export class Renderer {
         if (!on[y][x]) {
           continue;
         }
-        const rect = document.createElementNS(xmlns, 'rect');
+        const rect = document.createElementNS(XMLNS, 'rect');
         rect.setAttribute('x', this.leftOffset + x * cellSize + 'px');
         rect.setAttribute('y', this.topOffset + y * cellSize + 'px');
         rect.setAttribute('width', cellSize + 0.5 + 'px');
@@ -272,11 +272,11 @@ export class Renderer {
     for (let y = 0; y < this.spec.height; y++) {
       for (let x = 0; x < this.spec.width; x++) {
         if (!off[y][x]) continue;
-        const line1 = document.createElementNS(xmlns, 'line');
-        line1.setAttribute('x1', this.leftOffset + x * cellSize + cross_margin + 'px');
-        line1.setAttribute('x2', this.leftOffset + x * cellSize + cellSize - cross_margin + 'px');
-        line1.setAttribute('y1', this.topOffset + y * cellSize + cross_margin + 'px');
-        line1.setAttribute('y2', this.topOffset + y * cellSize + cellSize - cross_margin + 'px');
+        const line1 = document.createElementNS(XMLNS, 'line');
+        line1.setAttribute('x1', this.leftOffset + x * cellSize + CROSS_MARGIN + 'px');
+        line1.setAttribute('x2', this.leftOffset + x * cellSize + cellSize - CROSS_MARGIN + 'px');
+        line1.setAttribute('y1', this.topOffset + y * cellSize + CROSS_MARGIN + 'px');
+        line1.setAttribute('y2', this.topOffset + y * cellSize + cellSize - CROSS_MARGIN + 'px');
         if (!priorOff || priorOff[y][x]) {
           line1.classList.add('prior');
         } else {
@@ -284,11 +284,11 @@ export class Renderer {
         }
         this.crosses.appendChild(line1);
 
-        const line2 = document.createElementNS(xmlns, 'line');
-        line2.setAttribute('x1', this.leftOffset + x * cellSize + cellSize - cross_margin + 'px');
-        line2.setAttribute('x2', this.leftOffset + x * cellSize + cross_margin + 'px');
-        line2.setAttribute('y1', this.topOffset + y * cellSize + cross_margin + 'px');
-        line2.setAttribute('y2', this.topOffset + y * cellSize + cellSize - cross_margin + 'px');
+        const line2 = document.createElementNS(XMLNS, 'line');
+        line2.setAttribute('x1', this.leftOffset + x * cellSize + cellSize - CROSS_MARGIN + 'px');
+        line2.setAttribute('x2', this.leftOffset + x * cellSize + CROSS_MARGIN + 'px');
+        line2.setAttribute('y1', this.topOffset + y * cellSize + CROSS_MARGIN + 'px');
+        line2.setAttribute('y2', this.topOffset + y * cellSize + cellSize - CROSS_MARGIN + 'px');
         if (!priorOff || priorOff[y][x]) {
           line2.classList.add('prior');
         } else {
