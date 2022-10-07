@@ -245,9 +245,7 @@ export class Analyze {
           inferOn.push(true);
           inferOff.push(true);
         }
-        analyzeLine(
-            clues[horizontal ? 0 : 1][v], on, off, v, uSize, horizontal,
-            inferOn, inferOff);
+        analyzeLine(clues[horizontal ? 0 : 1][v], on, off, v, uSize, horizontal, inferOn, inferOff);
         let inferable = 0;
         for (let u = 0; u < uSize; u++) {
           if (inferOn[u]) {
