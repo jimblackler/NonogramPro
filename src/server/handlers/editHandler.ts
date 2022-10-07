@@ -12,19 +12,23 @@ export const editHandler: RequestHandler = async (req, res, next) => {
       style.setAttribute('href', '/styles/has_grid.css');
     },
     addControls: (document, parent) => {
+      const section = document.createElement('section');
+      parent.append(section);
+      section.setAttribute('class', 'edit');
+
       const h1 = document.createElement('h1');
-      parent.append(h1);
+      section.append(h1);
       h1.setAttribute('id', 'title');
       h1.setAttribute('contenteditable', 'true');
       h1.append('Title');
 
       const status = document.createElement('section');
-      parent.append(status);
+      section.append(status);
       status.setAttribute('id', 'status');
       status.append('Edit mode');
 
       const editSection = document.createElement('section');
-      parent.append(editSection);
+      section.append(editSection);
       editSection.setAttribute('id', 'edit_section');
 
       {

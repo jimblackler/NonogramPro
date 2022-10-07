@@ -27,19 +27,24 @@ class Edit {
 
   constructor() {
     this.gamesDb = new GamesDb();
-    const title = document.getElementById('title');
-    const status = document.getElementById('status');
-    const createNew = document.getElementById('create_new');
-    const play = document.getElementById('play');
-    const analyze = document.getElementById('analyze');
-    const publish = document.getElementById('publish');
-    const cancel = document.getElementById('cancel');
-    const delete_ = document.getElementById('delete');
-    const gridSize = document.getElementById('grid_size');
-    const colorScheme = document.getElementById('color_scheme');
+    const section = document.getElementsByClassName('edit')[0];
+    if (!section) {
+      throw new Error();
+    }
 
-    if (!title || !status || !createNew || !play || !analyze || !publish || !cancel || !delete_ ||
-        !gridSize || !colorScheme) {
+    const title = section.querySelector('h1#title');
+    const status = section.querySelector('section#status');
+    const createNew = section.querySelector('#create_new');
+    const play = section.querySelector('#play');
+    const analyze = section.querySelector('#analyze');
+    const publish = section.querySelector('#publish');
+    const cancel = section.querySelector('#cancel');
+    const delete_ = section.querySelector('#delete');
+    const gridSize = section.querySelector('#grid_size');
+    const colorScheme = section.querySelector('#color_scheme');
+
+    if (!(title instanceof HTMLHeadingElement) || !(status instanceof HTMLElement) || !createNew
+        || !play || !analyze || !publish || !cancel || !delete_ || !gridSize || !colorScheme) {
       throw new Error();
     }
     title.setAttribute('contenteditable', 'true');
