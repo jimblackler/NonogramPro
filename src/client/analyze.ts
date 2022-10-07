@@ -110,8 +110,7 @@ function analyzeLine(
   }
 
   return analyzeSequence(
-      clue, 0, on, off, 0, maxStart, uSize, v, horizontal, inferOn,
-      inferOff, complete);
+      clue, 0, on, off, 0, maxStart, uSize, v, horizontal, inferOn, inferOff, complete);
 }
 
 function analyzePass(
