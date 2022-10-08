@@ -32,79 +32,9 @@ export function playControlEnhanced(section: HTMLElement) {
     throw new Error();
   }
   const renderer = new Renderer(svg);
-
-  getGame(gamesDb, gameId, result => {
-    if (typeof result.grid_data !== 'object') {
-      throw new Error();
-    }
-
-    spec = result.spec;
-    data = result.grid_data;
-    style = result.style;
-    on = Generate.getEmpty(spec);
-    off = Generate.getEmpty(spec);
-    renderer.setDimensions(spec);
-
-    const colorSchemeStylesheet = document.getElementById('colorSchemeStylesheet');
-    if (!(colorSchemeStylesheet instanceof HTMLLinkElement)) {
-      throw new Error();
-    }
-    colorSchemeStylesheet.href = `/styles/color_schemes/${style}.css`;
-
-    const title = section.querySelector('#title');
-    if (!title) {
-      throw new Error();
-    }
-
-    title.textContent = result.name;
-    clues = generateClues(spec, data);
-    renderer.paintClues(clues);
-    playsDb.get(gameId).then(data => {
-      if (!data) {
-        return;
-      }
-      on = data.on;
-      off = data.off;
-      fromScratch();
-    });
-  }, () => {
-    alert('bad game');
-  });
-
-  const replay = section.querySelector('#replay');
-  const edit = section.querySelector('#edit');
-  const hint = section.querySelector('#hint');
-  if (!replay || !edit || !hint) {
-    throw new Error();
-  }
-
-  replay.addEventListener('click', () => {
-    on = Generate.getEmpty(spec);
-    off = Generate.getEmpty(spec);
-    fromScratch();
-  });
-
-  edit.addEventListener('click', () => {
-    window.location.href = `edit?game=${gameId}`;
-  });
-
-  hint.addEventListener('click', () => {
-    if (!renderer) {
-      throw new Error();
-    }
-    renderer.setHighlightMode('hint');
-    const hint = Analyze.findHint(spec, clues, on, off);
-    renderer.setHighlightRow(hint[0]);
-    renderer.setHighlightColumn(hint[1]);
-  });
-
-  const ActionMode = {NOT_DRAWING: 0, SETTING_ON: 1, SETTING_OFF: 2, SET_UNKNOWN: 3,};
-  let actionMode = ActionMode.NOT_DRAWING;
-
   svg.addEventListener('contextmenu', evt => {
     evt.preventDefault();
   });
-
   svg.addEventListener('mousedown', evt => {
     if (!renderer) {
       throw new Error();
@@ -147,7 +77,6 @@ export function playControlEnhanced(section: HTMLElement) {
       }
     });
   });
-
   svg.addEventListener('mousemove', evt => {
     if (!renderer) {
       return;
@@ -234,6 +163,74 @@ export function playControlEnhanced(section: HTMLElement) {
       }
     });
   });
+
+  getGame(gamesDb, gameId, result => {
+    if (typeof result.grid_data !== 'object') {
+      throw new Error();
+    }
+
+    spec = result.spec;
+    data = result.grid_data;
+    style = result.style;
+    on = Generate.getEmpty(spec);
+    off = Generate.getEmpty(spec);
+    renderer.setDimensions(spec);
+
+    const colorSchemeStylesheet = document.getElementById('colorSchemeStylesheet');
+    if (!(colorSchemeStylesheet instanceof HTMLLinkElement)) {
+      throw new Error();
+    }
+    colorSchemeStylesheet.href = `/styles/color_schemes/${style}.css`;
+
+    const title = section.querySelector('#title');
+    if (!title) {
+      throw new Error();
+    }
+
+    title.textContent = result.name;
+    clues = generateClues(spec, data);
+    renderer.paintClues(clues);
+    playsDb.get(gameId).then(data => {
+      if (!data) {
+        return;
+      }
+      on = data.on;
+      off = data.off;
+      fromScratch();
+    });
+  }, () => {
+    alert('bad game');
+  });
+
+  const replay = section.querySelector('#replay');
+  const edit = section.querySelector('#edit');
+  const hint = section.querySelector('#hint');
+  if (!replay || !edit || !hint) {
+    throw new Error();
+  }
+
+  replay.addEventListener('click', () => {
+    on = Generate.getEmpty(spec);
+    off = Generate.getEmpty(spec);
+    fromScratch();
+  });
+
+  edit.addEventListener('click', () => {
+    window.location.href = `edit?game=${gameId}`;
+  });
+
+  hint.addEventListener('click', () => {
+    if (!renderer) {
+      throw new Error();
+    }
+    renderer.setHighlightMode('hint');
+    const hint = Analyze.findHint(spec, clues, on, off);
+    renderer.setHighlightRow(hint[0]);
+    renderer.setHighlightColumn(hint[1]);
+  });
+
+  const ActionMode = {NOT_DRAWING: 0, SETTING_ON: 1, SETTING_OFF: 2, SET_UNKNOWN: 3,};
+  let actionMode = ActionMode.NOT_DRAWING;
 
   document.addEventListener('mouseup', evt => {
     if (!renderer) {
