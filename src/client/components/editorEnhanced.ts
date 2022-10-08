@@ -37,7 +37,8 @@ export function editorEnhanced(section: HTMLElement) {
   const colorScheme = section.querySelector('#ColorScheme');
 
   if (!(title instanceof HTMLHeadingElement) || !(status instanceof HTMLElement) || !createNew
-      || !play || !analyze || !publish || !cancel || !delete_ || !gridSize || !colorScheme) {
+      || !play || !analyze || !publish || !cancel || !delete_
+      || !(gridSize instanceof HTMLSelectElement) || !(colorScheme instanceof HTMLSelectElement)) {
     throw new Error();
   }
   title.setAttribute('contenteditable', 'true');
@@ -159,22 +160,14 @@ export function editorEnhanced(section: HTMLElement) {
   });
 
   gridSize.addEventListener('change', evt => {
-    const target = evt.target;
-    if (!(target instanceof HTMLSelectElement)) {
-      throw new Error();
-    }
-    spec = JSON.parse(target.value);
+    spec = JSON.parse(gridSize.value);
     data = Generate.getEmpty(spec);
     renderer.setDimensions(spec);
     repaint();
   });
 
   colorScheme.addEventListener('change', evt => {
-    const target = evt.target;
-    if (!(target instanceof HTMLSelectElement)) {
-      throw new Error();
-    }
-    style = target.value;
+    style = colorScheme.value;
     needsPublish = true;
     repaint();
     saveLocal();
