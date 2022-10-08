@@ -170,8 +170,8 @@ export class Renderer {
     let clientRect = svg.getBoundingClientRect();
     let x = evt.clientX - clientRect.left;
     let y = evt.clientY - clientRect.top;
-    const nextX = (x - this.leftOffset) / cellSize | 0;
-    const nextY = (y - this.topOffset) / cellSize | 0;
+    const nextX = Math.floor((x - this.leftOffset) / cellSize);
+    const nextY = Math.floor((y - this.topOffset) / cellSize);
     func(this, nextX, nextY, evt.which, evt.shiftKey);
     evt.preventDefault();
   }
@@ -185,8 +185,8 @@ export class Renderer {
     let clientRect = svg.getBoundingClientRect();
     let x = evt.clientX - clientRect.left;
     let y = evt.clientY - clientRect.top;
-    const nextX = (x - this.leftOffset) / cellSize | 0;
-    const nextY = (y - this.topOffset) / cellSize | 0;
+    const nextX = Math.floor((x - this.leftOffset) / cellSize);
+    const nextY = Math.floor((y - this.topOffset) / cellSize);
     func(this, nextX, nextY);
     evt.preventDefault();
   }
@@ -279,7 +279,9 @@ export class Renderer {
     }
     for (let y = 0; y < this.spec.height; y++) {
       for (let x = 0; x < this.spec.width; x++) {
-        if (!off[y][x]) continue;
+        if (!off[y][x]) {
+          continue;
+        }
         const line1 = document.createElementNS(XMLNS, 'line');
         this.crosses.append(line1);
         line1.setAttribute('x1', this.leftOffset + x * cellSize + CROSS_MARGIN + 'px');
