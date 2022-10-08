@@ -282,10 +282,6 @@ export function playControlEnhanced(section: HTMLElement) {
     if (!renderer) {
       throw new Error();
     }
-    const svg = document.getElementsByTagName('svg')[0];
-    if (!(svg instanceof SVGSVGElement)) {
-      throw new Error();
-    }
     playsDb.set(gameId, {on: on, off: off});
     renderer.paintOnSquares(on);
     renderer.paintOffSquares(off); /* Check is complete */
