@@ -18,7 +18,7 @@ export class Renderer {
   private spec: Spec = {width: 0, height: 0};
   private dimensions: Dimensions = {cell_size: 0, ratio_for_clues: 0};
   private highlightedColumn: SVGElement | false = false;
-  private highlightedRow: SVGElement | false;
+  private highlightedRow: SVGElement | false = false;
   private highlightMode: string | undefined;
 
   private leftOffset: number = 0;
@@ -33,8 +33,6 @@ export class Renderer {
 
   constructor(svg: SVGSVGElement) {
     this.svg = svg;
-    this.highlightedRow = false;
-    this.highlightedColumn = false;
   }
 
   setDimensions(spec: Spec, dimensions?: Dimensions) {
