@@ -31,138 +31,122 @@ export function playControlEnhanced(section: HTMLElement) {
   if (!(svg instanceof SVGSVGElement)) {
     throw new Error();
   }
-  const renderer = new Renderer(svg);
-  svg.addEventListener('contextmenu', evt => {
-    evt.preventDefault();
-  });
-  svg.addEventListener('mousedown', evt => {
-    if (!renderer) {
-      throw new Error();
-    }
-    renderer.mousedown(evt, (renderer, x, y, which, shiftKey) => {
-      if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
-        if (which === 3 || shiftKey) {
-          // Right click.
-          if (off[y][x]) {
-            actionMode = ActionMode.SET_UNKNOWN;
-            on[y][x] = false;
-            off[y][x] = false;
-            checkColumn(x);
-            checkRow(y);
-          } else if (!off[y][x]) {
-            actionMode = ActionMode.SETTING_OFF;
-            on[y][x] = false;
-            off[y][x] = true;
-            checkColumn(x);
-            checkRow(y);
+  const renderer = new Renderer(svg,
+      (x, y, which, shiftKey) => {
+        if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
+          if (which === 3 || shiftKey) {
+            // Right click.
+            if (off[y][x]) {
+              actionMode = ActionMode.SET_UNKNOWN;
+              on[y][x] = false;
+              off[y][x] = false;
+              checkColumn(x);
+              checkRow(y);
+            } else if (!off[y][x]) {
+              actionMode = ActionMode.SETTING_OFF;
+              on[y][x] = false;
+              off[y][x] = true;
+              checkColumn(x);
+              checkRow(y);
+            }
+          } else {
+            if (on[y][x]) {
+              actionMode = ActionMode.SET_UNKNOWN;
+              on[y][x] = false;
+              off[y][x] = false;
+              checkColumn(x);
+              checkRow(y);
+            } else if (!on[y][x]) {
+              actionMode = ActionMode.SETTING_ON;
+              on[y][x] = true;
+              off[y][x] = false;
+              checkColumn(x);
+              checkRow(y);
+            }
           }
-        } else {
-          if (on[y][x]) {
-            actionMode = ActionMode.SET_UNKNOWN;
-            on[y][x] = false;
-            off[y][x] = false;
-            checkColumn(x);
-            checkRow(y);
-          } else if (!on[y][x]) {
-            actionMode = ActionMode.SETTING_ON;
-            on[y][x] = true;
-            off[y][x] = false;
-            checkColumn(x);
-            checkRow(y);
+          lastX = x;
+          lastY = y;
+          repaint()
+        }
+      },
+      (x, y) => {
+        if (actionMode !== ActionMode.NOT_DRAWING &&
+            x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
+          if (rowLock === false && columnLock === false) {
+            if (lastY !== y) {
+              columnLock = x;
+              renderer.setHighlightMode('locked');
+              renderer.setHighlightColumn(x);
+              renderer.setHighlightRow(-1);
+            } else if (lastX !== x) {
+              rowLock = y;
+              renderer.setHighlightMode('locked');
+              renderer.setHighlightColumn(-1);
+              renderer.setHighlightRow(y);
+            }
+          }
+
+          if (columnLock !== false) {
+            x = columnLock;
+          } else if (rowLock !== false) {
+            y = rowLock;
+          }
+
+          const columnModified = new Set<number>();
+          const rowModified = new Set<number>();
+          let modified = false;
+          for (let p of plotLine(lastX, lastY, x, y)) {
+            if (actionMode === ActionMode.SETTING_ON) {
+              if (!on[p.y][p.x]) {
+                on[p.y][p.x] = true;
+                off[p.y][p.x] = false;
+                modified = true;
+                columnModified.add(p.x);
+                rowModified.add(p.y);
+              }
+            } else if (actionMode === ActionMode.SETTING_OFF) {
+              if (!off[p.y][p.x]) {
+                on[p.y][p.x] = false;
+                off[p.y][p.x] = true;
+                modified = true;
+                columnModified.add(p.x);
+                rowModified.add(p.y);
+              }
+            } else if (actionMode === ActionMode.SET_UNKNOWN) {
+              if (on[p.y][p.x] || off[p.y][p.x]) {
+                on[p.y][p.x] = false;
+                off[p.y][p.x] = false;
+                modified = true;
+                columnModified.add(p.x);
+                rowModified.add(p.y);
+              }
+            }
+          }
+
+          lastX = x;
+          lastY = y;
+          if (modified) {
+            for (let column of columnModified) {
+              checkColumn(column);
+            }
+            for (let row of rowModified) {
+              checkRow(row);
+            }
+            repaint();
           }
         }
-        lastX = x;
-        lastY = y;
-        repaint()
-      }
-    });
-  });
-  svg.addEventListener('mousemove', evt => {
-    if (!renderer) {
-      return;
-    }
-    renderer.mousemove(evt, (renderer, x, y) => {
-      if (!renderer) {
-        throw new Error();
-      }
-      if (actionMode !== ActionMode.NOT_DRAWING &&
-          x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
+
         if (rowLock === false && columnLock === false) {
-          if (lastY !== y) {
-            columnLock = x;
-            renderer.setHighlightMode('locked');
+          if (x >= 0 && x < spec.width) {
+            renderer.setHighlightMode('hover');
             renderer.setHighlightColumn(x);
-            renderer.setHighlightRow(-1);
-          } else if (lastX !== x) {
-            rowLock = y;
-            renderer.setHighlightMode('locked');
-            renderer.setHighlightColumn(-1);
+          }
+          if (y >= 0 && y < spec.height) {
+            renderer.setHighlightMode('hover');
             renderer.setHighlightRow(y);
           }
         }
-
-        if (columnLock !== false) {
-          x = columnLock;
-        } else if (rowLock !== false) {
-          y = rowLock;
-        }
-
-        const columnModified = new Set<number>();
-        const rowModified = new Set<number>();
-        let modified = false;
-        for (let p of plotLine(lastX, lastY, x, y)) {
-          if (actionMode === ActionMode.SETTING_ON) {
-            if (!on[p.y][p.x]) {
-              on[p.y][p.x] = true;
-              off[p.y][p.x] = false;
-              modified = true;
-              columnModified.add(p.x);
-              rowModified.add(p.y);
-            }
-          } else if (actionMode === ActionMode.SETTING_OFF) {
-            if (!off[p.y][p.x]) {
-              on[p.y][p.x] = false;
-              off[p.y][p.x] = true;
-              modified = true;
-              columnModified.add(p.x);
-              rowModified.add(p.y);
-            }
-          } else if (actionMode === ActionMode.SET_UNKNOWN) {
-            if (on[p.y][p.x] || off[p.y][p.x]) {
-              on[p.y][p.x] = false;
-              off[p.y][p.x] = false;
-              modified = true;
-              columnModified.add(p.x);
-              rowModified.add(p.y);
-            }
-          }
-        }
-
-        lastX = x;
-        lastY = y;
-        if (modified) {
-          for (let column of columnModified) {
-            checkColumn(column);
-          }
-          for (let row of rowModified) {
-            checkRow(row);
-          }
-          repaint();
-        }
-      }
-
-      if (rowLock === false && columnLock === false) {
-        if (x >= 0 && x < spec.width) {
-          renderer.setHighlightMode('hover');
-          renderer.setHighlightColumn(x);
-        }
-        if (y >= 0 && y < spec.height) {
-          renderer.setHighlightMode('hover');
-          renderer.setHighlightRow(y);
-        }
-      }
-    });
-  });
+      });
 
   getGame(gamesDb, gameId, result => {
     if (typeof result.grid_data !== 'object') {

@@ -31,8 +31,37 @@ export class Renderer {
   private squares: SVGGElement | undefined = undefined;
   private crosses: SVGGElement | undefined = undefined;
 
-  constructor(svg: SVGSVGElement) {
+
+  constructor(svg: SVGSVGElement,
+              mousedown: (x: number, y: number, which: number, shiftKey: boolean) => void,
+              mousemove: (x: number, y: number) => void) {
     this.svg = svg;
+
+    svg.addEventListener('mousedown', evt => {
+      const cellSize = this.dimensions.cell_size;
+      let clientRect = svg.getBoundingClientRect();
+      let x = evt.clientX - clientRect.left;
+      let y = evt.clientY - clientRect.top;
+      const nextX = Math.floor((x - this.leftOffset) / cellSize);
+      const nextY = Math.floor((y - this.topOffset) / cellSize);
+      mousedown(nextX, nextY, evt.which, evt.shiftKey);
+      evt.preventDefault();
+    });
+
+    svg.addEventListener('mousemove', evt => {
+        const cellSize = this.dimensions.cell_size;
+        let clientRect = svg.getBoundingClientRect();
+        let x = evt.clientX - clientRect.left;
+        let y = evt.clientY - clientRect.top;
+        const nextX = Math.floor((x - this.leftOffset) / cellSize);
+        const nextY = Math.floor((y - this.topOffset) / cellSize);
+        mousemove(nextX, nextY);
+        evt.preventDefault();
+    });
+
+    svg.addEventListener('contextmenu', evt => {
+      evt.preventDefault();
+    });
   }
 
   setDimensions(spec: Spec, dimensions?: Dimensions) {
@@ -160,36 +189,8 @@ export class Renderer {
     }
   }
 
-  mousedown(evt: MouseEvent,
-            func: (arg0: this, x: number, y: number, which: number, shift: boolean) => void) {
-    const svg = evt.currentTarget;
-    if (!(svg instanceof SVGElement)) {
-      throw new Error();
-    }
-    const cellSize = this.dimensions.cell_size;
-    let clientRect = svg.getBoundingClientRect();
-    let x = evt.clientX - clientRect.left;
-    let y = evt.clientY - clientRect.top;
-    const nextX = Math.floor((x - this.leftOffset) / cellSize);
-    const nextY = Math.floor((y - this.topOffset) / cellSize);
-    func(this, nextX, nextY, evt.which, evt.shiftKey);
-    evt.preventDefault();
-  }
 
-  mousemove(evt: MouseEvent, func: (arg0: this, x: number, y: number) => void) {
-    const svg = evt.currentTarget;
-    if (!(svg instanceof SVGElement)) {
-      throw new Error();
-    }
-    const cellSize = this.dimensions.cell_size;
-    let clientRect = svg.getBoundingClientRect();
-    let x = evt.clientX - clientRect.left;
-    let y = evt.clientY - clientRect.top;
-    const nextX = Math.floor((x - this.leftOffset) / cellSize);
-    const nextY = Math.floor((y - this.topOffset) / cellSize);
-    func(this, nextX, nextY);
-    evt.preventDefault();
-  }
+
 
   paintClues(clues: number[][][]) {
     if (!this.columnLabels || !this.rowLabels || !this.dimensions) {

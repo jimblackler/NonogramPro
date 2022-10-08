@@ -182,64 +182,48 @@ export function editorEnhanced(section: HTMLElement) {
   let drawMode = DrawMode.NOT_DRAWING;
 
   const svg = document.getElementsByTagName('svg')[0];
-  const renderer: Renderer = new Renderer(svg);
-  svg.addEventListener('contextmenu', evt => {
-    evt.preventDefault();
-  });
-  svg.addEventListener('mousedown', evt => {
-    if (!renderer) {
-      throw new Error();
-    }
-    renderer.mousedown(evt, (renderer, x, y, which) => {
-      if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
-        if (data[y][x]) {
-          drawMode = DrawMode.DELETING;
-          data[y][x] = false;
-          needsPublish = true;
-        } else {
-          drawMode = DrawMode.SETTING;
-          data[y][x] = true;
-          needsPublish = true;
-        }
-        lastX = x;
-        lastY = y;
-        repaint();
+  const renderer: Renderer = new Renderer(svg, (x, y) => {
+    if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
+      if (data[y][x]) {
+        drawMode = DrawMode.DELETING;
+        data[y][x] = false;
+        needsPublish = true;
+      } else {
+        drawMode = DrawMode.SETTING;
+        data[y][x] = true;
+        needsPublish = true;
       }
-    });
-  });
-
-  svg.addEventListener('mousemove', evt => {
-    if (!renderer) {
+      lastX = x;
+      lastY = y;
+      repaint();
+    }
+  }, (x, y) => {
+    if (drawMode === DrawMode.NOT_DRAWING) {
       return;
     }
-    renderer.mousemove(evt, (renderer, x, y) => {
-      if (drawMode === DrawMode.NOT_DRAWING) {
-        return;
-      }
-      let modified = false;
-      if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
-        for (let p of plotLine(lastX, lastY, x, y)) {
-          if (drawMode === DrawMode.SETTING) {
-            if (!data[p.y][p.x]) {
-              data[p.y][p.x] = true;
-              modified = true;
-              needsPublish = true;
-            }
-          } else if (drawMode === DrawMode.DELETING) {
-            if (data[p.y][p.x]) {
-              data[p.y][p.x] = false;
-              modified = true;
-              needsPublish = true;
-            }
+    let modified = false;
+    if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
+      for (let p of plotLine(lastX, lastY, x, y)) {
+        if (drawMode === DrawMode.SETTING) {
+          if (!data[p.y][p.x]) {
+            data[p.y][p.x] = true;
+            modified = true;
+            needsPublish = true;
+          }
+        } else if (drawMode === DrawMode.DELETING) {
+          if (data[p.y][p.x]) {
+            data[p.y][p.x] = false;
+            modified = true;
+            needsPublish = true;
           }
         }
-        lastX = x;
-        lastY = y;
-        if (modified) {
-          repaint();
-        }
       }
-    });
+      lastX = x;
+      lastY = y;
+      if (modified) {
+        repaint();
+      }
+    }
   });
 
   document.addEventListener('mouseup', evt => {
