@@ -116,7 +116,7 @@ export function addEditor(document: Document, parent: HTMLElement) {
     {
       const select = document.createElement('select');
       bordered.append(select);
-      select.setAttribute('id', 'ColorScheme');
+      select.setAttribute('id', 'colorScheme');
 
       {
         const option = document.createElement('option');

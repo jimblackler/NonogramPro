@@ -34,7 +34,7 @@ export function editorEnhanced(section: HTMLElement) {
   const cancel = section.querySelector('#cancel');
   const delete_ = section.querySelector('#delete');
   const gridSize = section.querySelector('#gridSize');
-  const colorScheme = section.querySelector('#ColorScheme');
+  const colorScheme = section.querySelector('select#colorScheme');
 
   if (!(title instanceof HTMLHeadingElement) || !(status instanceof HTMLElement) || !createNew
       || !play || !analyze || !publish || !cancel || !delete_
@@ -303,7 +303,7 @@ export function editorEnhanced(section: HTMLElement) {
   function repaint() {
     const title = document.getElementById('title');
     const gridSize = document.getElementById('gridSize');
-    const colorScheme = document.getElementById('ColorScheme');
+    const colorScheme = document.getElementById('colorScheme');
     const publish = document.getElementById('publish');
     const colorSchemeStylesheet = document.getElementById('colorSchemeStylesheet');
 
