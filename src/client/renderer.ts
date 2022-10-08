@@ -31,7 +31,6 @@ export class Renderer {
   private squares: SVGGElement | undefined = undefined;
   private crosses: SVGGElement | undefined = undefined;
 
-
   constructor(svg: SVGSVGElement,
               mousedown: (x: number, y: number, which: number, shiftKey: boolean) => void,
               mousemove: (x: number, y: number) => void) {
@@ -39,9 +38,9 @@ export class Renderer {
 
     svg.addEventListener('mousedown', evt => {
       const cellSize = this.dimensions.cell_size;
-      let clientRect = svg.getBoundingClientRect();
-      let x = evt.clientX - clientRect.left;
-      let y = evt.clientY - clientRect.top;
+      const clientRect = svg.getBoundingClientRect();
+      const x = evt.clientX - clientRect.left;
+      const y = evt.clientY - clientRect.top;
       const nextX = Math.floor((x - this.leftOffset) / cellSize);
       const nextY = Math.floor((y - this.topOffset) / cellSize);
       mousedown(nextX, nextY, evt.which, evt.shiftKey);
@@ -50,9 +49,9 @@ export class Renderer {
 
     svg.addEventListener('mousemove', evt => {
         const cellSize = this.dimensions.cell_size;
-        let clientRect = svg.getBoundingClientRect();
-        let x = evt.clientX - clientRect.left;
-        let y = evt.clientY - clientRect.top;
+        const clientRect = svg.getBoundingClientRect();
+        const x = evt.clientX - clientRect.left;
+        const y = evt.clientY - clientRect.top;
         const nextX = Math.floor((x - this.leftOffset) / cellSize);
         const nextY = Math.floor((y - this.topOffset) / cellSize);
         mousemove(nextX, nextY);
@@ -188,9 +187,6 @@ export class Renderer {
       line.setAttribute('y2', this.topOffset + y * cellSize + 'px');
     }
   }
-
-
-
 
   paintClues(clues: number[][][]) {
     if (!this.columnLabels || !this.rowLabels || !this.dimensions) {
