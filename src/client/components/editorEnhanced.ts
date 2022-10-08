@@ -33,7 +33,7 @@ export function editorEnhanced(section: HTMLElement) {
   const publish = section.querySelector('#publish');
   const cancel = section.querySelector('#cancel');
   const delete_ = section.querySelector('#delete');
-  const gridSize = section.querySelector('#gridSize');
+  const gridSize = section.querySelector('select#gridSize');
   const colorScheme = section.querySelector('select#colorScheme');
 
   if (!(title instanceof HTMLHeadingElement) || !(status instanceof HTMLElement) || !createNew
