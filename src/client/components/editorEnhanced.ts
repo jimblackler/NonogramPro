@@ -13,7 +13,6 @@ import {plotLine} from '../plotLine';
 import {Renderer} from '../renderer';
 
 export function editorEnhanced(section: HTMLElement) {
-  let renderer: Renderer | undefined;
   let data: boolean[][] = [];
   let gameId = '';
   let name = '';
@@ -164,8 +163,10 @@ export function editorEnhanced(section: HTMLElement) {
     if (!(target instanceof HTMLSelectElement)) {
       throw new Error();
     }
-    const spec = JSON.parse(target.value);
-    makeNewGame(spec, false);
+    spec = JSON.parse(target.value);
+    data = Generate.getEmpty(spec);
+    renderer.setDimensions(spec);
+    repaint();
   });
 
   colorScheme.addEventListener('change', evt => {
@@ -188,6 +189,7 @@ export function editorEnhanced(section: HTMLElement) {
   let drawMode = DrawMode.NOT_DRAWING;
 
   const svg = document.getElementsByTagName('svg')[0];
+  const renderer: Renderer = new Renderer(svg);
   svg.addEventListener('contextmenu', evt => {
     evt.preventDefault();
   });
@@ -270,7 +272,7 @@ export function editorEnhanced(section: HTMLElement) {
           name = game.name;
           style = game.style;
           needsPublish = game.needs_publish || false;
-          renderer = new Renderer(svg, spec);
+          renderer.setDimensions(spec);
           repaint();
         },
         () => {
@@ -350,8 +352,7 @@ export function editorEnhanced(section: HTMLElement) {
     style = 'midnight';
     data = Generate.getEmpty(spec);
     name = 'Untitled';
-    const svg = document.getElementsByTagName('svg')[0];
-    renderer = new Renderer(svg, spec);
+    renderer.setDimensions(spec);
     repaint();
   }
 }

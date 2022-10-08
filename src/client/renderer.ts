@@ -13,42 +13,44 @@ interface Dimensions {
 }
 
 export class Renderer {
-  private spec: Spec;
-  private dimensions: Dimensions;
-  private highlightedColumn: SVGElement | false;
+  private readonly svg: SVGSVGElement;
+
+  private spec: Spec = {width: 0, height: 0};
+  private dimensions: Dimensions = {cell_size: 0, ratio_for_clues: 0};
+  private highlightedColumn: SVGElement | false = false;
   private highlightedRow: SVGElement | false;
   private highlightMode: string | undefined;
 
-  private readonly leftOffset: number;
-  private readonly topOffset: number;
-  private readonly rowsAndColumns: SVGGElement;
-  private readonly rows: SVGGElement;
-  private readonly rowLabels: SVGGElement;
-  private readonly columns: SVGGElement;
-  private readonly columnLabels: SVGGElement;
-  private readonly squares: SVGGElement;
-  private readonly crosses: SVGGElement;
+  private leftOffset: number = 0;
+  private topOffset: number = 0;
+  private rowsAndColumns: SVGGElement | undefined = undefined;
+  private rows: SVGGElement | undefined = undefined;
+  private rowLabels: SVGGElement | undefined = undefined;
+  private columns: SVGGElement | undefined = undefined;
+  private columnLabels: SVGGElement | undefined = undefined;
+  private squares: SVGGElement | undefined = undefined;
+  private crosses: SVGGElement | undefined = undefined;
 
-  constructor(svg: SVGSVGElement, spec: Spec, dimensions?: Dimensions) {
-    if (!dimensions) {
-      dimensions = {cell_size: 25, ratio_for_clues: 0.42};
-    }
-    const content = svg.querySelector('#content') || svg;
+  constructor(svg: SVGSVGElement) {
+    this.svg = svg;
+    this.highlightedRow = false;
+    this.highlightedColumn = false;
+  }
+
+  setDimensions(spec: Spec, dimensions?: Dimensions) {
+    const content = this.svg.querySelector('#content') || this.svg;
     while (content.firstChild) {
       content.removeChild(content.firstChild);
     }
     this.spec = spec;
-    this.dimensions = dimensions;
-
-    this.highlightedRow = false;
-    this.highlightedColumn = false;
+    this.dimensions = dimensions || {cell_size: 25, ratio_for_clues: 0.42};
 
     const cellSize = this.dimensions.cell_size;
-    this.leftOffset = dimensions.ratio_for_clues * cellSize * spec.width;
-    this.topOffset = dimensions.ratio_for_clues * cellSize * spec.height;
+    this.leftOffset = this.dimensions.ratio_for_clues * cellSize * spec.width;
+    this.topOffset = this.dimensions.ratio_for_clues * cellSize * spec.height;
 
-    svg.setAttribute('width', this.leftOffset + spec.width * cellSize + 'px');
-    svg.setAttribute('height', this.topOffset + spec.height * cellSize + 'px');
+    this.svg.setAttribute('width', this.leftOffset + spec.width * cellSize + 'px');
+    this.svg.setAttribute('height', this.topOffset + spec.height * cellSize + 'px');
 
     const labels = document.createElementNS(XMLNS, 'g');
     content.append(labels);
@@ -192,6 +194,10 @@ export class Renderer {
   }
 
   paintClues(clues: number[][][]) {
+    if (!this.columnLabels || !this.rowLabels || !this.dimensions) {
+      throw new Error();
+    }
+
     const cellSize = this.dimensions.cell_size;
     while (this.rowLabels.firstChild) {
       this.rowLabels.removeChild(this.rowLabels.firstChild);
@@ -237,6 +243,9 @@ export class Renderer {
   }
 
   paintOnSquares(on: boolean[][], priorOn?: boolean[][]) {
+    if (!this.squares) {
+      throw new Error();
+    }
     const cellSize = this.dimensions.cell_size;
     while (this.squares.firstChild) {
       this.squares.removeChild(this.squares.firstChild);
@@ -262,6 +271,10 @@ export class Renderer {
   }
 
   paintOffSquares(off: boolean[][], priorOff?: boolean[][]) {
+    if (!this.crosses || !this.rowsAndColumns) {
+      throw new Error();
+    }
+
     const cellSize = this.dimensions.cell_size;
     while (this.crosses.firstChild) {
       this.crosses.removeChild(this.crosses.firstChild);
@@ -297,6 +310,9 @@ export class Renderer {
   }
 
   setHighlightMode(mode: string) {
+    if (!this.rowsAndColumns || !this.columns) {
+      throw new Error();
+    }
     if (this.highlightMode) {
       this.rowsAndColumns.classList.remove(this.highlightMode);
     }
@@ -305,6 +321,9 @@ export class Renderer {
   }
 
   setHighlightColumn(column: number) {
+    if (!this.columns) {
+      throw new Error();
+    }
     if (this.highlightedColumn) {
       this.highlightedColumn.classList.remove('highlighted');
     }
@@ -319,6 +338,9 @@ export class Renderer {
   }
 
   setHighlightRow(row: number) {
+    if (!this.rows) {
+      throw new Error();
+    }
     if (this.highlightedRow) {
       this.highlightedRow.classList.remove('highlighted');
     }
@@ -333,6 +355,9 @@ export class Renderer {
   }
 
   setColumnValid(column: number, valid: boolean, complete: number[]) {
+    if (!this.columnLabels) {
+      throw new Error();
+    }
     const group = this.columnLabels.childNodes[column];
     if (!(group instanceof SVGElement)) {
       throw new Error();
@@ -356,6 +381,9 @@ export class Renderer {
   }
 
   setRowValid(row: number, valid: boolean, complete: number[]) {
+    if (!this.rowLabels) {
+      throw new Error();
+    }
     const group = this.rowLabels.childNodes[row];
     if (!(group instanceof SVGElement)) {
       throw new Error();

@@ -88,7 +88,7 @@ export function addEditor(document: Document, parent: HTMLElement) {
         const option = document.createElement('option');
         select.append(option);
         option.setAttribute('value', '{"width": 5, "height": 5}');
-        option.append('10x10');
+        option.append('5x5');
       }
 
       {

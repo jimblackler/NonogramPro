@@ -16,7 +16,6 @@ export function playControlEnhanced(section: HTMLElement) {
   let clues: number[][][] = [];
   let data: boolean[][] = [];
   let style = '';
-  let renderer: Renderer | undefined;
   let on: boolean[][] = [];
   let off: boolean[][] = [];
   let lastX = -1;
@@ -32,6 +31,7 @@ export function playControlEnhanced(section: HTMLElement) {
   if (!(svg instanceof SVGSVGElement)) {
     throw new Error();
   }
+  const renderer = new Renderer(svg);
 
   getGame(gamesDb, gameId, result => {
     if (typeof result.grid_data !== 'object') {
@@ -43,7 +43,7 @@ export function playControlEnhanced(section: HTMLElement) {
     style = result.style;
     on = Generate.getEmpty(spec);
     off = Generate.getEmpty(spec);
-    renderer = new Renderer(svg, spec);
+    renderer.setDimensions(spec);
 
     const colorSchemeStylesheet = document.getElementById('colorSchemeStylesheet');
     if (!(colorSchemeStylesheet instanceof HTMLLinkElement)) {
