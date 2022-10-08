@@ -80,7 +80,7 @@ export function editorEnhanced(section: HTMLElement) {
   });
 
   analyze.addEventListener('click', evt => {
-    let clues = generateClues(spec, data);
+    const clues = generateClues(spec, data);
     Analyze.visualAnalyze(spec, clues);
   });
 
@@ -203,7 +203,7 @@ export function editorEnhanced(section: HTMLElement) {
     }
     let modified = false;
     if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
-      for (let p of plotLine(lastX, lastY, x, y)) {
+      for (const p of plotLine(lastX, lastY, x, y)) {
         if (drawMode === DrawMode.SETTING) {
           if (!data[p.y][p.x]) {
             data[p.y][p.x] = true;
@@ -298,7 +298,7 @@ export function editorEnhanced(section: HTMLElement) {
     }
     title.textContent = name;
     renderer.paintOnSquares(data);
-    let clues = generateClues(spec, data);
+    const clues = generateClues(spec, data);
     renderer.paintClues(clues);
 
     gridSize.value = `{"width": ${spec.width}, "height": ${spec.height}}`;
