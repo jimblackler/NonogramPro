@@ -95,7 +95,7 @@ export function playControlEnhanced(section: HTMLElement) {
           const columnModified = new Set<number>();
           const rowModified = new Set<number>();
           let modified = false;
-          for (let p of plotLine(lastX, lastY, x, y)) {
+          for (const p of plotLine(lastX, lastY, x, y)) {
             if (actionMode === ActionMode.SETTING_ON) {
               if (!on[p.y][p.x]) {
                 on[p.y][p.x] = true;
@@ -126,10 +126,10 @@ export function playControlEnhanced(section: HTMLElement) {
           lastX = x;
           lastY = y;
           if (modified) {
-            for (let column of columnModified) {
+            for (const column of columnModified) {
               checkColumn(column);
             }
-            for (let row of rowModified) {
+            for (const row of rowModified) {
               checkRow(row);
             }
             repaint();
