@@ -37,25 +37,20 @@ export class Renderer {
     this.svg = svg;
 
     svg.addEventListener('mousedown', evt => {
-      const cellSize = this.dimensions.cell_size;
       const clientRect = svg.getBoundingClientRect();
-      const x = evt.clientX - clientRect.left;
-      const y = evt.clientY - clientRect.top;
-      const nextX = Math.floor((x - this.leftOffset) / cellSize);
-      const nextY = Math.floor((y - this.topOffset) / cellSize);
-      mousedown(nextX, nextY, evt.which, evt.shiftKey);
+      mousedown(
+          Math.floor((evt.clientX - clientRect.left - this.leftOffset) / this.dimensions.cell_size),
+          Math.floor((evt.clientY - clientRect.top - this.topOffset) / this.dimensions.cell_size),
+          evt.which, evt.shiftKey);
       evt.preventDefault();
     });
 
     svg.addEventListener('mousemove', evt => {
-        const cellSize = this.dimensions.cell_size;
-        const clientRect = svg.getBoundingClientRect();
-        const x = evt.clientX - clientRect.left;
-        const y = evt.clientY - clientRect.top;
-        const nextX = Math.floor((x - this.leftOffset) / cellSize);
-        const nextY = Math.floor((y - this.topOffset) / cellSize);
-        mousemove(nextX, nextY);
-        evt.preventDefault();
+      const clientRect = svg.getBoundingClientRect();
+      mousemove(
+          Math.floor((evt.clientX - clientRect.left - this.leftOffset) / this.dimensions.cell_size),
+          Math.floor((evt.clientY - clientRect.top - this.topOffset) / this.dimensions.cell_size));
+      evt.preventDefault();
     });
 
     svg.addEventListener('contextmenu', evt => {
