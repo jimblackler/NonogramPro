@@ -16,7 +16,7 @@ export const editHandler: RequestHandler = async (req, res, next) => {
       addEditor(document, parent);
     },
     addScripts: (document, parent) => {
-      addScripts(document, parent, 'main');
+      addScripts(document, parent, 'editMain');
     }
   })
 };

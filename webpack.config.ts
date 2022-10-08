@@ -5,12 +5,15 @@ import {WebpackManifestPlugin} from 'webpack-manifest-plugin';
 export default function config(env: any, argv: any) {
   const configuration: webpack.Configuration = {
     entry: {
-      main: {
-        import: './src/client/main.ts'
+      editMain: {
+        import: './src/client/editMain.ts'
       },
       list: {
         import: './src/client/list.ts'
       },
+      playMain: {
+        import: './src/client/playMain.ts'
+      }
     },
     module: {
       rules: [

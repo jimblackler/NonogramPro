@@ -18,7 +18,7 @@ export const playHandler: RequestHandler = async (req, res, next) => {
     },
 
     addScripts: (document, parent) => {
-      addScripts(document, parent, 'main');
+      addScripts(document, parent, 'playMain');
     }
   })
 };
