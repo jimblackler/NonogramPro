@@ -8,8 +8,8 @@ const VERTICAL_CLUE_SEPARATION = 20;
 const HORIZONTAL_CLUE_BASELINE_POSITION = 0.75;
 
 interface Dimensions {
-  cell_size: number;
-  ratio_for_clues: number;
+  cellSize: number;
+  ratioForClues: number;
 }
 
 export interface GridDownData {
@@ -26,7 +26,7 @@ export interface GridMoveData {
 
 export function enhanceRenderer(svg: SVGSVGElement) {
   let spec: Spec = {width: 0, height: 0};
-  let dimensions: Dimensions = {cell_size: 0, ratio_for_clues: 0};
+  let dimensions: Dimensions = {cellSize: 0, ratioForClues: 0};
   let highlightedColumn: SVGElement | false = false;
   let highlightedRow: SVGElement | false = false;
   let highlightMode: string | undefined;
@@ -45,8 +45,8 @@ export function enhanceRenderer(svg: SVGSVGElement) {
     const clientRect = svg.getBoundingClientRect();
     svg.dispatchEvent(new CustomEvent<GridDownData>('griddown', {
       detail: {
-        x: Math.floor((evt.clientX - clientRect.left - leftOffset) / dimensions.cell_size),
-        y: Math.floor((evt.clientY - clientRect.top - topOffset) / dimensions.cell_size),
+        x: Math.floor((evt.clientX - clientRect.left - leftOffset) / dimensions.cellSize),
+        y: Math.floor((evt.clientY - clientRect.top - topOffset) / dimensions.cellSize),
         which: evt.which,
         shiftKey: evt.shiftKey
       }
@@ -58,8 +58,8 @@ export function enhanceRenderer(svg: SVGSVGElement) {
     const clientRect = svg.getBoundingClientRect();
     svg.dispatchEvent(new CustomEvent<GridMoveData>('gridmove', {
       detail: {
-        x: Math.floor((evt.clientX - clientRect.left - leftOffset) / dimensions.cell_size),
-        y: Math.floor((evt.clientY - clientRect.top - topOffset) / dimensions.cell_size)
+        x: Math.floor((evt.clientX - clientRect.left - leftOffset) / dimensions.cellSize),
+        y: Math.floor((evt.clientY - clientRect.top - topOffset) / dimensions.cellSize)
       }
     }));
     evt.preventDefault();
@@ -76,11 +76,11 @@ export function enhanceRenderer(svg: SVGSVGElement) {
         content.removeChild(content.firstChild);
       }
       spec = spec_;
-      dimensions = dimensions_ || {cell_size: 25, ratio_for_clues: 0.42};
+      dimensions = dimensions_ || {cellSize: 25, ratioForClues: 0.42};
 
-      const cellSize = dimensions.cell_size;
-      leftOffset = dimensions.ratio_for_clues * cellSize * spec.width;
-      topOffset = dimensions.ratio_for_clues * cellSize * spec.height;
+      const cellSize = dimensions.cellSize;
+      leftOffset = dimensions.ratioForClues * cellSize * spec.width;
+      topOffset = dimensions.ratioForClues * cellSize * spec.height;
 
       svg.setAttribute('width', `${leftOffset + spec.width * cellSize}px`);
       svg.setAttribute('height', `${topOffset + spec.height * cellSize}px`);
@@ -200,7 +200,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
         throw new Error();
       }
 
-      const cellSize = dimensions.cell_size;
+      const cellSize = dimensions.cellSize;
       while (rowLabels.firstChild) {
         rowLabels.removeChild(rowLabels.firstChild);
       }
@@ -248,7 +248,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
       if (!squares) {
         throw new Error();
       }
-      const cellSize = dimensions.cell_size;
+      const cellSize = dimensions.cellSize;
       while (squares.firstChild) {
         squares.removeChild(squares.firstChild);
       }
@@ -277,7 +277,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
         throw new Error();
       }
 
-      const cellSize = dimensions.cell_size;
+      const cellSize = dimensions.cellSize;
       while (crosses.firstChild) {
         crosses.removeChild(crosses.firstChild);
       }
