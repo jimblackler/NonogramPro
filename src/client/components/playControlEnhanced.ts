@@ -7,7 +7,7 @@ import {getGame} from '../fetchGame';
 import {Generate} from '../generate';
 import {generateClues} from '../generateClues';
 import {plotLine} from '../plotLine';
-import {Renderer} from '../renderer';
+import {GridDownData, GridMoveData, Renderer} from '../renderer';
 
 export function playControlEnhanced(section: HTMLElement) {
   let rowLock: number | false = false;
@@ -31,8 +31,12 @@ export function playControlEnhanced(section: HTMLElement) {
   if (!(svg instanceof SVGSVGElement)) {
     throw new Error();
   }
-  const renderer = new Renderer(svg,
-      (x, y, which, shiftKey) => {
+
+  svg.addEventListener('griddown', evt => {
+        if (!(evt instanceof CustomEvent)) {
+          throw new Error();
+        }
+        const {x, y, which, shiftKey} = evt.detail as GridDownData;
         if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
           if (which === 3 || shiftKey) {
             // Right click.
@@ -68,8 +72,14 @@ export function playControlEnhanced(section: HTMLElement) {
           lastY = y;
           repaint()
         }
-      },
-      (x, y) => {
+      }
+  );
+
+  svg.addEventListener('gridmove', evt => {
+        if (!(evt instanceof CustomEvent)) {
+          throw new Error();
+        }
+        let {x, y} = evt.detail as GridMoveData;
         if (actionMode !== ActionMode.NOT_DRAWING &&
             x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
           if (rowLock === false && columnLock === false) {
@@ -146,7 +156,10 @@ export function playControlEnhanced(section: HTMLElement) {
             renderer.setHighlightRow(y);
           }
         }
-      });
+      }
+  );
+
+  const renderer = new Renderer(svg);
 
   getGame(gamesDb, gameId, result => {
     if (typeof result.grid_data !== 'object') {

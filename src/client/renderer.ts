@@ -12,6 +12,18 @@ interface Dimensions {
   ratio_for_clues: number;
 }
 
+export interface GridDownData {
+  x: number;
+  y: number;
+  which: number;
+  shiftKey: boolean;
+}
+
+export interface GridMoveData {
+  x: number;
+  y: number;
+}
+
 export class Renderer {
   private readonly svg: SVGSVGElement;
 
@@ -31,25 +43,26 @@ export class Renderer {
   private squares: SVGGElement | undefined = undefined;
   private crosses: SVGGElement | undefined = undefined;
 
-  constructor(svg: SVGSVGElement,
-              mousedown: (x: number, y: number, which: number, shiftKey: boolean) => void,
-              mousemove: (x: number, y: number) => void) {
+  constructor(svg: SVGSVGElement) {
     this.svg = svg;
 
     svg.addEventListener('mousedown', evt => {
       const clientRect = svg.getBoundingClientRect();
-      mousedown(
-          Math.floor((evt.clientX - clientRect.left - this.leftOffset) / this.dimensions.cell_size),
-          Math.floor((evt.clientY - clientRect.top - this.topOffset) / this.dimensions.cell_size),
-          evt.which, evt.shiftKey);
+      svg.dispatchEvent(new CustomEvent<GridDownData>('griddown', {detail: {
+          x: Math.floor((evt.clientX - clientRect.left - this.leftOffset) / this.dimensions.cell_size),
+          y: Math.floor((evt.clientY - clientRect.top - this.topOffset) / this.dimensions.cell_size),
+          which: evt.which,
+          shiftKey: evt.shiftKey
+        }}));
       evt.preventDefault();
     });
 
     svg.addEventListener('mousemove', evt => {
       const clientRect = svg.getBoundingClientRect();
-      mousemove(
-          Math.floor((evt.clientX - clientRect.left - this.leftOffset) / this.dimensions.cell_size),
-          Math.floor((evt.clientY - clientRect.top - this.topOffset) / this.dimensions.cell_size));
+      svg.dispatchEvent(new CustomEvent<GridMoveData>('gridmove', {detail: {
+          x: Math.floor((evt.clientX - clientRect.left - this.leftOffset) / this.dimensions.cell_size),
+          y: Math.floor((evt.clientY - clientRect.top - this.topOffset) / this.dimensions.cell_size)
+        }}));
       evt.preventDefault();
     });
 

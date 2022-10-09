@@ -10,7 +10,7 @@ import {getGame} from '../fetchGame';
 import {Generate} from '../generate';
 import {generateClues} from '../generateClues';
 import {plotLine} from '../plotLine';
-import {Renderer} from '../renderer';
+import {GridDownData, GridMoveData, Renderer} from '../renderer';
 
 export function editorEnhanced(section: HTMLElement) {
   let data: boolean[][] = [];
@@ -182,49 +182,63 @@ export function editorEnhanced(section: HTMLElement) {
   let drawMode = DrawMode.NOT_DRAWING;
 
   const svg = document.getElementsByTagName('svg')[0];
-  const renderer: Renderer = new Renderer(svg, (x, y) => {
-    if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
-      if (data[y][x]) {
-        drawMode = DrawMode.DELETING;
-        data[y][x] = false;
-        needsPublish = true;
-      } else {
-        drawMode = DrawMode.SETTING;
-        data[y][x] = true;
-        needsPublish = true;
-      }
-      lastX = x;
-      lastY = y;
-      repaint();
-    }
-  }, (x, y) => {
-    if (drawMode === DrawMode.NOT_DRAWING) {
-      return;
-    }
-    let modified = false;
-    if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
-      for (const p of plotLine(lastX, lastY, x, y)) {
-        if (drawMode === DrawMode.SETTING) {
-          if (!data[p.y][p.x]) {
-            data[p.y][p.x] = true;
-            modified = true;
+  const renderer: Renderer = new Renderer(svg);
+
+  svg.addEventListener('griddown', evt => {
+        if (!(evt instanceof CustomEvent)) {
+          throw new Error();
+        }
+        const {x, y} = evt.detail as GridDownData;
+        if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
+          if (data[y][x]) {
+            drawMode = DrawMode.DELETING;
+            data[y][x] = false;
+            needsPublish = true;
+          } else {
+            drawMode = DrawMode.SETTING;
+            data[y][x] = true;
             needsPublish = true;
           }
-        } else if (drawMode === DrawMode.DELETING) {
-          if (data[p.y][p.x]) {
-            data[p.y][p.x] = false;
-            modified = true;
-            needsPublish = true;
+          lastX = x;
+          lastY = y;
+          repaint();
+        }
+      }
+  );
+
+  svg.addEventListener('gridmove', evt => {
+        if (!(evt instanceof CustomEvent)) {
+          throw new Error();
+        }
+        const {x, y} = evt.detail as GridMoveData;
+        if (drawMode === DrawMode.NOT_DRAWING) {
+          return;
+        }
+        let modified = false;
+        if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
+          for (const p of plotLine(lastX, lastY, x, y)) {
+            if (drawMode === DrawMode.SETTING) {
+              if (!data[p.y][p.x]) {
+                data[p.y][p.x] = true;
+                modified = true;
+                needsPublish = true;
+              }
+            } else if (drawMode === DrawMode.DELETING) {
+              if (data[p.y][p.x]) {
+                data[p.y][p.x] = false;
+                modified = true;
+                needsPublish = true;
+              }
+            }
+          }
+          lastX = x;
+          lastY = y;
+          if (modified) {
+            repaint();
           }
         }
       }
-      lastX = x;
-      lastY = y;
-      if (modified) {
-        repaint();
-      }
-    }
-  });
+  );
 
   document.addEventListener('mouseup', evt => {
     drawMode = DrawMode.NOT_DRAWING;

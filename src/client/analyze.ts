@@ -146,7 +146,7 @@ function draw(
     spec: Spec, on: boolean[][], priorOn: boolean[][], off: boolean[][], priorOff: boolean[][]) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.classList.add('mini');
-  const renderer = new Renderer(svg, (x, y, which, shiftKey) => {}, (x, y) => {});
+  const renderer = new Renderer(svg);
   renderer.setDimensions(spec, {cell_size: 10, ratio_for_clues: 0});
   renderer.paintOnSquares(on, priorOn);
   renderer.paintOffSquares(off, priorOff);
