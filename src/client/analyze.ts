@@ -148,11 +148,10 @@ function draw(parent: HTMLElement, spec: Spec, on: boolean[][], priorOn: boolean
   parent.append(svg);
   svg.classList.add('mini');
 
-  enhanceRenderer(svg).then(renderer => {
-    renderer.setDimensions(spec, {cell_size: 10, ratio_for_clues: 0});
-    renderer.paintOnSquares(on, priorOn);
-    renderer.paintOffSquares(off, priorOff);
-  });
+  const renderer = enhanceRenderer(svg);
+  renderer.setDimensions(spec, {cell_size: 10, ratio_for_clues: 0});
+  renderer.paintOnSquares(on, priorOn);
+  renderer.paintOffSquares(off, priorOff);
 }
 
 export class Analyze {

@@ -39,7 +39,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
   let columns: SVGGElement | undefined = undefined;
   let columnLabels: SVGGElement | undefined = undefined;
   let squares: SVGGElement | undefined = undefined;
-  let crosses: SVGGElement | undefined = undefined;
+  let crosses: SVGGElement;
 
   svg.addEventListener('mousedown', evt => {
     const clientRect = svg.getBoundingClientRect();
@@ -69,7 +69,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
     evt.preventDefault();
   });
 
-  const surface = {
+  return {
     setDimensions: (spec_: Spec, dimensions_?: Dimensions) => {
       const content = svg.querySelector('#content') || svg;
       while (content.firstChild) {
@@ -411,5 +411,4 @@ export function enhanceRenderer(svg: SVGSVGElement) {
       });
     }
   };
-  return Promise.resolve(surface);
 }
