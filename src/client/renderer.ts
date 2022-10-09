@@ -48,21 +48,25 @@ export class Renderer {
 
     svg.addEventListener('mousedown', evt => {
       const clientRect = svg.getBoundingClientRect();
-      svg.dispatchEvent(new CustomEvent<GridDownData>('griddown', {detail: {
+      svg.dispatchEvent(new CustomEvent<GridDownData>('griddown', {
+        detail: {
           x: Math.floor((evt.clientX - clientRect.left - this.leftOffset) / this.dimensions.cell_size),
           y: Math.floor((evt.clientY - clientRect.top - this.topOffset) / this.dimensions.cell_size),
           which: evt.which,
           shiftKey: evt.shiftKey
-        }}));
+        }
+      }));
       evt.preventDefault();
     });
 
     svg.addEventListener('mousemove', evt => {
       const clientRect = svg.getBoundingClientRect();
-      svg.dispatchEvent(new CustomEvent<GridMoveData>('gridmove', {detail: {
+      svg.dispatchEvent(new CustomEvent<GridMoveData>('gridmove', {
+        detail: {
           x: Math.floor((evt.clientX - clientRect.left - this.leftOffset) / this.dimensions.cell_size),
           y: Math.floor((evt.clientY - clientRect.top - this.topOffset) / this.dimensions.cell_size)
-        }}));
+        }
+      }));
       evt.preventDefault();
     });
 
