@@ -142,7 +142,7 @@ function analyzePass(
   }
 }
 
-function draw(parent: HTMLElement,spec: Spec, on: boolean[][], priorOn: boolean[][],
+function draw(parent: HTMLElement, spec: Spec, on: boolean[][], priorOn: boolean[][],
               off: boolean[][], priorOff: boolean[][]) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   parent.append(svg);
