@@ -24,395 +24,392 @@ export interface GridMoveData {
   y: number;
 }
 
-export class Renderer {
-  private readonly svg: SVGSVGElement;
+export function enhanceRenderer(svg: SVGSVGElement) {
+  let spec: Spec = {width: 0, height: 0};
+  let dimensions: Dimensions = {cell_size: 0, ratio_for_clues: 0};
+  let highlightedColumn: SVGElement | false = false;
+  let highlightedRow: SVGElement | false = false;
+  let highlightMode: string | undefined;
 
-  private spec: Spec = {width: 0, height: 0};
-  private dimensions: Dimensions = {cell_size: 0, ratio_for_clues: 0};
-  private highlightedColumn: SVGElement | false = false;
-  private highlightedRow: SVGElement | false = false;
-  private highlightMode: string | undefined;
+  let leftOffset: number = 0;
+  let topOffset: number = 0;
+  let rowsAndColumns: SVGGElement | undefined = undefined;
+  let rows: SVGGElement | undefined = undefined;
+  let rowLabels: SVGGElement | undefined = undefined;
+  let columns: SVGGElement | undefined = undefined;
+  let columnLabels: SVGGElement | undefined = undefined;
+  let squares: SVGGElement | undefined = undefined;
+  let crosses: SVGGElement | undefined = undefined;
 
-  private leftOffset: number = 0;
-  private topOffset: number = 0;
-  private rowsAndColumns: SVGGElement | undefined = undefined;
-  private rows: SVGGElement | undefined = undefined;
-  private rowLabels: SVGGElement | undefined = undefined;
-  private columns: SVGGElement | undefined = undefined;
-  private columnLabels: SVGGElement | undefined = undefined;
-  private squares: SVGGElement | undefined = undefined;
-  private crosses: SVGGElement | undefined = undefined;
-
-  constructor(svg: SVGSVGElement) {
-    this.svg = svg;
-
-    svg.addEventListener('mousedown', evt => {
-      const clientRect = svg.getBoundingClientRect();
-      svg.dispatchEvent(new CustomEvent<GridDownData>('griddown', {
-        detail: {
-          x: Math.floor((evt.clientX - clientRect.left - this.leftOffset) / this.dimensions.cell_size),
-          y: Math.floor((evt.clientY - clientRect.top - this.topOffset) / this.dimensions.cell_size),
-          which: evt.which,
-          shiftKey: evt.shiftKey
-        }
-      }));
-      evt.preventDefault();
-    });
-
-    svg.addEventListener('mousemove', evt => {
-      const clientRect = svg.getBoundingClientRect();
-      svg.dispatchEvent(new CustomEvent<GridMoveData>('gridmove', {
-        detail: {
-          x: Math.floor((evt.clientX - clientRect.left - this.leftOffset) / this.dimensions.cell_size),
-          y: Math.floor((evt.clientY - clientRect.top - this.topOffset) / this.dimensions.cell_size)
-        }
-      }));
-      evt.preventDefault();
-    });
-
-    svg.addEventListener('contextmenu', evt => {
-      evt.preventDefault();
-    });
-  }
-
-  setDimensions(spec: Spec, dimensions?: Dimensions) {
-    const content = this.svg.querySelector('#content') || this.svg;
-    while (content.firstChild) {
-      content.removeChild(content.firstChild);
-    }
-    this.spec = spec;
-    this.dimensions = dimensions || {cell_size: 25, ratio_for_clues: 0.42};
-
-    const cellSize = this.dimensions.cell_size;
-    this.leftOffset = this.dimensions.ratio_for_clues * cellSize * spec.width;
-    this.topOffset = this.dimensions.ratio_for_clues * cellSize * spec.height;
-
-    this.svg.setAttribute('width', `${this.leftOffset + spec.width * cellSize}px`);
-    this.svg.setAttribute('height', `${this.topOffset + spec.height * cellSize}px`);
-
-    const labels = document.createElementNS(XMLNS, 'g');
-    content.append(labels);
-    labels.classList.add('labels');
-
-    this.rowsAndColumns = document.createElementNS(XMLNS, 'g');
-    content.append(this.rowsAndColumns);
-
-    /* Build rows */
-    this.rows = document.createElementNS(XMLNS, 'g');
-    this.rowsAndColumns.append(this.rows);
-    this.rows.classList.add('rows');
-    this.rowLabels = document.createElementNS(XMLNS, 'g');
-    labels.append(this.rowLabels);
-    this.rowLabels.classList.add('row_labels');
-
-    for (let y = 0; y < spec.height; y++) {
-      const row = document.createElementNS(XMLNS, 'rect');
-      this.rows.append(row);
-      row.classList.add('row');
-      if (y % 2) {
-        row.classList.add('odd');
-      } else {
-        row.classList.add('even');
+  svg.addEventListener('mousedown', evt => {
+    const clientRect = svg.getBoundingClientRect();
+    svg.dispatchEvent(new CustomEvent<GridDownData>('griddown', {
+      detail: {
+        x: Math.floor((evt.clientX - clientRect.left - leftOffset) / dimensions.cell_size),
+        y: Math.floor((evt.clientY - clientRect.top - topOffset) / dimensions.cell_size),
+        which: evt.which,
+        shiftKey: evt.shiftKey
       }
-      row.setAttribute('x', '0');
-      row.setAttribute('y', `${this.topOffset + y * cellSize}px`);
-      row.setAttribute('width', `${this.leftOffset + spec.width * cellSize}px`);
-      row.setAttribute('height', `${cellSize}px`);
-    }
+    }));
+    evt.preventDefault();
+  });
 
-    /* Build columns */
-    this.columns = document.createElementNS(XMLNS, 'g');
-    this.rowsAndColumns.append(this.columns);
-    this.columns.classList.add('columns');
-    this.columnLabels = document.createElementNS(XMLNS, 'g');
-    labels.append(this.columnLabels);
-    this.columnLabels.setAttribute('class', 'column_labels');
-
-    for (let x = 0; x < spec.width; x++) {
-      const column = document.createElementNS(XMLNS, 'rect');
-      this.columns.append(column);
-      column.classList.add('column');
-      if (x % 2) {
-        column.classList.add('odd');
-      } else {
-        column.classList.add('even');
+  svg.addEventListener('mousemove', evt => {
+    const clientRect = svg.getBoundingClientRect();
+    svg.dispatchEvent(new CustomEvent<GridMoveData>('gridmove', {
+      detail: {
+        x: Math.floor((evt.clientX - clientRect.left - leftOffset) / dimensions.cell_size),
+        y: Math.floor((evt.clientY - clientRect.top - topOffset) / dimensions.cell_size)
       }
-      column.setAttribute('x', `${this.leftOffset + x * cellSize}px`);
-      column.setAttribute('y', '0');
-      column.setAttribute('width', `${cellSize}px`);
-      column.setAttribute('height', `${this.topOffset + spec.height * cellSize}px`);
-    }
+    }));
+    evt.preventDefault();
+  });
 
-    this.rowsAndColumns.classList.add('rows_and_columns');
+  svg.addEventListener('contextmenu', evt => {
+    evt.preventDefault();
+  });
 
-    this.squares = document.createElementNS(XMLNS, 'g');
-    content.append(this.squares);
-    this.squares.classList.add('squares');
-
-    this.crosses = document.createElementNS(XMLNS, 'g');
-    content.append(this.crosses);
-    this.crosses.classList.add('crosses');
-
-    /* Build grid lines */
-    const outer = document.createElementNS(XMLNS, 'g');
-    content.append(outer);
-    outer.classList.add('outer');
-
-    const major = document.createElementNS(XMLNS, 'g');
-    content.append(major);
-    major.classList.add('major');
-
-    const minor = document.createElementNS(XMLNS, 'g');
-    content.append(minor);
-    minor.classList.add('minor');
-
-    /* Vertical */
-    for (let x = 0; x <= spec.width; x++) {
-      const line = document.createElementNS(XMLNS, 'line');
-      if (x === 0 || x === spec.width) {
-        outer.append(line);
-      } else if (x % DIVISIONS) {
-        minor.append(line);
-      } else {
-        major.append(line);
+  const surface = {
+    setDimensions: (spec_: Spec, dimensions_?: Dimensions) => {
+      const content = svg.querySelector('#content') || svg;
+      while (content.firstChild) {
+        content.removeChild(content.firstChild);
       }
-      line.setAttribute('x1', `${this.leftOffset + x * cellSize}px`);
-      line.setAttribute('x2', `${this.leftOffset + x * cellSize}px`);
-      line.setAttribute('y1', `${this.topOffset}px`);
-      line.setAttribute('y2', `${this.topOffset + spec.height * cellSize}px`);
-    }
+      spec = spec_;
+      dimensions = dimensions_ || {cell_size: 25, ratio_for_clues: 0.42};
 
-    /* Horizontal */
-    for (let y = 0; y <= spec.height; y++) {
-      const line = document.createElementNS(XMLNS, 'line');
-      content.append(line);
-      if (y === 0 || y === spec.height) {
-        outer.append(line);
-      } else if (y % DIVISIONS) {
-        minor.append(line);
-      } else {
-        major.append(line);
-      }
-      line.setAttribute('x1', `${this.leftOffset}px`);
-      line.setAttribute('x2', `${this.leftOffset + spec.width * cellSize}px`);
-      line.setAttribute('y1', `${this.topOffset + y * cellSize}px`);
-      line.setAttribute('y2', `${this.topOffset + y * cellSize}px`);
-    }
-  }
+      const cellSize = dimensions.cell_size;
+      leftOffset = dimensions.ratio_for_clues * cellSize * spec.width;
+      topOffset = dimensions.ratio_for_clues * cellSize * spec.height;
 
-  paintClues(clues: number[][][]) {
-    if (!this.columnLabels || !this.rowLabels || !this.dimensions) {
-      throw new Error();
-    }
+      svg.setAttribute('width', `${leftOffset + spec.width * cellSize}px`);
+      svg.setAttribute('height', `${topOffset + spec.height * cellSize}px`);
 
-    const cellSize = this.dimensions.cell_size;
-    while (this.rowLabels.firstChild) {
-      this.rowLabels.removeChild(this.rowLabels.firstChild);
-    }
+      const labels = document.createElementNS(XMLNS, 'g');
+      content.append(labels);
+      labels.classList.add('labels');
 
-    for (let y = 0; y < this.spec.height; y++) {
-      const rowLabelGroup = document.createElementNS(XMLNS, 'g');
-      this.rowLabels.append(rowLabelGroup);
-      rowLabelGroup.classList.add('valid');
-      const rowLabel = document.createElementNS(XMLNS, 'text');
-      rowLabelGroup.append(rowLabel);
-      rowLabel.setAttribute('x', `${this.leftOffset - CLUE_TO_GRID_MARGIN}px`);
-      rowLabel.setAttribute('y',
-          `${this.topOffset + y * cellSize + cellSize * HORIZONTAL_CLUE_BASELINE_POSITION}px`);
-      const c2 = clues[0][y];
-      for (let idx = 0; idx < c2.length; idx++) {
-        const tspan = document.createElementNS(XMLNS, 'tspan');
-        rowLabel.append(tspan);
-        const textNode = document.createTextNode(` ${c2[idx]}`);
-        tspan.append(textNode);
-      }
-    }
+      rowsAndColumns = document.createElementNS(XMLNS, 'g');
+      content.append(rowsAndColumns);
 
-    while (this.columnLabels.firstChild) {
-      this.columnLabels.removeChild(this.columnLabels.firstChild);
-    }
-    for (let x = 0; x < this.spec.width; x++) {
-      const c = clues[1][x];
-      let yPos = this.topOffset - CLUE_TO_GRID_MARGIN;
-      const columnLabelGroup = document.createElementNS(XMLNS, 'g');
-      this.columnLabels.append(columnLabelGroup);
-      columnLabelGroup.classList.add('valid');
-      for (let idx = c.length - 1; idx >= 0; idx--) {
-        const columnLabel = document.createElementNS(XMLNS, 'text');
-        columnLabelGroup.append(columnLabel);
-        columnLabel.setAttribute('x', `${this.leftOffset + cellSize / 2 + x * cellSize}px`);
-        columnLabel.setAttribute('y', `${yPos}px`);
-        const textNode = document.createTextNode('' + c[idx]);
-        columnLabel.append(textNode);
-        yPos -= VERTICAL_CLUE_SEPARATION;
-      }
-    }
-  }
+      /* Build rows */
+      rows = document.createElementNS(XMLNS, 'g');
+      rowsAndColumns.append(rows);
+      rows.classList.add('rows');
+      rowLabels = document.createElementNS(XMLNS, 'g');
+      labels.append(rowLabels);
+      rowLabels.classList.add('row_labels');
 
-  paintOnSquares(on: boolean[][], priorOn?: boolean[][]) {
-    if (!this.squares) {
-      throw new Error();
-    }
-    const cellSize = this.dimensions.cell_size;
-    while (this.squares.firstChild) {
-      this.squares.removeChild(this.squares.firstChild);
-    }
-    for (let y = 0; y < this.spec.height; y++) {
-      for (let x = 0; x < this.spec.width; x++) {
-        if (!on[y][x]) {
-          continue;
-        }
-        const rect = document.createElementNS(XMLNS, 'rect');
-        this.squares.append(rect);
-        rect.setAttribute('x', `${this.leftOffset + x * cellSize}px`);
-        rect.setAttribute('y', `${this.topOffset + y * cellSize}px`);
-        rect.setAttribute('width', `${cellSize + 0.5}px`);
-        rect.setAttribute('height', `${cellSize + 0.5}px`);
-        if (!priorOn || priorOn[y][x]) {
-          rect.classList.add('prior');
+      for (let y = 0; y < spec.height; y++) {
+        const row = document.createElementNS(XMLNS, 'rect');
+        rows.append(row);
+        row.classList.add('row');
+        if (y % 2) {
+          row.classList.add('odd');
         } else {
-          rect.classList.add('new');
+          row.classList.add('even');
         }
+        row.setAttribute('x', '0');
+        row.setAttribute('y', `${topOffset + y * cellSize}px`);
+        row.setAttribute('width', `${leftOffset + spec.width * cellSize}px`);
+        row.setAttribute('height', `${cellSize}px`);
       }
-    }
-  }
 
-  paintOffSquares(off: boolean[][], priorOff?: boolean[][]) {
-    if (!this.crosses || !this.rowsAndColumns) {
-      throw new Error();
-    }
+      /* Build columns */
+      columns = document.createElementNS(XMLNS, 'g');
+      rowsAndColumns.append(columns);
+      columns.classList.add('columns');
+      columnLabels = document.createElementNS(XMLNS, 'g');
+      labels.append(columnLabels);
+      columnLabels.setAttribute('class', 'column_labels');
 
-    const cellSize = this.dimensions.cell_size;
-    while (this.crosses.firstChild) {
-      this.crosses.removeChild(this.crosses.firstChild);
-    }
-    for (let y = 0; y < this.spec.height; y++) {
-      for (let x = 0; x < this.spec.width; x++) {
-        if (!off[y][x]) {
-          continue;
-        }
-        const line1 = document.createElementNS(XMLNS, 'line');
-        this.crosses.append(line1);
-        line1.setAttribute('x1', `${this.leftOffset + x * cellSize + CROSS_MARGIN}px`);
-        line1.setAttribute('x2', `${this.leftOffset + x * cellSize + cellSize - CROSS_MARGIN}px`);
-        line1.setAttribute('y1', `${this.topOffset + y * cellSize + CROSS_MARGIN}px`);
-        line1.setAttribute('y2', `${this.topOffset + y * cellSize + cellSize - CROSS_MARGIN}px`);
-        if (!priorOff || priorOff[y][x]) {
-          line1.classList.add('prior');
+      for (let x = 0; x < spec.width; x++) {
+        const column = document.createElementNS(XMLNS, 'rect');
+        columns.append(column);
+        column.classList.add('column');
+        if (x % 2) {
+          column.classList.add('odd');
         } else {
-          line1.classList.add('new');
+          column.classList.add('even');
         }
+        column.setAttribute('x', `${leftOffset + x * cellSize}px`);
+        column.setAttribute('y', '0');
+        column.setAttribute('width', `${cellSize}px`);
+        column.setAttribute('height', `${topOffset + spec.height * cellSize}px`);
+      }
 
-        const line2 = document.createElementNS(XMLNS, 'line');
-        this.crosses.append(line2);
-        line2.setAttribute('x1', `${this.leftOffset + x * cellSize + cellSize - CROSS_MARGIN}px`);
-        line2.setAttribute('x2', `${this.leftOffset + x * cellSize + CROSS_MARGIN}px`);
-        line2.setAttribute('y1', `${this.topOffset + y * cellSize + CROSS_MARGIN}px`);
-        line2.setAttribute('y2', `${this.topOffset + y * cellSize + cellSize - CROSS_MARGIN}px`);
-        if (!priorOff || priorOff[y][x]) {
-          line2.classList.add('prior');
+      rowsAndColumns.classList.add('rows_and_columns');
+
+      squares = document.createElementNS(XMLNS, 'g');
+      content.append(squares);
+      squares.classList.add('squares');
+
+      crosses = document.createElementNS(XMLNS, 'g');
+      content.append(crosses);
+      crosses.classList.add('crosses');
+
+      /* Build grid lines */
+      const outer = document.createElementNS(XMLNS, 'g');
+      content.append(outer);
+      outer.classList.add('outer');
+
+      const major = document.createElementNS(XMLNS, 'g');
+      content.append(major);
+      major.classList.add('major');
+
+      const minor = document.createElementNS(XMLNS, 'g');
+      content.append(minor);
+      minor.classList.add('minor');
+
+      /* Vertical */
+      for (let x = 0; x <= spec.width; x++) {
+        const line = document.createElementNS(XMLNS, 'line');
+        if (x === 0 || x === spec.width) {
+          outer.append(line);
+        } else if (x % DIVISIONS) {
+          minor.append(line);
         } else {
-          line2.classList.add('new');
+          major.append(line);
+        }
+        line.setAttribute('x1', `${leftOffset + x * cellSize}px`);
+        line.setAttribute('x2', `${leftOffset + x * cellSize}px`);
+        line.setAttribute('y1', `${topOffset}px`);
+        line.setAttribute('y2', `${topOffset + spec.height * cellSize}px`);
+      }
+
+      /* Horizontal */
+      for (let y = 0; y <= spec.height; y++) {
+        const line = document.createElementNS(XMLNS, 'line');
+        content.append(line);
+        if (y === 0 || y === spec.height) {
+          outer.append(line);
+        } else if (y % DIVISIONS) {
+          minor.append(line);
+        } else {
+          major.append(line);
+        }
+        line.setAttribute('x1', `${leftOffset}px`);
+        line.setAttribute('x2', `${leftOffset + spec.width * cellSize}px`);
+        line.setAttribute('y1', `${topOffset + y * cellSize}px`);
+        line.setAttribute('y2', `${topOffset + y * cellSize}px`);
+      }
+    },
+
+    paintClues: (clues: number[][][]) => {
+      if (!columnLabels || !rowLabels || !dimensions) {
+        throw new Error();
+      }
+
+      const cellSize = dimensions.cell_size;
+      while (rowLabels.firstChild) {
+        rowLabels.removeChild(rowLabels.firstChild);
+      }
+
+      for (let y = 0; y < spec.height; y++) {
+        const rowLabelGroup = document.createElementNS(XMLNS, 'g');
+        rowLabels.append(rowLabelGroup);
+        rowLabelGroup.classList.add('valid');
+        const rowLabel = document.createElementNS(XMLNS, 'text');
+        rowLabelGroup.append(rowLabel);
+        rowLabel.setAttribute('x', `${leftOffset - CLUE_TO_GRID_MARGIN}px`);
+        rowLabel.setAttribute('y',
+            `${topOffset + y * cellSize + cellSize * HORIZONTAL_CLUE_BASELINE_POSITION}px`);
+        const c2 = clues[0][y];
+        for (let idx = 0; idx < c2.length; idx++) {
+          const tspan = document.createElementNS(XMLNS, 'tspan');
+          rowLabel.append(tspan);
+          const textNode = document.createTextNode(` ${c2[idx]}`);
+          tspan.append(textNode);
         }
       }
-    }
-  }
 
-  setHighlightMode(mode: string) {
-    if (!this.rowsAndColumns || !this.columns) {
-      throw new Error();
-    }
-    if (this.highlightMode) {
-      this.rowsAndColumns.classList.remove(this.highlightMode);
-    }
-    this.rowsAndColumns.classList.add(mode);
-    this.highlightMode = mode;
-  }
+      while (columnLabels.firstChild) {
+        columnLabels.removeChild(columnLabels.firstChild);
+      }
+      for (let x = 0; x < spec.width; x++) {
+        const c = clues[1][x];
+        let yPos = topOffset - CLUE_TO_GRID_MARGIN;
+        const columnLabelGroup = document.createElementNS(XMLNS, 'g');
+        columnLabels.append(columnLabelGroup);
+        columnLabelGroup.classList.add('valid');
+        for (let idx = c.length - 1; idx >= 0; idx--) {
+          const columnLabel = document.createElementNS(XMLNS, 'text');
+          columnLabelGroup.append(columnLabel);
+          columnLabel.setAttribute('x', `${leftOffset + cellSize / 2 + x * cellSize}px`);
+          columnLabel.setAttribute('y', `${yPos}px`);
+          const textNode = document.createTextNode('' + c[idx]);
+          columnLabel.append(textNode);
+          yPos -= VERTICAL_CLUE_SEPARATION;
+        }
+      }
+    },
 
-  setHighlightColumn(column: number) {
-    if (!this.columns) {
-      throw new Error();
-    }
-    if (this.highlightedColumn) {
-      this.highlightedColumn.classList.remove('highlighted');
-    }
-    if (column !== -1) {
-      const childNode = this.columns.childNodes[column];
-      if (!(childNode instanceof SVGElement)) {
+    paintOnSquares: (on: boolean[][], priorOn?: boolean[][]) => {
+      if (!squares) {
         throw new Error();
       }
-      this.highlightedColumn = childNode;
-      this.highlightedColumn.classList.add('highlighted');
-    }
-  }
+      const cellSize = dimensions.cell_size;
+      while (squares.firstChild) {
+        squares.removeChild(squares.firstChild);
+      }
+      for (let y = 0; y < spec.height; y++) {
+        for (let x = 0; x < spec.width; x++) {
+          if (!on[y][x]) {
+            continue;
+          }
+          const rect = document.createElementNS(XMLNS, 'rect');
+          squares.append(rect);
+          rect.setAttribute('x', `${leftOffset + x * cellSize}px`);
+          rect.setAttribute('y', `${topOffset + y * cellSize}px`);
+          rect.setAttribute('width', `${cellSize + 0.5}px`);
+          rect.setAttribute('height', `${cellSize + 0.5}px`);
+          if (!priorOn || priorOn[y][x]) {
+            rect.classList.add('prior');
+          } else {
+            rect.classList.add('new');
+          }
+        }
+      }
+    },
 
-  setHighlightRow(row: number) {
-    if (!this.rows) {
-      throw new Error();
-    }
-    if (this.highlightedRow) {
-      this.highlightedRow.classList.remove('highlighted');
-    }
-    if (row !== -1) {
-      const childNode = this.rows.childNodes[row];
-      if (!(childNode instanceof SVGElement)) {
+    paintOffSquares: (off: boolean[][], priorOff?: boolean[][]) => {
+      if (!crosses || !rowsAndColumns) {
         throw new Error();
       }
-      this.highlightedRow = childNode;
-      this.highlightedRow.classList.add('highlighted');
-    }
-  }
 
-  setColumnValid(column: number, valid: boolean, complete: number[]) {
-    if (!this.columnLabels) {
-      throw new Error();
-    }
-    const group = this.columnLabels.childNodes[column];
-    if (!(group instanceof SVGElement)) {
-      throw new Error();
-    }
-    if (valid) {
-      group.classList.add('valid');
-    } else {
-      group.classList.remove('valid');
-    }
-    complete.forEach((v, i) => {
-      const part = group.childNodes[group.childNodes.length - 1 - i];
-      if (!(part instanceof SVGElement)) {
+      const cellSize = dimensions.cell_size;
+      while (crosses.firstChild) {
+        crosses.removeChild(crosses.firstChild);
+      }
+      for (let y = 0; y < spec.height; y++) {
+        for (let x = 0; x < spec.width; x++) {
+          if (!off[y][x]) {
+            continue;
+          }
+          const line1 = document.createElementNS(XMLNS, 'line');
+          crosses.append(line1);
+          line1.setAttribute('x1', `${leftOffset + x * cellSize + CROSS_MARGIN}px`);
+          line1.setAttribute('x2', `${leftOffset + x * cellSize + cellSize - CROSS_MARGIN}px`);
+          line1.setAttribute('y1', `${topOffset + y * cellSize + CROSS_MARGIN}px`);
+          line1.setAttribute('y2', `${topOffset + y * cellSize + cellSize - CROSS_MARGIN}px`);
+          if (!priorOff || priorOff[y][x]) {
+            line1.classList.add('prior');
+          } else {
+            line1.classList.add('new');
+          }
+
+          const line2 = document.createElementNS(XMLNS, 'line');
+          crosses.append(line2);
+          line2.setAttribute('x1', `${leftOffset + x * cellSize + cellSize - CROSS_MARGIN}px`);
+          line2.setAttribute('x2', `${leftOffset + x * cellSize + CROSS_MARGIN}px`);
+          line2.setAttribute('y1', `${topOffset + y * cellSize + CROSS_MARGIN}px`);
+          line2.setAttribute('y2', `${topOffset + y * cellSize + cellSize - CROSS_MARGIN}px`);
+          if (!priorOff || priorOff[y][x]) {
+            line2.classList.add('prior');
+          } else {
+            line2.classList.add('new');
+          }
+        }
+      }
+    },
+
+    setHighlightMode: (mode: string) => {
+      if (!rowsAndColumns || !columns) {
         throw new Error();
       }
-      if (v >= 0) {
-        part.classList.add('complete');
+      if (highlightMode) {
+        rowsAndColumns.classList.remove(highlightMode);
+      }
+      rowsAndColumns.classList.add(mode);
+      highlightMode = mode;
+    },
+
+    setHighlightColumn: (column: number) => {
+      if (!columns) {
+        throw new Error();
+      }
+      if (highlightedColumn) {
+        highlightedColumn.classList.remove('highlighted');
+      }
+      if (column !== -1) {
+        const childNode = columns.childNodes[column];
+        if (!(childNode instanceof SVGElement)) {
+          throw new Error();
+        }
+        highlightedColumn = childNode;
+        highlightedColumn.classList.add('highlighted');
+      }
+    },
+
+    setHighlightRow: (row: number) => {
+      if (!rows) {
+        throw new Error();
+      }
+      if (highlightedRow) {
+        highlightedRow.classList.remove('highlighted');
+      }
+      if (row !== -1) {
+        const childNode = rows.childNodes[row];
+        if (!(childNode instanceof SVGElement)) {
+          throw new Error();
+        }
+        highlightedRow = childNode;
+        highlightedRow.classList.add('highlighted');
+      }
+    },
+
+    setColumnValid: (column: number, valid: boolean, complete: number[]) => {
+      if (!columnLabels) {
+        throw new Error();
+      }
+      const group = columnLabels.childNodes[column];
+      if (!(group instanceof SVGElement)) {
+        throw new Error();
+      }
+      if (valid) {
+        group.classList.add('valid');
       } else {
-        part.classList.remove('complete');
+        group.classList.remove('valid');
       }
-    });
-  }
+      complete.forEach((v, i) => {
+        const part = group.childNodes[group.childNodes.length - 1 - i];
+        if (!(part instanceof SVGElement)) {
+          throw new Error();
+        }
+        if (v >= 0) {
+          part.classList.add('complete');
+        } else {
+          part.classList.remove('complete');
+        }
+      });
+    },
 
-  setRowValid(row: number, valid: boolean, complete: number[]) {
-    if (!this.rowLabels) {
-      throw new Error();
-    }
-    const group = this.rowLabels.childNodes[row];
-    if (!(group instanceof SVGElement)) {
-      throw new Error();
-    }
-    if (valid) {
-      group.classList.add('valid');
-    } else {
-      group.classList.remove('valid');
-    }
-    const elements = group.childNodes[0].childNodes;
-    complete.forEach((v, i) => {
-      const part = elements[i];
-      if (!(part instanceof SVGElement)) {
+    setRowValid: (row: number, valid: boolean, complete: number[]) => {
+      if (!rowLabels) {
         throw new Error();
       }
-      if (v >= 0) {
-        part.classList.add('complete');
-      } else {
-        part.classList.remove('complete');
+      const group = rowLabels.childNodes[row];
+      if (!(group instanceof SVGElement)) {
+        throw new Error();
       }
-    });
-  }
+      if (valid) {
+        group.classList.add('valid');
+      } else {
+        group.classList.remove('valid');
+      }
+      const elements = group.childNodes[0].childNodes;
+      complete.forEach((v, i) => {
+        const part = elements[i];
+        if (!(part instanceof SVGElement)) {
+          throw new Error();
+        }
+        if (v >= 0) {
+          part.classList.add('complete');
+        } else {
+          part.classList.remove('complete');
+        }
+      });
+    }
+  };
+  return Promise.resolve(surface);
 }

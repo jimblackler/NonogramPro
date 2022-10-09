@@ -1,6 +1,6 @@
 import {Spec} from '../common/spec';
 import {Generate} from './generate';
-import {Renderer} from './renderer';
+import {enhanceRenderer} from './renderer';
 
 require('./dialog');
 
@@ -142,15 +142,17 @@ function analyzePass(
   }
 }
 
-function draw(
-    spec: Spec, on: boolean[][], priorOn: boolean[][], off: boolean[][], priorOff: boolean[][]) {
+function draw(parent: HTMLElement,spec: Spec, on: boolean[][], priorOn: boolean[][],
+              off: boolean[][], priorOff: boolean[][]) {
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  parent.append(svg);
   svg.classList.add('mini');
-  const renderer = new Renderer(svg);
-  renderer.setDimensions(spec, {cell_size: 10, ratio_for_clues: 0});
-  renderer.paintOnSquares(on, priorOn);
-  renderer.paintOffSquares(off, priorOff);
-  return svg;
+
+  enhanceRenderer(svg).then(renderer => {
+    renderer.setDimensions(spec, {cell_size: 10, ratio_for_clues: 0});
+    renderer.paintOnSquares(on, priorOn);
+    renderer.paintOffSquares(off, priorOff);
+  });
 }
 
 export class Analyze {
@@ -175,7 +177,7 @@ export class Analyze {
       } else {
         failed = 0;
       }
-      perRound(on, priorOn, off, priorOff);
+      perRound(Generate.clone(on), priorOn, Generate.clone(off), priorOff);
 
       if (Generate.complete(on, off)) {
         return rounds;
@@ -204,7 +206,7 @@ export class Analyze {
     div.appendChild(header);
 
     let difficulty = Analyze.analyze(spec, clues,
-        (on, priorOn, off, priorOff) => div.appendChild(draw(spec, on, priorOn, off, priorOff)));
+        (on, priorOn, off, priorOff) => draw(div, spec, on, priorOn, off, priorOff));
 
     let phrase;
     if (difficulty === -1) {

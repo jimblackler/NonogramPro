@@ -10,7 +10,7 @@ import {getGame} from '../fetchGame';
 import {Generate} from '../generate';
 import {generateClues} from '../generateClues';
 import {plotLine} from '../plotLine';
-import {GridDownData, GridMoveData, Renderer} from '../renderer';
+import {enhanceRenderer, GridDownData, GridMoveData} from '../renderer';
 
 export function editorEnhanced(section: HTMLElement) {
   let data: boolean[][] = [];
@@ -84,70 +84,6 @@ export function editorEnhanced(section: HTMLElement) {
     Analyze.visualAnalyze(spec, clues);
   });
 
-  publish.addEventListener('click', evt => {
-    if (name === 'Untitled' || name === '') {
-      name = prompt('Enter a name for your puzzle') || '';
-      saveLocal();
-      repaint();
-    }
-    const data = {
-      ...getData(),
-      game_id: gameId
-    };
-    // We don't technically need to uuencode the grid at this stage, but
-    // big boolean arrays aren't transport or server friendly.
-    if (typeof data.grid_data !== 'object') {
-      throw new Error();
-    }
-    data.grid_data = encode(data.grid_data);
-    axios.post('/publish', data)
-        .then(response => response.data)
-        .then(obj => {
-          if (obj.login) {
-            window.location.href = obj.login;
-          } else if (obj.exception) {
-            alert(obj.exception);
-          } else {
-            const game = obj.game.data;
-            const newId = obj.game.key;
-            if (typeof game.grid_data != 'string') {
-              throw new Error();
-            }
-
-            game.grid_data = decode(game.spec, game.grid_data);
-
-            needsPublish = false;
-            if (gameId !== newId) {
-              gamesDb.deleteItem(gameId).then(
-                  () => window.history.replaceState({}, '', `edit?game=${gameId}`));
-              gameId = newId;
-            }
-            gamesDb.set(gameId, game);
-            publish.setAttribute('disabled', '');
-
-            alert(`Difficulty ${game.difficulty}`);
-          }
-        });
-  });
-
-  cancel.addEventListener('click', evt => {
-    // Defined as 'delete any local changes and restore to the published
-    // version'.
-
-    // We don't have a local copy so must refresh from server. Requires
-    // internet. May not be the best solution.
-    getGame(gamesDb, gameId, game => {
-      if (typeof game.grid_data !== 'object') {
-        throw new Error();
-      }
-      spec = game.spec;
-      data = game.grid_data;
-      name = game.name;
-      repaint();
-    }, () => {
-    });
-  });
-
   delete_.addEventListener('click', evt => {
     // Local delete
     gamesDb.deleteItem(gameId);
@@ -159,20 +95,6 @@ export function editorEnhanced(section: HTMLElement) {
         });
   });
 
-  gridSize.addEventListener('change', evt => {
-    spec = JSON.parse(gridSize.value);
-    data = Generate.getEmpty(spec);
-    renderer.setDimensions(spec);
-    repaint();
-  });
-
-  colorScheme.addEventListener('change', evt => {
-    style = colorScheme.value;
-    needsPublish = true;
-    repaint();
-    saveLocal();
-  });
-
   const DrawMode = {
     NOT_DRAWING: 0,
     SETTING: 1,
@@ -182,63 +104,207 @@ export function editorEnhanced(section: HTMLElement) {
   let drawMode = DrawMode.NOT_DRAWING;
 
   const svg = document.getElementsByTagName('svg')[0];
-  const renderer: Renderer = new Renderer(svg);
+  enhanceRenderer(svg).then(renderer => {
+    function repaint() {
+      const title = document.getElementById('title');
+      const gridSize = document.getElementById('gridSize');
+      const colorScheme = document.getElementById('colorScheme');
+      const publish = document.getElementById('publish');
+      const colorSchemeStylesheet = document.getElementById('colorSchemeStylesheet');
 
-  svg.addEventListener('griddown', evt => {
-        if (!(evt instanceof CustomEvent)) {
-          throw new Error();
-        }
-        const {x, y} = evt.detail as GridDownData;
-        if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
-          if (data[y][x]) {
-            drawMode = DrawMode.DELETING;
-            data[y][x] = false;
-            needsPublish = true;
-          } else {
-            drawMode = DrawMode.SETTING;
-            data[y][x] = true;
-            needsPublish = true;
-          }
-          lastX = x;
-          lastY = y;
-          repaint();
-        }
+      if (!title || !(gridSize instanceof HTMLSelectElement) ||
+          !(colorScheme instanceof HTMLSelectElement) || !publish ||
+          !(colorSchemeStylesheet instanceof HTMLLinkElement)) {
+        throw new Error();
       }
-  );
+      title.textContent = name;
+      renderer.paintOnSquares(data);
+      const clues = generateClues(spec, data);
+      renderer.paintClues(clues);
 
-  svg.addEventListener('gridmove', evt => {
-        if (!(evt instanceof CustomEvent)) {
-          throw new Error();
-        }
-        const {x, y} = evt.detail as GridMoveData;
-        if (drawMode === DrawMode.NOT_DRAWING) {
-          return;
-        }
-        let modified = false;
-        if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
-          for (const p of plotLine(lastX, lastY, x, y)) {
-            if (drawMode === DrawMode.SETTING) {
-              if (!data[p.y][p.x]) {
-                data[p.y][p.x] = true;
-                modified = true;
-                needsPublish = true;
-              }
-            } else if (drawMode === DrawMode.DELETING) {
-              if (data[p.y][p.x]) {
-                data[p.y][p.x] = false;
-                modified = true;
-                needsPublish = true;
-              }
+      gridSize.value = `{"width": ${spec.width}, "height": ${spec.height}}`;
+
+      colorScheme.value = style;
+
+      if (needsPublish) {
+        publish.removeAttribute('disabled');
+      } else {
+        publish.setAttribute('disabled', '');
+      }
+      if (setStyle !== style) {
+        colorSchemeStylesheet.href = `/styles/color_schemes/${style}.css`;
+        setStyle = style;
+      }
+    }
+
+    function makeNewGame(spec_: Spec, replace: boolean) {
+      const random = Alea();
+      gameId = `draft${random() * 10000 | 0}`;
+      const url = `edit?game=${gameId}`;
+      if (replace) {
+        window.history.replaceState({}, '', url);
+      } else {
+        window.history.pushState({}, '', url);
+      }
+      spec = spec_;
+      style = 'midnight';
+      data = Generate.getEmpty(spec);
+      name = 'Untitled';
+      renderer.setDimensions(spec);
+      repaint();
+    }
+
+    if (gameId) {
+      getGame(
+          gamesDb, gameId,
+          game => {
+            spec = game.spec;
+            if (typeof game.grid_data !== 'object') {
+              throw new Error();
             }
+            data = game.grid_data;
+            name = game.name;
+            style = game.style;
+            needsPublish = game.needs_publish || false;
+            renderer.setDimensions(spec);
+            repaint();
+          },
+          () => {
+            makeNewGame(defaultSpec, true);
+          });
+    } else {
+      // Otherwise make a new game.
+      makeNewGame(defaultSpec, true);
+    }
+
+    gridSize.addEventListener('change', evt => {
+      spec = JSON.parse(gridSize.value);
+      data = Generate.getEmpty(spec);
+      renderer.setDimensions(spec);
+      repaint();
+    });
+
+    svg.addEventListener('griddown', evt => {
+          if (!(evt instanceof CustomEvent)) {
+            throw new Error();
           }
-          lastX = x;
-          lastY = y;
-          if (modified) {
+          const {x, y} = evt.detail as GridDownData;
+          if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
+            if (data[y][x]) {
+              drawMode = DrawMode.DELETING;
+              data[y][x] = false;
+              needsPublish = true;
+            } else {
+              drawMode = DrawMode.SETTING;
+              data[y][x] = true;
+              needsPublish = true;
+            }
+            lastX = x;
+            lastY = y;
             repaint();
           }
         }
+    );
+
+    svg.addEventListener('gridmove', evt => {
+          if (!(evt instanceof CustomEvent)) {
+            throw new Error();
+          }
+          const {x, y} = evt.detail as GridMoveData;
+          if (drawMode === DrawMode.NOT_DRAWING) {
+            return;
+          }
+          let modified = false;
+          if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
+            for (const p of plotLine(lastX, lastY, x, y)) {
+              if (drawMode === DrawMode.SETTING) {
+                if (!data[p.y][p.x]) {
+                  data[p.y][p.x] = true;
+                  modified = true;
+                  needsPublish = true;
+                }
+              } else if (drawMode === DrawMode.DELETING) {
+                if (data[p.y][p.x]) {
+                  data[p.y][p.x] = false;
+                  modified = true;
+                  needsPublish = true;
+                }
+              }
+            }
+            lastX = x;
+            lastY = y;
+            if (modified) {
+              repaint();
+            }
+          }
+        }
+    );
+
+    cancel.addEventListener('click', evt => {
+      // Defined as 'delete any local changes and restore to the published
+      // version'.
+
+      // We don't have a local copy so must refresh from server. Requires
+      // internet. May not be the best solution.
+      getGame(gamesDb, gameId, game => {
+        if (typeof game.grid_data !== 'object') {
+          throw new Error();
+        }
+        spec = game.spec;
+        data = game.grid_data;
+        name = game.name;
+        repaint();
+      }, () => {
+      });
+    });
+
+    publish.addEventListener('click', evt => {
+      if (name === 'Untitled' || name === '') {
+        name = prompt('Enter a name for your puzzle') || '';
+        saveLocal();
+        repaint();
       }
-  );
+      const data = {
+        ...getData(),
+        game_id: gameId
+      };
+      // We don't technically need to uuencode the grid at this stage, but
+      // big boolean arrays aren't transport or server friendly.
+      if (typeof data.grid_data !== 'object') {
+        throw new Error();
+      }
+      data.grid_data = encode(data.grid_data);
+      axios.post('/publish', data)
+          .then(response => response.data)
+          .then(obj => {
+            if (obj.login) {
+              window.location.href = obj.login;
+            } else if (obj.exception) {
+              alert(obj.exception);
+            } else {
+              const game = obj.game.data;
+              const newId = obj.game.key;
+              if (typeof game.grid_data != 'string') {
+                throw new Error();
+              }
+
+              game.grid_data = decode(game.spec, game.grid_data);
+
+              needsPublish = false;
+              if (gameId !== newId) {
+                gamesDb.deleteItem(gameId).then(
+                    () => window.history.replaceState({}, '', `edit?game=${gameId}`));
+                gameId = newId;
+              }
+              gamesDb.set(gameId, game);
+              publish.setAttribute('disabled', '');
+
+              alert(`Difficulty ${game.difficulty}`);
+            }
+          });
+    });
+  });
+
 
   document.addEventListener('mouseup', evt => {
     drawMode = DrawMode.NOT_DRAWING;
@@ -250,30 +316,6 @@ export function editorEnhanced(section: HTMLElement) {
   gameId = new URL(window.location.href).searchParams.get('game') || '';
   needsPublish = false;
   const defaultSpec = {width: 20, height: 20};
-
-  if (gameId) {
-    getGame(
-        gamesDb, gameId,
-        game => {
-          spec = game.spec;
-          if (typeof game.grid_data !== 'object') {
-            throw new Error();
-          }
-          data = game.grid_data;
-          name = game.name;
-          style = game.style;
-          needsPublish = game.needs_publish || false;
-          renderer.setDimensions(spec);
-          repaint();
-        },
-        () => {
-          makeNewGame(defaultSpec, true);
-        });
-  } else {
-    // Otherwise make a new game.
-    makeNewGame(defaultSpec, true);
-  }
-
 
   function getData() {
     return {
@@ -296,54 +338,5 @@ export function editorEnhanced(section: HTMLElement) {
       })
     };
     gamesDb.set(gameId, data);
-  }
-
-  function repaint() {
-    const title = document.getElementById('title');
-    const gridSize = document.getElementById('gridSize');
-    const colorScheme = document.getElementById('colorScheme');
-    const publish = document.getElementById('publish');
-    const colorSchemeStylesheet = document.getElementById('colorSchemeStylesheet');
-
-    if (!title || !(gridSize instanceof HTMLSelectElement) ||
-        !(colorScheme instanceof HTMLSelectElement) || !renderer || !publish ||
-        !(colorSchemeStylesheet instanceof HTMLLinkElement)) {
-      throw new Error();
-    }
-    title.textContent = name;
-    renderer.paintOnSquares(data);
-    const clues = generateClues(spec, data);
-    renderer.paintClues(clues);
-
-    gridSize.value = `{"width": ${spec.width}, "height": ${spec.height}}`;
-
-    colorScheme.value = style;
-
-    if (needsPublish) {
-      publish.removeAttribute('disabled');
-    } else {
-      publish.setAttribute('disabled', '');
-    }
-    if (setStyle !== style) {
-      colorSchemeStylesheet.href = `/styles/color_schemes/${style}.css`;
-      setStyle = style;
-    }
-  }
-
-  function makeNewGame(spec_: Spec, replace: boolean) {
-    const random = Alea();
-    gameId = `draft${random() * 10000 | 0}`;
-    const url = `edit?game=${gameId}`;
-    if (replace) {
-      window.history.replaceState({}, '', url);
-    } else {
-      window.history.pushState({}, '', url);
-    }
-    spec = spec_;
-    style = 'midnight';
-    data = Generate.getEmpty(spec);
-    name = 'Untitled';
-    renderer.setDimensions(spec);
-    repaint();
   }
 }
