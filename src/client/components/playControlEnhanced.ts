@@ -160,6 +160,11 @@ export function playControlEnhanced(section: HTMLElement) {
       }
   );
 
+  svg.addEventListener('mouseout', evt => {
+    renderer.setHighlightColumn(-1);
+    renderer.setHighlightRow(-1);
+  });
+
   getGame(gamesDb, gameId, result => {
     if (typeof result.grid_data !== 'object') {
       throw new Error();
