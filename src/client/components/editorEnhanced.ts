@@ -1,5 +1,6 @@
 import Alea from 'alea';
 import axios from 'axios';
+import {Canvg, Parser} from 'canvg';
 import {ClientGameData} from '../../common/clientGame';
 import {Spec} from '../../common/spec';
 import {Analyze} from '../analyze';
@@ -32,6 +33,7 @@ export function editorEnhanced(section: HTMLElement) {
   const createNew = notNull(section.querySelector('#createNew'));
   const play = notNull(section.querySelector('#play'));
   const analyze = notNull(section.querySelector('#analyze'));
+  const importSvg = notNull(section.querySelector('#importSvg'));
   const publish = notNull(section.querySelector('#publish'));
   const cancel = notNull(section.querySelector('#cancel'));
   const delete_ = notNull(section.querySelector('#delete'));
@@ -215,6 +217,65 @@ export function editorEnhanced(section: HTMLElement) {
       name = game.name;
       repaint();
     }, () => {
+    });
+  });
+
+  importSvg.addEventListener('click', evt => {
+    const input = document.createElement('input');
+    section.append(input);
+    input.setAttribute('id', 'importSvg');
+    input.setAttribute('type', 'file');
+    input.setAttribute('accept', 'image/svg+xml');
+    input.append('Import SVG');
+
+    input.addEventListener('change', evt => {
+      const file = input.files && input.files[0];
+      if (!file) {
+        return;
+      }
+      const reader = new FileReader();
+      reader.addEventListener('load', evt => {
+        const contents = reader.result;
+        if (typeof contents !== 'string') {
+          throw new Error();
+        }
+        const canvas = document.createElement('canvas');
+        if (!canvas) {
+          throw new Error();
+        }
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          throw new Error();
+        }
+
+        const parser = new Parser({})
+        parser.parse(contents).then(doc => {
+          const canvg = new Canvg(ctx, doc, {});
+          return canvg.render();
+        }).then(() => {
+          const canvas2 = document.createElement('canvas');
+          canvas2.width = spec.width;
+          canvas2.height = spec.height;
+          const ctx2 = canvas2.getContext('2d');
+          if (!ctx2) {
+            throw new Error();
+          }
+          ctx2.scale(spec.width / canvas.width, spec.height / canvas.height);
+          ctx2.drawImage(canvas, 0, 0);
+
+          section.append(canvas2);
+          const imageData = ctx2.getImageData(0, 0, spec.width, spec.height);
+
+          for (let y = 0; y < spec.height; y++) {
+            for (let x = 0; x < spec.width; x++) {
+              const datumElement = imageData.data[(y * imageData.width + x) * 4 + 3];
+              data[y][x] = datumElement > 0;
+            }
+          }
+          repaint();
+        });
+      });
+      reader.readAsText(file);
     });
   });
 

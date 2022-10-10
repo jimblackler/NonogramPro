@@ -54,6 +54,13 @@ export function addEditor(document: Document, parent: HTMLElement) {
     {
       const button = document.createElement('button');
       bordered.append(button);
+      button.setAttribute('id', 'importSvg');
+      button.append('Import SVG');
+    }
+
+    {
+      const button = document.createElement('button');
+      bordered.append(button);
       button.setAttribute('id', 'publish');
       button.setAttribute('disabled', '');
       button.append('Publish');
