@@ -13,6 +13,7 @@
     "@google-cloud/datastore": "^7.0.0",
     "alea": "^1.0.1",
     "axios": "^0.27.2",
+    "canvg": "^4.0.1",
     "express": "^4.18.1",
     "google-auth-library": "^8.5.1",
     "googleapis": "^108.0.0",

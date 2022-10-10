@@ -10,6 +10,7 @@ import {getGame} from '../fetchGame';
 import {Generate} from '../generate';
 import {generateClues} from '../generateClues';
 import {is} from '../is';
+import {notNull} from '../notNull';
 import {plotLine} from '../plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from '../renderer';
 
@@ -28,12 +29,12 @@ export function editorEnhanced(section: HTMLElement) {
 
   const title = is(HTMLHeadingElement, section.querySelector('h1#title'));
   const status = is(HTMLElement, section.querySelector('section#status'));
-  const createNew = is(HTMLElement, section.querySelector('#createNew'));
-  const play = is(HTMLElement, section.querySelector('#play'));
-  const analyze = is(HTMLElement, section.querySelector('#analyze'));
-  const publish = is(HTMLElement, section.querySelector('#publish'));
-  const cancel = is(HTMLElement, section.querySelector('#cancel'));
-  const delete_ = is(HTMLElement, section.querySelector('#delete'));
+  const createNew = notNull(section.querySelector('#createNew'));
+  const play = notNull(section.querySelector('#play'));
+  const analyze = notNull(section.querySelector('#analyze'));
+  const publish = notNull(section.querySelector('#publish'));
+  const cancel = notNull(section.querySelector('#cancel'));
+  const delete_ = notNull(section.querySelector('#delete'));
   const gridSize = is(HTMLSelectElement, section.querySelector('select#gridSize'));
   const colorScheme = is(HTMLSelectElement, section.querySelector('select#colorScheme'));
 
@@ -101,6 +102,7 @@ export function editorEnhanced(section: HTMLElement) {
 
   const svg = document.getElementsByTagName('svg')[0];
   const renderer = enhanceRenderer(svg);
+
   function repaint() {
     const colorSchemeStylesheet =
         is(HTMLLinkElement, document.getElementById('colorSchemeStylesheet'));

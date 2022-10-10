@@ -7,8 +7,10 @@ import {getGame} from '../fetchGame';
 import {Generate} from '../generate';
 import {generateClues} from '../generateClues';
 import {is} from '../is';
+import {notNull} from '../notNull';
 import {plotLine} from '../plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from '../renderer';
+import {truthy} from '../truthy';
 
 export function playControlEnhanced(section: HTMLElement) {
   let rowLock: number | false = false;
@@ -28,7 +30,7 @@ export function playControlEnhanced(section: HTMLElement) {
   columnLock = false;
 
   const gameId = new URL(window.location.href).searchParams.get('game') || '';
-  const svg = is(SVGSVGElement, document.getElementsByTagName('svg')[0]);
+  const svg = truthy(document.getElementsByTagName('svg')[0]);
 
   const renderer = enhanceRenderer(svg);
   svg.addEventListener('griddown', evt => {
@@ -173,8 +175,7 @@ export function playControlEnhanced(section: HTMLElement) {
         is(HTMLLinkElement, document.getElementById('colorSchemeStylesheet'));
     colorSchemeStylesheet.href = `/styles/color_schemes/${style}.css`;
 
-    const title = is(HTMLElement, section.querySelector('#title'));
-
+    const title = notNull(section.querySelector('#title'));
     title.textContent = result.name;
     clues = generateClues(spec, data);
     renderer.paintClues(clues);
@@ -190,9 +191,9 @@ export function playControlEnhanced(section: HTMLElement) {
     alert('bad game');
   });
 
-  const replay = is(HTMLElement, section.querySelector('#replay'));
-  const edit = is(HTMLElement, section.querySelector('#edit'));
-  const hint = is(HTMLElement, section.querySelector('#hint'));
+  const replay = notNull(section.querySelector('#replay'));
+  const edit = notNull(section.querySelector('#edit'));
+  const hint = notNull(section.querySelector('#hint'));
 
   replay.addEventListener('click', () => {
     on = Generate.getEmpty(spec);
