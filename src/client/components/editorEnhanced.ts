@@ -67,6 +67,24 @@ function findTrueBounds(ctx: CanvasRenderingContext2D) {
   }
 }
 
+function countCube(
+    imageData: ImageData, trueBounds: { top: number; left: number; bottom: number; right: number },
+    x: number, y: number, spec: Spec) {
+  const left = Math.floor(x / spec.width * (trueBounds.right - trueBounds.left) + trueBounds.left);
+  const right = Math.floor((x + 1) / spec.width * (trueBounds.right - trueBounds.left) + trueBounds.left);
+  const top = Math.floor(y / spec.height * (trueBounds.bottom - trueBounds.top) + trueBounds.top);
+  const bottom = Math.floor((y + 1) / spec.height * (trueBounds.bottom - trueBounds.top) + trueBounds.top);
+  let count = 0;
+  for (let y = top; y < bottom; y++) {
+    for (let x = left; x < right; x++) {
+      if (imageData.data[(y * imageData.width + x) * 4 + 3] > 0) {
+        count++;
+      }
+    }
+  }
+  return count / ((right - left) * (bottom - top));
+}
+
 export function editorEnhanced(section: HTMLElement) {
   let data: boolean[][] = [];
   let gameId = '';
@@ -306,23 +324,10 @@ export function editorEnhanced(section: HTMLElement) {
           return canvg.render();
         }).then(() => {
           const trueBounds = findTrueBounds(ctx);
-          const canvas2 = document.createElement('canvas');
-          canvas2.width = spec.width;
-          canvas2.height = spec.height;
-          const ctx2 = canvas2.getContext('2d');
-          if (!ctx2) {
-            throw new Error();
-          }
-          const ratio = [spec.width / (trueBounds.right - trueBounds.left),
-            spec.height / (trueBounds.bottom - trueBounds.top)];
-          ctx2.scale(ratio[0], ratio[1]);
-          ctx2.drawImage(canvas, -trueBounds.left, -trueBounds.top);
-
-          section.append(canvas2);
-          const imageData = ctx2.getImageData(0, 0, spec.width, spec.height);
+          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           for (let y = 0; y < spec.height; y++) {
             for (let x = 0; x < spec.width; x++) {
-              data[y][x] = imageData.data[(y * imageData.width + x) * 4 + 3] > 0;
+              data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
             }
           }
           repaint();
