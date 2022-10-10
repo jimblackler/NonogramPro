@@ -1,4 +1,5 @@
 import {Spec} from '../common/spec';
+import {is} from './is';
 
 const XMLNS = 'http://www.w3.org/2000/svg';
 const DIVISIONS = 5;
@@ -27,8 +28,8 @@ export interface GridMoveData {
 export function enhanceRenderer(svg: SVGSVGElement) {
   let spec: Spec = {width: 0, height: 0};
   let dimensions: Dimensions = {cellSize: 0, ratioForClues: 0};
-  let highlightedColumn: SVGElement | false = false;
-  let highlightedRow: SVGElement | false = false;
+  let highlightedColumn = -1;
+  let highlightedRow = -1;
   let highlightMode: string | undefined;
 
   let leftOffset: number = 0;
@@ -328,16 +329,12 @@ export function enhanceRenderer(svg: SVGSVGElement) {
       if (!columns) {
         throw new Error();
       }
-      if (highlightedColumn) {
-        highlightedColumn.classList.remove('highlighted');
+      if (highlightedColumn !== -1) {
+        columns.children[highlightedColumn].classList.remove('highlighted')
       }
+      highlightedColumn = column;
       if (column !== -1) {
-        const childNode = columns.childNodes[column];
-        if (!(childNode instanceof SVGElement)) {
-          throw new Error();
-        }
-        highlightedColumn = childNode;
-        highlightedColumn.classList.add('highlighted');
+        columns.children[highlightedColumn].classList.add('highlighted')
       }
     },
 
@@ -345,16 +342,12 @@ export function enhanceRenderer(svg: SVGSVGElement) {
       if (!rows) {
         throw new Error();
       }
-      if (highlightedRow) {
-        highlightedRow.classList.remove('highlighted');
+      if (highlightedRow !== -1) {
+        rows.children[highlightedRow].classList.remove('highlighted');
       }
+      highlightedRow = row;
       if (row !== -1) {
-        const childNode = rows.childNodes[row];
-        if (!(childNode instanceof SVGElement)) {
-          throw new Error();
-        }
-        highlightedRow = childNode;
-        highlightedRow.classList.add('highlighted');
+        rows.children[highlightedRow].classList.add('highlighted');
       }
     },
 
