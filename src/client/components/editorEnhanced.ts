@@ -9,6 +9,7 @@ import {encode} from '../encoder';
 import {getGame} from '../fetchGame';
 import {Generate} from '../generate';
 import {generateClues} from '../generateClues';
+import {is} from '../is';
 import {plotLine} from '../plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from '../renderer';
 
@@ -25,22 +26,17 @@ export function editorEnhanced(section: HTMLElement) {
 
   const gamesDb = new GamesDb();
 
-  const title = section.querySelector('h1#title');
-  const status = section.querySelector('section#status');
-  const createNew = section.querySelector('#createNew');
-  const play = section.querySelector('#play');
-  const analyze = section.querySelector('#analyze');
-  const publish = section.querySelector('#publish');
-  const cancel = section.querySelector('#cancel');
-  const delete_ = section.querySelector('#delete');
-  const gridSize = section.querySelector('select#gridSize');
-  const colorScheme = section.querySelector('select#colorScheme');
+  const title = is(section.querySelector('h1#title'), HTMLHeadingElement);
+  const status = is(section.querySelector('section#status'), HTMLElement);
+  const createNew = is(section.querySelector('#createNew'), HTMLElement);
+  const play = is(section.querySelector('#play'), HTMLElement);
+  const analyze = is(section.querySelector('#analyze'), HTMLElement);
+  const publish = is(section.querySelector('#publish'), HTMLElement);
+  const cancel = is(section.querySelector('#cancel'), HTMLElement);
+  const delete_ = is(section.querySelector('#delete'), HTMLElement);
+  const gridSize = is(section.querySelector('select#gridSize'), HTMLSelectElement);
+  const colorScheme = is(section.querySelector('select#colorScheme'), HTMLSelectElement);
 
-  if (!(title instanceof HTMLHeadingElement) || !(status instanceof HTMLElement) || !createNew
-      || !play || !analyze || !publish || !cancel || !delete_
-      || !(gridSize instanceof HTMLSelectElement) || !(colorScheme instanceof HTMLSelectElement)) {
-    throw new Error();
-  }
   title.setAttribute('contenteditable', 'true');
 
   title.addEventListener('keypress', evt => {
@@ -106,17 +102,8 @@ export function editorEnhanced(section: HTMLElement) {
   const svg = document.getElementsByTagName('svg')[0];
   const renderer = enhanceRenderer(svg);
   function repaint() {
-    const title = document.getElementById('title');
-    const gridSize = document.getElementById('gridSize');
-    const colorScheme = document.getElementById('colorScheme');
-    const publish = document.getElementById('publish');
-    const colorSchemeStylesheet = document.getElementById('colorSchemeStylesheet');
-
-    if (!title || !(gridSize instanceof HTMLSelectElement) ||
-        !(colorScheme instanceof HTMLSelectElement) || !publish ||
-        !(colorSchemeStylesheet instanceof HTMLLinkElement)) {
-      throw new Error();
-    }
+    const colorSchemeStylesheet =
+        is(document.getElementById('colorSchemeStylesheet'), HTMLLinkElement);
     title.textContent = name;
     renderer.paintOnSquares(data);
     const clues = generateClues(spec, data);

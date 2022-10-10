@@ -6,6 +6,7 @@ import {PlaysDb} from '../db/playsDb';
 import {getGame} from '../fetchGame';
 import {Generate} from '../generate';
 import {generateClues} from '../generateClues';
+import {is} from '../is';
 import {plotLine} from '../plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from '../renderer';
 
@@ -27,17 +28,11 @@ export function playControlEnhanced(section: HTMLElement) {
   columnLock = false;
 
   const gameId = new URL(window.location.href).searchParams.get('game') || '';
-  const svg = document.getElementsByTagName('svg')[0];
-  if (!(svg instanceof SVGSVGElement)) {
-    throw new Error();
-  }
+  const svg = is(document.getElementsByTagName('svg')[0], SVGSVGElement);
 
   const renderer = enhanceRenderer(svg);
   svg.addEventListener('griddown', evt => {
-        if (!(evt instanceof CustomEvent)) {
-          throw new Error();
-        }
-        const {x, y, which, shiftKey} = evt.detail as GridDownData;
+        const {x, y, which, shiftKey} = is(evt, CustomEvent).detail as GridDownData;
         if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
           if (which === 3 || shiftKey) {
             // Right click.
@@ -77,10 +72,7 @@ export function playControlEnhanced(section: HTMLElement) {
   );
 
   svg.addEventListener('gridmove', evt => {
-        if (!(evt instanceof CustomEvent)) {
-          throw new Error();
-        }
-        let {x, y} = evt.detail as GridMoveData;
+        let {x, y} = is(evt, CustomEvent).detail as GridMoveData;
         if (actionMode !== ActionMode.NOT_DRAWING &&
             x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
           if (rowLock === false && columnLock === false) {
@@ -177,16 +169,11 @@ export function playControlEnhanced(section: HTMLElement) {
     off = Generate.getEmpty(spec);
     renderer.setDimensions(spec);
 
-    const colorSchemeStylesheet = document.getElementById('colorSchemeStylesheet');
-    if (!(colorSchemeStylesheet instanceof HTMLLinkElement)) {
-      throw new Error();
-    }
+    const colorSchemeStylesheet =
+        is(document.getElementById('colorSchemeStylesheet'), HTMLLinkElement);
     colorSchemeStylesheet.href = `/styles/color_schemes/${style}.css`;
 
-    const title = section.querySelector('#title');
-    if (!title) {
-      throw new Error();
-    }
+    const title = is(section.querySelector('#title'), HTMLElement);
 
     title.textContent = result.name;
     clues = generateClues(spec, data);
@@ -203,12 +190,9 @@ export function playControlEnhanced(section: HTMLElement) {
     alert('bad game');
   });
 
-  const replay = section.querySelector('#replay');
-  const edit = section.querySelector('#edit');
-  const hint = section.querySelector('#hint');
-  if (!replay || !edit || !hint) {
-    throw new Error();
-  }
+  const replay = is(section.querySelector('#replay'), HTMLElement);
+  const edit = is(section.querySelector('#edit'), HTMLElement);
+  const hint = is(section.querySelector('#hint'), HTMLElement);
 
   replay.addEventListener('click', () => {
     on = Generate.getEmpty(spec);
