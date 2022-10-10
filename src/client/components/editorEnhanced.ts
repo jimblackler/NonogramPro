@@ -318,7 +318,7 @@ export function editorEnhanced(section: HTMLElement) {
           throw new Error();
         }
 
-        const parser = new Parser({})
+        const parser = new Parser({});
         parser.parse(contents).then(doc => {
           const canvg = new Canvg(ctx, doc, {});
           return canvg.render();
