@@ -221,9 +221,6 @@ export function playControlEnhanced(section: HTMLElement) {
   });
 
   hint.addEventListener('click', () => {
-    if (!renderer) {
-      throw new Error();
-    }
     renderer.setHighlightMode('hint');
     const hint = Analyze.findHint(spec, clues, on, off);
     renderer.setHighlightRow(hint[0]);
@@ -234,9 +231,6 @@ export function playControlEnhanced(section: HTMLElement) {
   let actionMode = ActionMode.NOT_DRAWING;
 
   document.addEventListener('mouseup', evt => {
-    if (!renderer) {
-      throw new Error();
-    }
     actionMode = ActionMode.NOT_DRAWING;
     rowLock = false;
     columnLock = false;
@@ -251,9 +245,6 @@ export function playControlEnhanced(section: HTMLElement) {
   });
 
   function checkColumn(column: number) {
-    if (!renderer) {
-      throw new Error();
-    }
     const clue = clues[1][column];
     const complete = [];
     while (complete.length < clue.length) {
@@ -264,9 +255,6 @@ export function playControlEnhanced(section: HTMLElement) {
   }
 
   function checkRow(row: number) {
-    if (!renderer) {
-      throw new Error();
-    }
     const clue = clues[0][row];
     const complete = [];
     while (complete.length < clue.length) {
@@ -277,9 +265,6 @@ export function playControlEnhanced(section: HTMLElement) {
   }
 
   function repaint() {
-    if (!renderer) {
-      throw new Error();
-    }
     playsDb.set(gameId, {on: on, off: off});
     renderer.paintOnSquares(on);
     renderer.paintOffSquares(off); /* Check is complete */
