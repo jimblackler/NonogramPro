@@ -149,10 +149,7 @@ export function editorEnhanced(section: HTMLElement) {
   });
 
   svg.addEventListener('griddown', evt => {
-        if (!(evt instanceof CustomEvent)) {
-          throw new Error();
-        }
-        const {x, y} = evt.detail as GridDownData;
+        const {x, y} = is(CustomEvent, evt).detail as GridDownData;
         if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
           if (data[y][x]) {
             drawMode = DrawMode.DELETING;
@@ -171,10 +168,7 @@ export function editorEnhanced(section: HTMLElement) {
   );
 
   svg.addEventListener('gridmove', evt => {
-        if (!(evt instanceof CustomEvent)) {
-          throw new Error();
-        }
-        const {x, y} = evt.detail as GridMoveData;
+        const {x, y} = is(CustomEvent, evt).detail as GridMoveData;
         if (drawMode === DrawMode.NOT_DRAWING) {
           return;
         }
