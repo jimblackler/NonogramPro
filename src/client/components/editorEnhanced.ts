@@ -15,6 +15,58 @@ import {notNull} from '../notNull';
 import {plotLine} from '../plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from '../renderer';
 
+function findLeftBounds(imageData: ImageData) {
+  for (let x = 0; x < imageData.width; x++) {
+    for (let y = 0; y < imageData.height; y++) {
+      if (imageData.data[(y * imageData.width + x) * 4 + 3] > 0) {
+        return x;
+      }
+    }
+  }
+  return imageData.width;
+}
+
+function findRightBounds(imageData: ImageData) {
+  for (let x = imageData.width - 1; x >= 0; x--) {
+    for (let y = 0; y < imageData.height; y++) {
+      if (imageData.data[(y * imageData.width + x) * 4 + 3] > 0) {
+        return x + 1;
+      }
+    }
+  }
+  return 0;
+}
+
+function findTopBounds(imageData: ImageData) {
+  for (let y = 0; y < imageData.height; y++) {
+    for (let x = 0; x < imageData.width; x++) {
+      if (imageData.data[(y * imageData.width + x) * 4 + 3] > 0) {
+        return y;
+      }
+    }
+  }
+  return imageData.height;
+}
+
+function findBottomBounds(imageData: ImageData) {
+  for (let y = imageData.height - 1; y >= 0; y--) {
+    for (let x = 0; x < imageData.width; x++) {
+      if (imageData.data[(y * imageData.width + x) * 4 + 3] > 0) {
+        return y + 1;
+      }
+    }
+  }
+  return 0;
+}
+
+function findTrueBounds(ctx: CanvasRenderingContext2D) {
+  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+  return {
+    left: findLeftBounds(imageData), right: findRightBounds(imageData),
+    top: findTopBounds(imageData), bottom: findBottomBounds(imageData)
+  }
+}
+
 export function editorEnhanced(section: HTMLElement) {
   let data: boolean[][] = [];
   let gameId = '';
@@ -253,6 +305,7 @@ export function editorEnhanced(section: HTMLElement) {
           const canvg = new Canvg(ctx, doc, {});
           return canvg.render();
         }).then(() => {
+          const trueBounds = findTrueBounds(ctx);
           const canvas2 = document.createElement('canvas');
           canvas2.width = spec.width;
           canvas2.height = spec.height;
@@ -260,16 +313,16 @@ export function editorEnhanced(section: HTMLElement) {
           if (!ctx2) {
             throw new Error();
           }
-          ctx2.scale(spec.width / canvas.width, spec.height / canvas.height);
-          ctx2.drawImage(canvas, 0, 0);
+          const ratio = [spec.width / (trueBounds.right - trueBounds.left),
+            spec.height / (trueBounds.bottom - trueBounds.top)];
+          ctx2.scale(ratio[0], ratio[1]);
+          ctx2.drawImage(canvas, -trueBounds.left, -trueBounds.top);
 
           section.append(canvas2);
           const imageData = ctx2.getImageData(0, 0, spec.width, spec.height);
-
           for (let y = 0; y < spec.height; y++) {
             for (let x = 0; x < spec.width; x++) {
-              const datumElement = imageData.data[(y * imageData.width + x) * 4 + 3];
-              data[y][x] = datumElement > 0;
+              data[y][x] = imageData.data[(y * imageData.width + x) * 4 + 3] > 0;
             }
           }
           repaint();
