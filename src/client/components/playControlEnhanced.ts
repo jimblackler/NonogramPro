@@ -28,11 +28,11 @@ export function playControlEnhanced(section: HTMLElement) {
   columnLock = false;
 
   const gameId = new URL(window.location.href).searchParams.get('game') || '';
-  const svg = is(document.getElementsByTagName('svg')[0], SVGSVGElement);
+  const svg = is(SVGSVGElement, document.getElementsByTagName('svg')[0]);
 
   const renderer = enhanceRenderer(svg);
   svg.addEventListener('griddown', evt => {
-        const {x, y, which, shiftKey} = is(evt, CustomEvent).detail as GridDownData;
+        const {x, y, which, shiftKey} = is(CustomEvent, evt).detail as GridDownData;
         if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
           if (which === 3 || shiftKey) {
             // Right click.
@@ -72,7 +72,7 @@ export function playControlEnhanced(section: HTMLElement) {
   );
 
   svg.addEventListener('gridmove', evt => {
-        let {x, y} = is(evt, CustomEvent).detail as GridMoveData;
+        let {x, y} = is(CustomEvent, evt).detail as GridMoveData;
         if (actionMode !== ActionMode.NOT_DRAWING &&
             x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
           if (rowLock === false && columnLock === false) {
@@ -170,10 +170,10 @@ export function playControlEnhanced(section: HTMLElement) {
     renderer.setDimensions(spec);
 
     const colorSchemeStylesheet =
-        is(document.getElementById('colorSchemeStylesheet'), HTMLLinkElement);
+        is(HTMLLinkElement, document.getElementById('colorSchemeStylesheet'));
     colorSchemeStylesheet.href = `/styles/color_schemes/${style}.css`;
 
-    const title = is(section.querySelector('#title'), HTMLElement);
+    const title = is(HTMLElement, section.querySelector('#title'));
 
     title.textContent = result.name;
     clues = generateClues(spec, data);
@@ -190,9 +190,9 @@ export function playControlEnhanced(section: HTMLElement) {
     alert('bad game');
   });
 
-  const replay = is(section.querySelector('#replay'), HTMLElement);
-  const edit = is(section.querySelector('#edit'), HTMLElement);
-  const hint = is(section.querySelector('#hint'), HTMLElement);
+  const replay = is(HTMLElement, section.querySelector('#replay'));
+  const edit = is(HTMLElement, section.querySelector('#edit'));
+  const hint = is(HTMLElement, section.querySelector('#hint'));
 
   replay.addEventListener('click', () => {
     on = Generate.getEmpty(spec);

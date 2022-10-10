@@ -26,16 +26,16 @@ export function editorEnhanced(section: HTMLElement) {
 
   const gamesDb = new GamesDb();
 
-  const title = is(section.querySelector('h1#title'), HTMLHeadingElement);
-  const status = is(section.querySelector('section#status'), HTMLElement);
-  const createNew = is(section.querySelector('#createNew'), HTMLElement);
-  const play = is(section.querySelector('#play'), HTMLElement);
-  const analyze = is(section.querySelector('#analyze'), HTMLElement);
-  const publish = is(section.querySelector('#publish'), HTMLElement);
-  const cancel = is(section.querySelector('#cancel'), HTMLElement);
-  const delete_ = is(section.querySelector('#delete'), HTMLElement);
-  const gridSize = is(section.querySelector('select#gridSize'), HTMLSelectElement);
-  const colorScheme = is(section.querySelector('select#colorScheme'), HTMLSelectElement);
+  const title = is(HTMLHeadingElement, section.querySelector('h1#title'));
+  const status = is(HTMLElement, section.querySelector('section#status'));
+  const createNew = is(HTMLElement, section.querySelector('#createNew'));
+  const play = is(HTMLElement, section.querySelector('#play'));
+  const analyze = is(HTMLElement, section.querySelector('#analyze'));
+  const publish = is(HTMLElement, section.querySelector('#publish'));
+  const cancel = is(HTMLElement, section.querySelector('#cancel'));
+  const delete_ = is(HTMLElement, section.querySelector('#delete'));
+  const gridSize = is(HTMLSelectElement, section.querySelector('select#gridSize'));
+  const colorScheme = is(HTMLSelectElement, section.querySelector('select#colorScheme'));
 
   title.setAttribute('contenteditable', 'true');
 
@@ -103,7 +103,7 @@ export function editorEnhanced(section: HTMLElement) {
   const renderer = enhanceRenderer(svg);
   function repaint() {
     const colorSchemeStylesheet =
-        is(document.getElementById('colorSchemeStylesheet'), HTMLLinkElement);
+        is(HTMLLinkElement, document.getElementById('colorSchemeStylesheet'));
     title.textContent = name;
     renderer.paintOnSquares(data);
     const clues = generateClues(spec, data);

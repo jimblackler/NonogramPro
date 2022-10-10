@@ -1,4 +1,4 @@
-export function is<T>(object: any, type:{new(...a:any[]):T}) {
+export function is<T>(type: { new(...a: any[]): T }, object: any) {
   if (object instanceof type) {
     return object;
   }
