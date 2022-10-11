@@ -357,6 +357,7 @@ export function editorEnhanced(section: HTMLElement) {
           data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
         }
       }
+      needsPublish = true;
       repaint();
     });
     input.click();
