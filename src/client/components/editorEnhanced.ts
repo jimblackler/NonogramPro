@@ -59,8 +59,7 @@ function findBottomBounds(imageData: ImageData) {
   return 0;
 }
 
-function findTrueBounds(ctx: CanvasRenderingContext2D) {
-  const imageData = ctx.getImageData(0, 0, ctx.canvas.width, ctx.canvas.height);
+function findTrueBounds(imageData: ImageData) {
   return {
     left: findLeftBounds(imageData), right: findRightBounds(imageData),
     top: findTopBounds(imageData), bottom: findBottomBounds(imageData)
@@ -333,8 +332,8 @@ export function editorEnhanced(section: HTMLElement) {
           }
 
           new Parser({}).parse(contents).then(doc => new Canvg(ctx, doc, {}).render()).then(() => {
-            const trueBounds = findTrueBounds(ctx);
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            const trueBounds = findTrueBounds(imageData);
             for (let y = 0; y < spec.height; y++) {
               for (let x = 0; x < spec.width; x++) {
                 data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
