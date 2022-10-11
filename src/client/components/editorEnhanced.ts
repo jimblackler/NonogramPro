@@ -323,7 +323,6 @@ export function editorEnhanced(section: HTMLElement) {
 
   importImage.addEventListener('click', evt => {
     const input = document.createElement('input');
-    section.append(input);
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/svg+xml, image/png');
 
@@ -360,6 +359,7 @@ export function editorEnhanced(section: HTMLElement) {
       }
       repaint();
     });
+    input.click();
   });
 
   publish.addEventListener('click', evt => {
