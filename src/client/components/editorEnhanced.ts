@@ -330,11 +330,7 @@ export function editorEnhanced(section: HTMLElement) {
         throw new Error();
       }
 
-      const parser = new Parser({});
-      parser.parse(contents).then(doc => {
-        const canvg = new Canvg(ctx, doc, {});
-        return canvg.render();
-      }).then(() => {
+      new Parser({}).parse(contents).then(doc => new Canvg(ctx, doc, {}).render()).then(() => {
         const trueBounds = findTrueBounds(ctx);
         const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
         for (let y = 0; y < spec.height; y++) {
