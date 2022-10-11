@@ -67,7 +67,7 @@ function findTrueBounds(ctx: CanvasRenderingContext2D) {
   }
 }
 
-function loadFile(input: HTMLInputElement): Promise<string> {
+function loadFile(input: HTMLInputElement): Promise<ArrayBuffer> {
   return new Promise((resolve, reject) => {
     input.addEventListener('change', evt => {
       const file = input.files && input.files[0];
@@ -78,13 +78,13 @@ function loadFile(input: HTMLInputElement): Promise<string> {
       const reader = new FileReader();
       reader.addEventListener('load', () => {
         const result = reader.result;
-        if (typeof result !== 'string') {
+        if (!(result instanceof ArrayBuffer)) {
           reject();
           return;
         }
         resolve(result);
       });
-      reader.readAsText(file);
+      reader.readAsArrayBuffer(file);
     });
   });
 }
@@ -320,27 +320,29 @@ export function editorEnhanced(section: HTMLElement) {
     input.setAttribute('accept', 'image/svg+xml');
     input.append('Import SVG');
 
-    loadFile(input).then(contents => {
-      const canvas = document.createElement('canvas');
-      if (!canvas) {
-        throw new Error();
-      }
-      const ctx = canvas.getContext('2d');
-      if (!ctx) {
-        throw new Error();
-      }
-
-      new Parser({}).parse(contents).then(doc => new Canvg(ctx, doc, {}).render()).then(() => {
-        const trueBounds = findTrueBounds(ctx);
-        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        for (let y = 0; y < spec.height; y++) {
-          for (let x = 0; x < spec.width; x++) {
-            data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
+    loadFile(input)
+        .then(result => new TextDecoder('utf-8').decode(result))
+        .then(contents => {
+          const canvas = document.createElement('canvas');
+          if (!canvas) {
+            throw new Error();
           }
-        }
-        repaint();
-      });
-    });
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            throw new Error();
+          }
+
+          new Parser({}).parse(contents).then(doc => new Canvg(ctx, doc, {}).render()).then(() => {
+            const trueBounds = findTrueBounds(ctx);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            for (let y = 0; y < spec.height; y++) {
+              for (let x = 0; x < spec.width; x++) {
+                data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
+              }
+            }
+            repaint();
+          });
+        });
   });
 
   publish.addEventListener('click', evt => {
