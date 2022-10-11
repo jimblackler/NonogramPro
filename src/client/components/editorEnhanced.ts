@@ -15,6 +15,9 @@ import {notNull} from '../notNull';
 import {plotLine} from '../plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from '../renderer';
 
+require('png-js/zlib.js');
+require('png-js/png.js');
+
 interface LocalImageData {
   data: ArrayLike<number>;
   width: number;
@@ -72,7 +75,7 @@ function findTrueBounds(imageData: LocalImageData) {
   }
 }
 
-function loadFile(input: HTMLInputElement): Promise<ArrayBuffer> {
+function loadFile(input: HTMLInputElement): Promise<{ type: string, data: ArrayBuffer }> {
   return new Promise((resolve, reject) => {
     input.addEventListener('change', evt => {
       const file = input.files && input.files[0];
@@ -82,12 +85,12 @@ function loadFile(input: HTMLInputElement): Promise<ArrayBuffer> {
       }
       const reader = new FileReader();
       reader.addEventListener('load', () => {
-        const result = reader.result;
-        if (!(result instanceof ArrayBuffer)) {
+        const data = reader.result;
+        if (!(data instanceof ArrayBuffer)) {
           reject();
           return;
         }
-        resolve(result);
+        resolve({type: file.type, data});
       });
       reader.readAsArrayBuffer(file);
     });
@@ -95,7 +98,8 @@ function loadFile(input: HTMLInputElement): Promise<ArrayBuffer> {
 }
 
 function countCube(
-    imageData: LocalImageData, trueBounds: { top: number; left: number; bottom: number; right: number },
+    imageData: LocalImageData,
+    trueBounds: { top: number; left: number; bottom: number; right: number },
     x: number, y: number, spec: Spec) {
   const left = Math.floor(x / spec.width * (trueBounds.right - trueBounds.left) + trueBounds.left);
   const right = Math.floor((x + 1) / spec.width * (trueBounds.right - trueBounds.left) + trueBounds.left);
@@ -130,7 +134,7 @@ export function editorEnhanced(section: HTMLElement) {
   const createNew = notNull(section.querySelector('#createNew'));
   const play = notNull(section.querySelector('#play'));
   const analyze = notNull(section.querySelector('#analyze'));
-  const importSvg = notNull(section.querySelector('#importSvg'));
+  const importImage = notNull(section.querySelector('#importImage'));
   const publish = notNull(section.querySelector('#publish'));
   const cancel = notNull(section.querySelector('#cancel'));
   const delete_ = notNull(section.querySelector('#delete'));
@@ -317,38 +321,45 @@ export function editorEnhanced(section: HTMLElement) {
     });
   });
 
-  importSvg.addEventListener('click', evt => {
+  importImage.addEventListener('click', evt => {
     const input = document.createElement('input');
     section.append(input);
-    input.setAttribute('id', 'importSvg');
     input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/svg+xml');
-    input.append('Import SVG');
+    input.setAttribute('accept', 'image/svg+xml, image/png');
 
-    loadFile(input)
-        .then(result => new TextDecoder('utf-8').decode(result))
-        .then(contents => {
-          const canvas = document.createElement('canvas');
-          if (!canvas) {
-            throw new Error();
-          }
-          const ctx = canvas.getContext('2d');
-          if (!ctx) {
-            throw new Error();
-          }
-
-          new Parser({}).parse(contents).then(doc => new Canvg(ctx, doc, {}).render()).then(() => {
-            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            Uint8ClampedArray
-            const trueBounds = findTrueBounds(imageData);
-            for (let y = 0; y < spec.height; y++) {
-              for (let x = 0; x < spec.width; x++) {
-                data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
-              }
-            }
-            repaint();
-          });
-        });
+    loadFile(input).then(result => {
+      if (result.type === 'image/png') {
+        const png = new (window as any).PNG(new Uint8Array(result.data));
+        const pixels = png.decode();
+        const imageData: LocalImageData = {
+          data: pixels,
+          width: png.width,
+          height: png.height
+        };
+        return imageData;
+      } else if (result.type === 'image/svg+xml') {
+        const canvas = document.createElement('canvas');
+        if (!canvas) {
+          throw new Error();
+        }
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          throw new Error();
+        }
+        return new Parser({}).parse(new TextDecoder('utf-8').decode(result.data))
+            .then(doc => new Canvg(ctx, doc, {}).render())
+            .then(() => ctx.getImageData(0, 0, canvas.width, canvas.height));
+      }
+      throw new Error();
+    }).then(imageData => {
+      const trueBounds = findTrueBounds(imageData);
+      for (let y = 0; y < spec.height; y++) {
+        for (let x = 0; x < spec.width; x++) {
+          data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
+        }
+      }
+      repaint();
+    });
   });
 
   publish.addEventListener('click', evt => {

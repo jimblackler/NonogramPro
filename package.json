@@ -18,6 +18,7 @@
     "google-auth-library": "^8.5.1",
     "googleapis": "^108.0.0",
     "jsonwebtoken": "^8.5.1",
+    "png-js": "^1.0.0",
     "ts-loader": "^9.4.0",
     "ts-node": "^10.9.1"
   },
