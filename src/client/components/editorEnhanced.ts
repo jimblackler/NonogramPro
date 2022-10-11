@@ -15,7 +15,13 @@ import {notNull} from '../notNull';
 import {plotLine} from '../plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from '../renderer';
 
-function findLeftBounds(imageData: ImageData) {
+interface LocalImageData {
+  data: ArrayLike<number>;
+  width: number;
+  height: number;
+}
+
+function findLeftBounds(imageData: LocalImageData) {
   for (let x = 0; x < imageData.width; x++) {
     for (let y = 0; y < imageData.height; y++) {
       if (imageData.data[(y * imageData.width + x) * 4 + 3] > 0) {
@@ -26,7 +32,7 @@ function findLeftBounds(imageData: ImageData) {
   return imageData.width;
 }
 
-function findRightBounds(imageData: ImageData) {
+function findRightBounds(imageData: LocalImageData) {
   for (let x = imageData.width - 1; x >= 0; x--) {
     for (let y = 0; y < imageData.height; y++) {
       if (imageData.data[(y * imageData.width + x) * 4 + 3] > 0) {
@@ -37,7 +43,7 @@ function findRightBounds(imageData: ImageData) {
   return 0;
 }
 
-function findTopBounds(imageData: ImageData) {
+function findTopBounds(imageData: LocalImageData) {
   for (let y = 0; y < imageData.height; y++) {
     for (let x = 0; x < imageData.width; x++) {
       if (imageData.data[(y * imageData.width + x) * 4 + 3] > 0) {
@@ -48,7 +54,7 @@ function findTopBounds(imageData: ImageData) {
   return imageData.height;
 }
 
-function findBottomBounds(imageData: ImageData) {
+function findBottomBounds(imageData: LocalImageData) {
   for (let y = imageData.height - 1; y >= 0; y--) {
     for (let x = 0; x < imageData.width; x++) {
       if (imageData.data[(y * imageData.width + x) * 4 + 3] > 0) {
@@ -59,7 +65,7 @@ function findBottomBounds(imageData: ImageData) {
   return 0;
 }
 
-function findTrueBounds(imageData: ImageData) {
+function findTrueBounds(imageData: LocalImageData) {
   return {
     left: findLeftBounds(imageData), right: findRightBounds(imageData),
     top: findTopBounds(imageData), bottom: findBottomBounds(imageData)
@@ -333,6 +339,7 @@ export function editorEnhanced(section: HTMLElement) {
 
           new Parser({}).parse(contents).then(doc => new Canvg(ctx, doc, {}).render()).then(() => {
             const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            Uint8ClampedArray
             const trueBounds = findTrueBounds(imageData);
             for (let y = 0; y < spec.height; y++) {
               for (let x = 0; x < spec.width; x++) {
