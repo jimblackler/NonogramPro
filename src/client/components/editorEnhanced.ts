@@ -67,6 +67,28 @@ function findTrueBounds(ctx: CanvasRenderingContext2D) {
   }
 }
 
+function loadFile(input: HTMLInputElement): Promise<string> {
+  return new Promise((resolve, reject) => {
+    input.addEventListener('change', evt => {
+      const file = input.files && input.files[0];
+      if (!file) {
+        reject();
+        return;
+      }
+      const reader = new FileReader();
+      reader.addEventListener('load', () => {
+        const result = reader.result;
+        if (typeof result !== 'string') {
+          reject();
+          return;
+        }
+        resolve(result);
+      });
+      reader.readAsText(file);
+    });
+  });
+}
+
 function countCube(
     imageData: ImageData, trueBounds: { top: number; left: number; bottom: number; right: number },
     x: number, y: number, spec: Spec) {
@@ -298,42 +320,30 @@ export function editorEnhanced(section: HTMLElement) {
     input.setAttribute('accept', 'image/svg+xml');
     input.append('Import SVG');
 
-    input.addEventListener('change', evt => {
-      const file = input.files && input.files[0];
-      if (!file) {
-        return;
+    loadFile(input).then(contents => {
+      const canvas = document.createElement('canvas');
+      if (!canvas) {
+        throw new Error();
       }
-      const reader = new FileReader();
-      reader.addEventListener('load', evt => {
-        const contents = reader.result;
-        if (typeof contents !== 'string') {
-          throw new Error();
-        }
-        const canvas = document.createElement('canvas');
-        if (!canvas) {
-          throw new Error();
-        }
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          throw new Error();
-        }
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        throw new Error();
+      }
 
-        const parser = new Parser({});
-        parser.parse(contents).then(doc => {
-          const canvg = new Canvg(ctx, doc, {});
-          return canvg.render();
-        }).then(() => {
-          const trueBounds = findTrueBounds(ctx);
-          const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-          for (let y = 0; y < spec.height; y++) {
-            for (let x = 0; x < spec.width; x++) {
-              data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
-            }
+      const parser = new Parser({});
+      parser.parse(contents).then(doc => {
+        const canvg = new Canvg(ctx, doc, {});
+        return canvg.render();
+      }).then(() => {
+        const trueBounds = findTrueBounds(ctx);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        for (let y = 0; y < spec.height; y++) {
+          for (let x = 0; x < spec.width; x++) {
+            data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
           }
-          repaint();
-        });
+        }
+        repaint();
       });
-      reader.readAsText(file);
     });
   });
 
