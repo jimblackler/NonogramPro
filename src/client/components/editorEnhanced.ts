@@ -150,7 +150,7 @@ export function editorEnhanced(section: HTMLElement) {
     }
   });
 
-  title.addEventListener('focus', evt => {
+  title.addEventListener('focus', () => {
     const range = document.createRange();
     range.selectNodeContents(title);
     const selection = window.getSelection();
@@ -172,19 +172,19 @@ export function editorEnhanced(section: HTMLElement) {
 
   status.innerText = 'Edit mode';
 
-  createNew.addEventListener('click', evt => {
+  createNew.addEventListener('click', () => {
     window.location.href = 'edit';
   });
-  play.addEventListener('click', evt => {
+  play.addEventListener('click', () => {
     window.location.href = `/play?game=${gameId}`;
   });
 
-  analyze.addEventListener('click', evt => {
+  analyze.addEventListener('click', () => {
     const clues = generateClues(spec, data);
     Analyze.visualAnalyze(spec, clues);
   });
 
-  delete_.addEventListener('click', evt => {
+  delete_.addEventListener('click', () => {
     // Local delete
     gamesDb.deleteItem(gameId);
     // Remove delete
