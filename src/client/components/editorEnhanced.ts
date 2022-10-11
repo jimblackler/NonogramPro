@@ -95,7 +95,7 @@ function loadFile(input: HTMLInputElement): Promise<ArrayBuffer> {
 }
 
 function countCube(
-    imageData: ImageData, trueBounds: { top: number; left: number; bottom: number; right: number },
+    imageData: LocalImageData, trueBounds: { top: number; left: number; bottom: number; right: number },
     x: number, y: number, spec: Spec) {
   const left = Math.floor(x / spec.width * (trueBounds.right - trueBounds.left) + trueBounds.left);
   const right = Math.floor((x + 1) / spec.width * (trueBounds.right - trueBounds.left) + trueBounds.left);
