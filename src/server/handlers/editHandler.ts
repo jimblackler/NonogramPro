@@ -6,10 +6,6 @@ export const editHandler: RequestHandler = async (req, res, next) => {
   await hasGridHtmlRespond(req, res, {
     _class: 'edit',
     addStyles: (document, parent) => {
-      const style = document.createElement('link');
-      parent.append(style);
-      style.setAttribute('rel', 'stylesheet');
-      style.setAttribute('href', '/styles/has_grid.css');
     },
     addControls: (document, parent) => {
       const h1 = document.createElement('h1');
