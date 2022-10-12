@@ -22,7 +22,7 @@ export function addEditor(document: Document, parent: HTMLElement) {
   {
     const bordered = document.createElement('section');
     editSection.append(bordered);
-    bordered.setAttribute('class', 'bordered');
+    bordered.setAttribute('class', 'buttonRow bordered');
 
     {
       const button = document.createElement('button');
@@ -49,7 +49,7 @@ export function addEditor(document: Document, parent: HTMLElement) {
   {
     const bordered = document.createElement('section');
     editSection.append(bordered);
-    bordered.setAttribute('class', 'bordered');
+    bordered.setAttribute('class', 'buttonRow bordered');
 
     {
       const button = document.createElement('button');
@@ -84,7 +84,7 @@ export function addEditor(document: Document, parent: HTMLElement) {
   {
     const bordered = document.createElement('section');
     editSection.append(bordered);
-    bordered.setAttribute('class', 'bordered');
+    bordered.setAttribute('class', 'buttonRow bordered');
 
     {
       const select = document.createElement('select');

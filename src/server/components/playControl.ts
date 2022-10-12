@@ -13,6 +13,7 @@ export function addPlayControl(document: Document, parent: HTMLElement) {
 
   const section = document.createElement('section');
   controlSection.append(section);
+  section.setAttribute('class', 'buttonRow');
 
   {
     const button = document.createElement('button');

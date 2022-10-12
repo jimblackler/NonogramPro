@@ -30,6 +30,7 @@ export const listHandler: RequestHandler = async (req, res, next) => {
     addMain: (document, parent) => {
       const section = document.createElement('section');
       parent.append(section);
+      section.setAttribute('class', 'buttonRow');
 
       {
         const a = document.createElement('a');
@@ -39,8 +40,6 @@ export const listHandler: RequestHandler = async (req, res, next) => {
         a.append('Local games');
       }
 
-      section.append(' ');
-
       {
         const a = document.createElement('a');
         section.append(a);
@@ -48,8 +47,6 @@ export const listHandler: RequestHandler = async (req, res, next) => {
         a.setAttribute('href', '?v=published');
         a.append('Published games');
       }
-
-      section.append(' ');
 
       {
         const a = document.createElement('a');
