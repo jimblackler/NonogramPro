@@ -151,6 +151,13 @@ gridSize.addEventListener('change', evt => {
   repaint();
 });
 
+colorScheme.addEventListener('change', evt => {
+  style = colorScheme.value;
+  needsPublish = true;
+  repaint();
+  saveLocal();
+});
+
 svg.addEventListener('griddown', evt => {
       const {x, y} = is(CustomEvent, evt).detail as GridDownData;
       if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
