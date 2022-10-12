@@ -5,8 +5,6 @@ import {addScripts} from '../manifest';
 export const editHandler: RequestHandler = async (req, res, next) => {
   await hasGridHtmlRespond(req, res, {
     _class: 'edit',
-    addStyles: (document, parent) => {
-    },
     addControls: (document, parent) => {
       const h1 = document.createElement('h1');
       parent.append(h1);

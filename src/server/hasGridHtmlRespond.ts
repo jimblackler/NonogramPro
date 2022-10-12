@@ -7,7 +7,6 @@ import {htmlRespond} from './htmlRespond';
 
 interface HasGridHtmlRespondClient {
   _class: string,
-  addStyles: (document: Document, parent: HTMLElement) => void,
   addControls: (document: Document, parent: HTMLElement) => void,
   addScripts: (document: Document, parent: HTMLElement) => void
 }
@@ -29,7 +28,6 @@ export async function hasGridHtmlRespond(
       parent.append(style2);
       style2.setAttribute('rel', 'stylesheet');
       style2.setAttribute('id', 'colorSchemeStylesheet');
-      client.addStyles(document, parent);
     },
     addHeader: (document, parent) => {
     },
