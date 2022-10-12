@@ -6,6 +6,7 @@ main {
 
 aside {
   display: flex;
+  flex: min-content;
   flex-direction: column;
   gap: 1em;
   margin: 1em;
@@ -38,6 +39,10 @@ g.row_labels text {
 
 g.hint rect.highlighted {
   opacity: 1;
+}
+
+svg#game {
+  flex-shrink: 0;
 }
 
 svg.main g.major line, svg.main g.outer line {

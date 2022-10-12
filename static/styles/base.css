@@ -52,6 +52,7 @@ section.bordered {
 
 section.buttonRow {
   display: flex;
+  flex-wrap: wrap;
   gap: 1em;
 }
 
