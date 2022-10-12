@@ -28,6 +28,9 @@ a.link_button:hover {
 }
 
 ol#games {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1em;
   padding: 0;
 }
 
@@ -37,15 +40,14 @@ ol#games li {
 }
 
 ol#games a {
-  margin: 10px 10px;
-  padding: 10px 10px;
   background: linear-gradient(purple, rebeccapurple);
-  width: 164px;
-  height: 59px;
+  border-radius: 1em;
   display: flex;
   flex-direction: column;
-  border-radius: 5px;
+  height: 5em;
   overflow: hidden;
+  padding: 1em;
+  width: 10em;
 }
 
 ol#games a:hover {
