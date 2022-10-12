@@ -70,9 +70,9 @@ class List {
   }
 
   async populate() {
-    const plays = new Set();
+    const plays = new Set<string>();
     for await (const currentTarget of await this.playsDb.list()) {
-      plays.add(currentTarget.key);
+      plays.add(currentTarget.key.toString());
     }
 
     const list = document.getElementById('games');
@@ -81,7 +81,8 @@ class List {
     }
     if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
       for await (const result of await this.gamesDb.list()) {
-        List.addGame(result.primaryKey.toString(), result.value, plays.has(result.key), list);
+        const primaryKey = result.primaryKey.toString();
+        List.addGame(primaryKey, result.value, plays.has(primaryKey), list);
       }
     } else {
       axios.get('/games')
