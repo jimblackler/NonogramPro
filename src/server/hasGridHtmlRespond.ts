@@ -47,11 +47,7 @@ export async function hasGridHtmlRespond(
       parent.append(aside);
       addGlobalControls(document, aside, req, oAuth, email);
 
-      const controlsSection = document.createElement('section');
-      aside.append(controlsSection);
-      controlsSection.setAttribute('id', 'controls');
-
-      client.addControls(document, controlsSection);
+      client.addControls(document, aside);
 
       const footer = document.createElement('footer');
       aside.append(footer);

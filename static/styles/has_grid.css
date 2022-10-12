@@ -3,14 +3,11 @@ main {
   flex-wrap: wrap;
 }
 
-section {
-  margin: 10px 0;
-}
-
 aside {
   margin: 20px;
   display: flex;
   flex-direction: column;
+  gap: 1em;
   padding-left: 30px;
 }
 
