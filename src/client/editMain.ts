@@ -3,7 +3,7 @@ import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
 import {Spec} from '../common/spec';
 import {Analyze} from './analyze';
-import {GamesDb} from './db/gamesDb';
+import {deleteGame, setGame} from './db/gamesDb';
 import {decode} from './decoder';
 import {encode} from './encoder';
 import {getGame} from './fetchGame';
@@ -24,8 +24,6 @@ let style = '';
 let setStyle = '';
 let lastX = -1;
 let lastY = -1;
-
-const gamesDb = new GamesDb();
 
 const title = is(HTMLHeadingElement, document.body.querySelector('h1#title'));
 const status = is(HTMLElement, document.body.querySelector('#status'));
@@ -84,7 +82,7 @@ analyze.addEventListener('click', () => {
 
 delete_.addEventListener('click', () => {
   // Local delete
-  gamesDb.deleteItem(gameId);
+  deleteGame(gameId);
   // Remove delete
   axios.post('/delete', {game_id: gameId})
       .then(response => response.data)
@@ -214,7 +212,7 @@ cancel.addEventListener('click', evt => {
 
   // We don't have a local copy so must refresh from server. Requires
   // internet. May not be the best solution.
-  getGame(gamesDb, gameId, game => {
+  getGame(gameId, game => {
     if (typeof game.gridData !== 'object') {
       throw new Error();
     }
@@ -267,11 +265,11 @@ publish.addEventListener('click', evt => {
 
           needsPublish = false;
           if (gameId !== newId) {
-            gamesDb.deleteItem(gameId).then(
+            deleteGame(gameId).then(
                 () => window.history.replaceState({}, '', `edit?game=${gameId}`));
             gameId = newId;
           }
-          gamesDb.set(gameId, game);
+          setGame(gameId, game);
           publish.setAttribute('disabled', '');
 
           alert(`Difficulty ${game.difficulty}`);
@@ -292,7 +290,7 @@ const defaultSpec = {width: 20, height: 20};
 
 if (gameId) {
   getGame(
-      gamesDb, gameId,
+      gameId,
       game => {
         spec = game.spec;
         if (typeof game.gridData !== 'object') {
@@ -333,5 +331,5 @@ function saveLocal() {
     difficulty: Analyze.analyze(spec, generateClues(spec, data1.gridData), () => {
     })
   };
-  gamesDb.set(gameId, data);
+  setGame(gameId, data);
 }

@@ -1,9 +1,9 @@
 import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
-import {GamesDb} from './db/gamesDb';
+import {getGameDb, setGame} from './db/gamesDb';
 import {decode} from './decoder';
 
-function getGameInternet(gamesDb: GamesDb, gameId: string,
+function getGameInternet(gameId: string,
                          resolve: (game: ClientGameData) => void, reject: () => void) {
   axios.get(`/games?id=${gameId}`)
       .then(value => value.data)
@@ -15,20 +15,20 @@ function getGameInternet(gamesDb: GamesDb, gameId: string,
           }
           game.gridData = decode(game.spec, game.gridData);
           game.needsPublish = false;
-          gamesDb.set(gameId, game).then(() => resolve(game));
+          setGame(gameId, game).then(() => resolve(game));
         } else {
           reject();
         }
       });
 }
 
-export function getGame(gamesDb: GamesDb, gameId: string,
+export function getGame(gameId: string,
                         resolve: (game: ClientGameData) => void, reject: () => void) {
-  gamesDb.get(gameId).then(game => {
+  getGameDb(gameId).then(game => {
     if (game) {
       resolve(game);
       return;
     }
-    getGameInternet(gamesDb, gameId, resolve, reject);
+    getGameInternet(gameId, resolve, reject);
   });
 }

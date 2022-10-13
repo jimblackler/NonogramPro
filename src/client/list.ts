@@ -1,15 +1,13 @@
 import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
-import {GamesDb} from './db/gamesDb';
+import {listGames, setGame} from './db/gamesDb';
 import {PlaysDb} from './db/playsDb';
 import {decode} from './decoder';
 
 class List {
-  private gamesDb: GamesDb;
   private playsDb: PlaysDb;
 
   constructor() {
-    this.gamesDb = new GamesDb();
     this.playsDb = new PlaysDb();
   }
 
@@ -80,7 +78,7 @@ class List {
       throw new Error();
     }
     if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
-      for await (const result of await this.gamesDb.list()) {
+      for await (const result of await listGames()) {
         const primaryKey = result.primaryKey.toString();
         List.addGame(primaryKey, result.value, plays.has(primaryKey), list);
       }
@@ -93,7 +91,7 @@ class List {
               // We write the incoming games to the local database (which needs
               // the grid decoding). Might not always be desirable.
               game.data.gridData = decode(game.data.spec, game.data.gridData);
-              this.gamesDb.set(game.key, game.data);
+              setGame(game.key, game.data);
             }
           });
     }

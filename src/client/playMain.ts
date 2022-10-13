@@ -1,6 +1,5 @@
 import {Analyze} from './analyze';
 import {CompletedDb} from './db/completedDb';
-import {GamesDb} from './db/gamesDb';
 import {PlaysDb} from './db/playsDb';
 import {getGame} from './fetchGame';
 import {Generate} from './generate';
@@ -11,10 +10,9 @@ import {plotLine} from './plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';
 import {truthy} from './truthy';
 
-const gamesDb = new GamesDb();
 const gameId = new URL(window.location.href).searchParams.get('game') || '';
 
-getGame(gamesDb, gameId, result => {
+getGame(gameId, result => {
   if (typeof result.gridData !== 'object') {
     throw new Error();
   }
