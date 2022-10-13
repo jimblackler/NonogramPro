@@ -3,11 +3,11 @@ import {Spec} from './spec';
 export interface ClientGameData {
   creator?: string;
   difficulty: number;
-  grid_data: string | boolean[][];
+  gridData: string | boolean[][];
   spec: Spec;
   name: string;
   style: string;
-  needs_publish?: boolean;
+  needsPublish?: boolean;
 }
 
 export interface ClientGame {

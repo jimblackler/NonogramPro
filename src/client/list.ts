@@ -42,7 +42,7 @@ class List {
       anchor.appendChild(name);
     }
 
-    if (game.needs_publish) {
+    if (game.needsPublish) {
       const name = document.createElement('span');
       name.classList.add('draft');
       name.appendChild(document.createTextNode('Draft'));
@@ -92,7 +92,7 @@ class List {
               List.addGame(game.key, game.data, plays.has(game.key), list);
               // We write the incoming games to the local database (which needs
               // the grid decoding). Might not always be desirable.
-              game.data.grid_data = decode(game.data.spec, game.data.grid_data);
+              game.data.gridData = decode(game.data.spec, game.data.gridData);
               this.gamesDb.set(game.key, game.data);
             }
           });

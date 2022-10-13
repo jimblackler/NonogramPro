@@ -159,12 +159,12 @@ svg.addEventListener('mouseout', evt => {
 });
 
 getGame(gamesDb, gameId, result => {
-  if (typeof result.grid_data !== 'object') {
+  if (typeof result.gridData !== 'object') {
     throw new Error();
   }
 
   spec = result.spec;
-  data = result.grid_data;
+  data = result.gridData;
   style = result.style;
   on = Generate.getEmpty(spec);
   off = Generate.getEmpty(spec);

@@ -10,11 +10,11 @@ function getGameInternet(gamesDb: GamesDb, gameId: string,
       .then(obj => {
         if (obj.results.length === 1) {
           const game = obj.results[0].data as ClientGameData;
-          if (typeof game.grid_data !== 'string') {
+          if (typeof game.gridData !== 'string') {
             throw new Error();
           }
-          game.grid_data = decode(game.spec, game.grid_data);
-          game.needs_publish = false;
+          game.gridData = decode(game.spec, game.gridData);
+          game.needsPublish = false;
           gamesDb.set(gameId, game).then(() => resolve(game));
         } else {
           reject();

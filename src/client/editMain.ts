@@ -215,11 +215,11 @@ cancel.addEventListener('click', evt => {
   // We don't have a local copy so must refresh from server. Requires
   // internet. May not be the best solution.
   getGame(gamesDb, gameId, game => {
-    if (typeof game.grid_data !== 'object') {
+    if (typeof game.gridData !== 'object') {
       throw new Error();
     }
     spec = game.spec;
-    data = game.grid_data;
+    data = game.gridData;
     name = game.name;
     repaint();
   }, () => {
@@ -245,10 +245,10 @@ publish.addEventListener('click', evt => {
   };
   // We don't technically need to uuencode the grid at this stage, but
   // big boolean arrays aren't transport or server friendly.
-  if (typeof data.grid_data !== 'object') {
+  if (typeof data.gridData !== 'object') {
     throw new Error();
   }
-  data.grid_data = encode(data.grid_data);
+  data.gridData = encode(data.gridData);
   axios.post('/publish', data)
       .then(response => response.data)
       .then(obj => {
@@ -259,11 +259,11 @@ publish.addEventListener('click', evt => {
         } else {
           const game = obj.game.data;
           const newId = obj.game.key;
-          if (typeof game.grid_data != 'string') {
+          if (typeof game.gridData != 'string') {
             throw new Error();
           }
 
-          game.grid_data = decode(game.spec, game.grid_data);
+          game.gridData = decode(game.spec, game.gridData);
 
           needsPublish = false;
           if (gameId !== newId) {
@@ -295,13 +295,13 @@ if (gameId) {
       gamesDb, gameId,
       game => {
         spec = game.spec;
-        if (typeof game.grid_data !== 'object') {
+        if (typeof game.gridData !== 'object') {
           throw new Error();
         }
-        data = game.grid_data;
+        data = game.gridData;
         name = game.name;
         style = game.style;
-        needsPublish = game.needs_publish || false;
+        needsPublish = game.needsPublish || false;
         renderer.setDimensions(spec);
         repaint();
       },
@@ -315,7 +315,7 @@ if (gameId) {
 
 function getData() {
   return {
-    grid_data: data as string | boolean[][],
+    gridData: data as string | boolean[][],
     spec: spec,
     name: name,
     style: style,
@@ -324,13 +324,13 @@ function getData() {
 
 function saveLocal() {
   const data1 = getData();
-  if (typeof data1.grid_data === 'string') {
+  if (typeof data1.gridData === 'string') {
     throw new Error();
   }
   const data: ClientGameData = {
     ...data1,
-    needs_publish: needsPublish,
-    difficulty: Analyze.analyze(spec, generateClues(spec, data1.grid_data), () => {
+    needsPublish: needsPublish,
+    difficulty: Analyze.analyze(spec, generateClues(spec, data1.gridData), () => {
     })
   };
   gamesDb.set(gameId, data);

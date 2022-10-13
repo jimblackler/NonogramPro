@@ -7,7 +7,7 @@ export function gameToClientGame(game: any): ClientGame {
     data: {
       creator: game.creator,
       difficulty: game.difficulty,
-      grid_data: game.grid_data,
+      gridData: game.gridData,
       spec: {
         width: game.width, height: game.height
       },

@@ -3,7 +3,7 @@ export interface Game {
   width: number,
   height: number,
   style: string,
-  grid_data: string,
+  gridData: string,
   difficulty: number,
   creator: string
 }
