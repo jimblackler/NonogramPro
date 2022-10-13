@@ -3,8 +3,8 @@ import {ClientGameData} from '../common/clientGame';
 import {gamesDb} from './db/gamesDb';
 import {playsDb} from './db/playsDb';
 import {decode} from './decoder';
+import {notNull} from './notNull';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
-import {transactionToPromise} from './transactionToPromise';
 
 function addGame(key: string, game: ClientGameData, playing: boolean, list: HTMLElement) {
   const li = document.createElement('li');
@@ -63,6 +63,11 @@ function addGame(key: string, game: ClientGameData, playing: boolean, list: HTML
 }
 
 async function populate() {
+  const list = notNull(document.getElementById('games'));
+  const progress = document.createElement('img');
+  list.append(progress);
+  progress.setAttribute('src', '/images/progress.svg');
+
   const plays = new Set<string>();
   for await (const currentTarget of await playsDb
       .then(db => db.transaction('plays', 'readonly').objectStore('plays').openCursor())
@@ -70,10 +75,6 @@ async function populate() {
     plays.add(currentTarget.key.toString());
   }
 
-  const list = document.getElementById('games');
-  if (!(list instanceof HTMLElement)) {
-    throw new Error();
-  }
   if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
     for await (const result of await gamesDb
         .then(db => db.transaction('games', 'readonly')
@@ -82,6 +83,7 @@ async function populate() {
       const primaryKey = result.primaryKey.toString();
       addGame(primaryKey, result.value, plays.has(primaryKey), list);
     }
+    progress.remove();
   } else {
     axios.get('/games')
         .then(response => response.data)
@@ -92,10 +94,10 @@ async function populate() {
             // the grid decoding). Might not always be desirable.
             game.data.gridData = decode(game.data.spec, game.data.gridData);
             gamesDb.then(db => db.transaction('games', 'readwrite').objectStore('games')
-                .put(game.data, game.key))
-                .then(transactionToPromise);
+                .put(game.data, game.key));
           }
-        });
+        })
+        .finally(() => progress.remove());
   }
 }
 
