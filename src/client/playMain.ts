@@ -239,14 +239,13 @@ getGame(gameId, result => {
   }
 
   function repaint() {
-    playsDb
-        .then(db => db.transaction('plays', 'readwrite').objectStore('plays')
-            .put({on, off}, gameId));
+    playsDb.then(db => db.transaction('plays', 'readwrite').objectStore('plays')
+        .put({on, off}, gameId));
     renderer.paintOnSquares(on);
     renderer.paintOffSquares(off); /* Check is complete */
     if (Generate.equals(on, data)) {
       svg.classList.add('gameComplete');
-      const value: Complete = {completed:true};
+      const value: Complete = {completed: true};
       completedDb
           .then(db => db.transaction('completed', 'readwrite').objectStore('completed')
               .put(value, gameId))
