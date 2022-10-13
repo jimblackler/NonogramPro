@@ -25,8 +25,6 @@ let lastY = -1;
 const gamesDb = new GamesDb();
 const playsDb = new PlaysDb();
 const completedDb = new CompletedDb();
-rowLock = false;
-columnLock = false;
 
 const gameId = new URL(window.location.href).searchParams.get('game') || '';
 const svg = truthy(document.getElementsByTagName('svg')[0]);
