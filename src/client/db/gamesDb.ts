@@ -5,13 +5,13 @@ export const gamesDb: Promise<IDBDatabase> = new Promise((resolve, reject) => {
     if (event.oldVersion < 1) {
       objectStore = request.result.createObjectStore('games');
     }
-    if (event.oldVersion < 2) {
+    if (event.oldVersion < 3) {
       const transaction = request.transaction;
       if (!transaction) {
         throw new Error();
       }
       objectStore = transaction.objectStore('games');
-      objectStore.createIndex('by_difficulty', 'difficulty');
+      objectStore.createIndex('byDifficulty', 'difficulty');
     }
     return objectStore;
   };

@@ -78,7 +78,7 @@ class List {
     if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
       for await (const result of await gamesDb
           .then(db => db.transaction('games', 'readonly')
-              .objectStore('games').index('by_difficulty').openCursor())
+              .objectStore('games').index('byDifficulty').openCursor())
           .then(requestToAsyncGenerator)) {
         const primaryKey = result.primaryKey.toString();
         List.addGame(primaryKey, result.value, plays.has(primaryKey), list);
