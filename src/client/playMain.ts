@@ -13,7 +13,7 @@ import {truthy} from './truthy';
 
 const gameId = new URL(window.location.href).searchParams.get('game') || '';
 
-getGame(gameId, result => {
+getGame(gameId).then(result => {
   if (typeof result.gridData !== 'object') {
     throw new Error();
   }

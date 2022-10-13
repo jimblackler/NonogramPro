@@ -215,7 +215,7 @@ cancel.addEventListener('click', evt => {
 
   // We don't have a local copy so must refresh from server. Requires
   // internet. May not be the best solution.
-  getGame(gameId, game => {
+  getGame(gameId).then(game => {
     if (typeof game.gridData !== 'object') {
       throw new Error();
     }
@@ -223,7 +223,6 @@ cancel.addEventListener('click', evt => {
     data = game.gridData;
     name = game.name;
     repaint();
-  }, () => {
   });
 });
 
@@ -297,7 +296,7 @@ const defaultSpec = {width: 20, height: 20};
 
 if (gameId) {
   getGame(
-      gameId,
+      gameId).then(
       game => {
         spec = game.spec;
         if (typeof game.gridData !== 'object') {
