@@ -1,8 +1,10 @@
 import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
-import {listGames, setGame} from './db/gamesDb';
+import {gamesDb} from './db/gamesDb';
 import {PlaysDb} from './db/playsDb';
 import {decode} from './decoder';
+import {requestToAsyncGenerator} from './requestToAsyncGenerator';
+import {transactionToPromise} from './transactionToPromise';
 
 class List {
   private playsDb: PlaysDb;
@@ -78,7 +80,10 @@ class List {
       throw new Error();
     }
     if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
-      for await (const result of await listGames()) {
+      for await (const result of await gamesDb
+          .then(db => db.transaction('games', 'readonly').objectStore('games').index('by_difficulty')
+              .openCursor())
+          .then(requestToAsyncGenerator)) {
         const primaryKey = result.primaryKey.toString();
         List.addGame(primaryKey, result.value, plays.has(primaryKey), list);
       }
@@ -91,7 +96,9 @@ class List {
               // We write the incoming games to the local database (which needs
               // the grid decoding). Might not always be desirable.
               game.data.gridData = decode(game.data.spec, game.data.gridData);
-              setGame(game.key, game.data);
+              gamesDb.then(db => db.transaction('games', 'readwrite').objectStore('games')
+                  .put(game.data, game.key))
+                  .then(transactionToPromise);
             }
           });
     }

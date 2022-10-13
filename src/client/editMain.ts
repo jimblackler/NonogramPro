@@ -3,7 +3,7 @@ import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
 import {Spec} from '../common/spec';
 import {Analyze} from './analyze';
-import {deleteGame, setGame} from './db/gamesDb';
+import {gamesDb} from './db/gamesDb';
 import {decode} from './decoder';
 import {encode} from './encoder';
 import {getGame} from './fetchGame';
@@ -14,6 +14,7 @@ import {is} from './is';
 import {notNull} from './notNull';
 import {plotLine} from './plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';
+import {transactionToPromise} from './transactionToPromise';
 
 let data: boolean[][] = [];
 let gameId = '';
@@ -82,7 +83,9 @@ analyze.addEventListener('click', () => {
 
 delete_.addEventListener('click', () => {
   // Local delete
-  deleteGame(gameId);
+  gamesDb
+      .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
+      .then(transactionToPromise);
   // Remove delete
   axios.post('/delete', {game_id: gameId})
       .then(response => response.data)
@@ -265,11 +268,15 @@ publish.addEventListener('click', evt => {
 
           needsPublish = false;
           if (gameId !== newId) {
-            deleteGame(gameId).then(
+            gamesDb
+                .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
+                .then(transactionToPromise).then(
                 () => window.history.replaceState({}, '', `edit?game=${gameId}`));
             gameId = newId;
           }
-          setGame(gameId, game);
+          gamesDb
+              .then(db => db.transaction('games', 'readwrite').objectStore('games').put(game, gameId))
+              .then(transactionToPromise);
           publish.setAttribute('disabled', '');
 
           alert(`Difficulty ${game.difficulty}`);
@@ -331,5 +338,7 @@ function saveLocal() {
     difficulty: Analyze.analyze(spec, generateClues(spec, data1.gridData), () => {
     })
   };
-  setGame(gameId, data);
+  gamesDb
+      .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data, gameId))
+      .then(transactionToPromise);
 }
