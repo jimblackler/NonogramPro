@@ -8,9 +8,11 @@ import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 
 function addGame(key: string, game: ClientGameData, playing: boolean, list: HTMLElement) {
   const li = document.createElement('li');
+  list.appendChild(li);
+
   const anchor = document.createElement('a');
-  anchor.setAttribute('href', `/play?game=${key}`);
   li.appendChild(anchor);
+  anchor.setAttribute('href', `/play?game=${key}`);
 
   /* Name */
   {
@@ -58,8 +60,6 @@ function addGame(key: string, game: ClientGameData, playing: boolean, list: HTML
     playing.appendChild(document.createTextNode('In progress'));
     anchor.appendChild(playing);
   }
-
-  list.appendChild(li);
 }
 
 async function populate() {
