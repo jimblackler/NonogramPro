@@ -1,5 +1,5 @@
-interface Complete {
-
+export interface Complete {
+  completed: true;
 }
 
 export const completedDb: Promise<IDBDatabase> = new Promise((resolve, reject) => {

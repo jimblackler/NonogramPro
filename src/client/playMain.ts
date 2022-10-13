@@ -1,5 +1,5 @@
 import {Analyze} from './analyze';
-import {completedDb} from './db/completedDb';
+import {Complete, completedDb} from './db/completedDb';
 import {PlayInDb, playsDb} from './db/playsDb';
 import {getGame} from './fetchGame';
 import {Generate} from './generate';
@@ -246,8 +246,10 @@ getGame(gameId, result => {
     renderer.paintOffSquares(off); /* Check is complete */
     if (Generate.equals(on, data)) {
       svg.classList.add('gameComplete');
+      const value: Complete = {completed:true};
       completedDb
-          .then(db => db.transaction('games', 'readwrite').objectStore('completed').put({}, gameId))
+          .then(db => db.transaction('completed', 'readwrite').objectStore('completed')
+              .put(value, gameId))
           .then(transactionToPromise);
     } else {
       svg.classList.remove('gameComplete');
