@@ -47,7 +47,7 @@ getGame(gameId).then(result => {
           columnModified.add(p.x);
           rowModified.add(p.y);
         }
-      } else if (actionMode === ActionMode.SET_UNKNOWN) {
+      } else if (actionMode === ActionMode.SETTING_UNKNOWN) {
         if (on[p.y][p.x] || off[p.y][p.x]) {
           on[p.y][p.x] = false;
           off[p.y][p.x] = false;
@@ -76,13 +76,13 @@ getGame(gameId).then(result => {
         if (which === 3 || shiftKey) {
           // Right click.
           if (off[y][x]) {
-            actionMode = ActionMode.SET_UNKNOWN;
+            actionMode = ActionMode.SETTING_UNKNOWN;
           } else {
             actionMode = ActionMode.SETTING_OFF;
           }
         } else if (ctrlKey) {
           if (on[y][x]) {
-            actionMode = ActionMode.SET_UNKNOWN;
+            actionMode = ActionMode.SETTING_UNKNOWN;
           } else {
             actionMode = ActionMode.SETTING_ON;
           }
@@ -90,7 +90,7 @@ getGame(gameId).then(result => {
           if (on[y][x]) {
             actionMode = ActionMode.SETTING_OFF;
           } else if (off[y][x]) {
-            actionMode = ActionMode.SET_UNKNOWN;
+            actionMode = ActionMode.SETTING_UNKNOWN;
           } else {
             actionMode = ActionMode.SETTING_ON;
           }
@@ -193,7 +193,7 @@ getGame(gameId).then(result => {
     renderer.setHighlightColumn(hint[1]);
   });
 
-  const ActionMode = {NOT_DRAWING: 0, SETTING_ON: 1, SETTING_OFF: 2, SET_UNKNOWN: 3,};
+  const ActionMode = {NOT_DRAWING: 0, SETTING_ON: 1, SETTING_OFF: 2, SETTING_UNKNOWN: 3,};
   let actionMode = ActionMode.NOT_DRAWING;
 
   document.addEventListener('mouseup', evt => {
