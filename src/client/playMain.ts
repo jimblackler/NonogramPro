@@ -245,12 +245,12 @@ getGame(gameId, result => {
     renderer.paintOnSquares(on);
     renderer.paintOffSquares(off); /* Check is complete */
     if (Generate.equals(on, data)) {
-      svg.classList.add('game_complete');
+      svg.classList.add('gameComplete');
       completedDb
           .then(db => db.transaction('games', 'readwrite').objectStore('completed').put({}, gameId))
           .then(transactionToPromise);
     } else {
-      svg.classList.remove('game_complete');
+      svg.classList.remove('gameComplete');
     }
   }
 

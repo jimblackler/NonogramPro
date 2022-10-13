@@ -58,11 +58,11 @@ svg.main g.minor line {
   opacity: 0.3;
 }
 
-svg.game_complete g.minor {
+svg.gameComplete g.minor {
   visibility: hidden;
 }
 
-svg.game_complete g.major line {
+svg.gameComplete g.major line {
   visibility: hidden;
 }
 
@@ -74,7 +74,7 @@ g.squares {
   opacity: 0.9;
 }
 
-svg.game_complete g.squares rect {
+svg.gameComplete g.squares rect {
   opacity: 1;
 }
 
@@ -83,7 +83,7 @@ g.crosses line {
   stroke-width: 2;
 }
 
-svg.game_complete g.crosses line {
+svg.gameComplete g.crosses line {
   opacity: 0.3;
 }
 
