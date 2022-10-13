@@ -193,7 +193,7 @@ getGame(gameId).then(result => {
     renderer.setHighlightColumn(hint[1]);
   });
 
-  const ActionMode = {NOT_DRAWING: 0, SETTING_ON: 1, SETTING_OFF: 2, SETTING_UNKNOWN: 3,};
+  const ActionMode = {NOT_DRAWING: 0, SETTING_ON: 1, SETTING_OFF: 2, SETTING_UNKNOWN: 3};
   let actionMode = ActionMode.NOT_DRAWING;
 
   document.addEventListener('mouseup', evt => {
