@@ -1,6 +1,6 @@
 import {Analyze} from './analyze';
 import {CompletedDb} from './db/completedDb';
-import {PlaysDb} from './db/playsDb';
+import {PlayInDb, playsDb} from './db/playsDb';
 import {getGame} from './fetchGame';
 import {Generate} from './generate';
 import {generateClues} from './generateClues';
@@ -8,6 +8,7 @@ import {is} from './is';
 import {notNull} from './notNull';
 import {plotLine} from './plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';
+import {transactionToPromise} from './transactionToPromise';
 import {truthy} from './truthy';
 
 const gameId = new URL(window.location.href).searchParams.get('game') || '';
@@ -16,7 +17,6 @@ getGame(gameId, result => {
   if (typeof result.gridData !== 'object') {
     throw new Error();
   }
-  const playsDb = new PlaysDb();
   const completedDb = new CompletedDb();
   const svg = truthy(document.getElementsByTagName('svg')[0]);
   const renderer = enhanceRenderer(svg);
@@ -168,14 +168,18 @@ getGame(gameId, result => {
   title.textContent = result.name;
   const clues = generateClues(spec, data);
   renderer.paintClues(clues);
-  playsDb.get(gameId).then(data => {
-    if (!data) {
-      return;
-    }
-    on = data.on;
-    off = data.off;
-    fromScratch();
-  });
+  playsDb
+      .then(db => db.transaction('plays', 'readonly').objectStore('plays').get(gameId))
+      .then(transactionToPromise)
+      .then(result => result as PlayInDb | undefined)
+      .then(data => {
+        if (!data) {
+          return;
+        }
+        on = data.on;
+        off = data.off;
+        fromScratch();
+      });
 
   const replay = notNull(document.body.querySelector('#replay'));
   const edit = notNull(document.body.querySelector('#edit'));
@@ -236,7 +240,9 @@ getGame(gameId, result => {
   }
 
   function repaint() {
-    playsDb.set(gameId, {on: on, off: off});
+    playsDb
+        .then(db => db.transaction('plays', 'readwrite').objectStore('plays')
+            .put({on, off}, gameId));
     renderer.paintOnSquares(on);
     renderer.paintOffSquares(off); /* Check is complete */
     if (Generate.equals(on, data)) {

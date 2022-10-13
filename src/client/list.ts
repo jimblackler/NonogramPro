@@ -1,18 +1,12 @@
 import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
 import {gamesDb} from './db/gamesDb';
-import {PlaysDb} from './db/playsDb';
+import {playsDb} from './db/playsDb';
 import {decode} from './decoder';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 import {transactionToPromise} from './transactionToPromise';
 
 class List {
-  private playsDb: PlaysDb;
-
-  constructor() {
-    this.playsDb = new PlaysDb();
-  }
-
   static addGame(key: string, game: ClientGameData, playing: boolean, list: HTMLElement) {
     const li = document.createElement('li');
     const anchor = document.createElement('a');
@@ -71,7 +65,9 @@ class List {
 
   async populate() {
     const plays = new Set<string>();
-    for await (const currentTarget of await this.playsDb.list()) {
+    for await (const currentTarget of await playsDb
+        .then(db => db.transaction('plays', 'readonly').objectStore('plays').openCursor())
+        .then(requestToAsyncGenerator)) {
       plays.add(currentTarget.key.toString());
     }
 
@@ -81,8 +77,8 @@ class List {
     }
     if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
       for await (const result of await gamesDb
-          .then(db => db.transaction('games', 'readonly').objectStore('games').index('by_difficulty')
-              .openCursor())
+          .then(db => db.transaction('games', 'readonly')
+              .objectStore('games').index('by_difficulty').openCursor())
           .then(requestToAsyncGenerator)) {
         const primaryKey = result.primaryKey.toString();
         List.addGame(primaryKey, result.value, plays.has(primaryKey), list);
