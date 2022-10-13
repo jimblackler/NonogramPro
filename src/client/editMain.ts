@@ -161,20 +161,18 @@ colorScheme.addEventListener('change', evt => {
 
 svg.addEventListener('griddown', evt => {
       const {x, y} = is(CustomEvent, evt).detail as GridDownData;
-      if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
-        if (data[y][x]) {
-          drawMode = DrawMode.DELETING;
-          data[y][x] = false;
-          needsPublish = true;
-        } else {
-          drawMode = DrawMode.SETTING;
-          data[y][x] = true;
-          needsPublish = true;
-        }
-        lastX = x;
-        lastY = y;
-        repaint();
+      if (data[y][x]) {
+        drawMode = DrawMode.DELETING;
+        data[y][x] = false;
+        needsPublish = true;
+      } else {
+        drawMode = DrawMode.SETTING;
+        data[y][x] = true;
+        needsPublish = true;
       }
+      lastX = x;
+      lastY = y;
+      repaint();
     }
 );
 
@@ -184,27 +182,25 @@ svg.addEventListener('gridmove', evt => {
         return;
       }
       let modified = false;
-      if (x >= 0 && x < spec.width && y >= 0 && y < spec.height) {
-        for (const p of plotLine(lastX, lastY, x, y)) {
-          if (drawMode === DrawMode.SETTING) {
-            if (!data[p.y][p.x]) {
-              data[p.y][p.x] = true;
-              modified = true;
-              needsPublish = true;
-            }
-          } else if (drawMode === DrawMode.DELETING) {
-            if (data[p.y][p.x]) {
-              data[p.y][p.x] = false;
-              modified = true;
-              needsPublish = true;
-            }
+      for (const p of plotLine(lastX, lastY, x, y)) {
+        if (drawMode === DrawMode.SETTING) {
+          if (!data[p.y][p.x]) {
+            data[p.y][p.x] = true;
+            modified = true;
+            needsPublish = true;
+          }
+        } else if (drawMode === DrawMode.DELETING) {
+          if (data[p.y][p.x]) {
+            data[p.y][p.x] = false;
+            modified = true;
+            needsPublish = true;
           }
         }
-        lastX = x;
-        lastY = y;
-        if (modified) {
-          repaint();
-        }
+      }
+      lastX = x;
+      lastY = y;
+      if (modified) {
+        repaint();
       }
     }
 );

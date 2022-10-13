@@ -1,5 +1,4 @@
 import {Spec} from '../common/spec';
-import {is} from './is';
 
 const XMLNS = 'http://www.w3.org/2000/svg';
 const DIVISIONS = 5;
@@ -44,25 +43,25 @@ export function enhanceRenderer(svg: SVGSVGElement) {
 
   svg.addEventListener('mousedown', evt => {
     const clientRect = svg.getBoundingClientRect();
+    const x = Math.floor((evt.clientX - clientRect.left - leftOffset) / dimensions.cellSize);
+    const y = Math.floor((evt.clientY - clientRect.top - topOffset) / dimensions.cellSize);
+    if (x < 0 || x >= spec.width || y < 0 || y >= spec.height) {
+      return;
+    }
     svg.dispatchEvent(new CustomEvent<GridDownData>('griddown', {
-      detail: {
-        x: Math.floor((evt.clientX - clientRect.left - leftOffset) / dimensions.cellSize),
-        y: Math.floor((evt.clientY - clientRect.top - topOffset) / dimensions.cellSize),
-        which: evt.which,
-        shiftKey: evt.shiftKey
-      }
+      detail: {x, y, which: evt.which, shiftKey: evt.shiftKey}
     }));
     evt.preventDefault();
   });
 
   svg.addEventListener('mousemove', evt => {
     const clientRect = svg.getBoundingClientRect();
-    svg.dispatchEvent(new CustomEvent<GridMoveData>('gridmove', {
-      detail: {
-        x: Math.floor((evt.clientX - clientRect.left - leftOffset) / dimensions.cellSize),
-        y: Math.floor((evt.clientY - clientRect.top - topOffset) / dimensions.cellSize)
-      }
-    }));
+    const x = Math.floor((evt.clientX - clientRect.left - leftOffset) / dimensions.cellSize);
+    const y = Math.floor((evt.clientY - clientRect.top - topOffset) / dimensions.cellSize);
+    if (x < 0 || x >= spec.width || y < 0 || y >= spec.height) {
+      return;
+    }
+    svg.dispatchEvent(new CustomEvent<GridMoveData>('gridmove', {detail: {x, y}}));
     evt.preventDefault();
   });
 
