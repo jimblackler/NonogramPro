@@ -334,7 +334,7 @@ function saveLocal() {
   }
   const data: ClientGameData = {
     ...data1,
-    needsPublish: needsPublish,
+    needsPublish,
     difficulty: Analyze.analyze(spec, generateClues(spec, data1.gridData), () => {
     })
   };
