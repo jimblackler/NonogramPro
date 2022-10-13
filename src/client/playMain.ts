@@ -26,7 +26,7 @@ getGame(gameId).then(result => {
   let lastY = -1;
 
   svg.addEventListener('griddown', evt => {
-        const {x, y, which, shiftKey} = is(CustomEvent, evt).detail as GridDownData;
+        const {x, y, which, shiftKey, ctrlKey} = is(CustomEvent, evt).detail as GridDownData;
         if (which === 3 || shiftKey) {
           // Right click.
           if (off[y][x]) {
@@ -42,8 +42,28 @@ getGame(gameId).then(result => {
             checkColumn(x);
             checkRow(y);
           }
+        } else if (ctrlKey) {
+          if (on[y][x]) {
+            actionMode = ActionMode.SET_UNKNOWN;
+            on[y][x] = false;
+            off[y][x] = false;
+            checkColumn(x);
+            checkRow(y);
+          } else {
+            actionMode = ActionMode.SETTING_ON;
+            on[y][x] = true;
+            off[y][x] = false;
+            checkColumn(x);
+            checkRow(y);
+          }
         } else {
           if (on[y][x]) {
+            actionMode = ActionMode.SETTING_OFF;
+            on[y][x] = false;
+            off[y][x] = true;
+            checkColumn(x);
+            checkRow(y);
+          } else if (off[y][x]) {
             actionMode = ActionMode.SET_UNKNOWN;
             on[y][x] = false;
             off[y][x] = false;
