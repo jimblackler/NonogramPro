@@ -332,11 +332,14 @@ function saveLocal() {
   if (typeof data1.gridData === 'string') {
     throw new Error();
   }
+  let difficulty = 0;
+  for (const round of Analyze.analyze(spec, generateClues(spec, data1.gridData))) {
+    difficulty++;
+  }
   const data: ClientGameData = {
     ...data1,
     needsPublish,
-    difficulty: Analyze.analyze(spec, generateClues(spec, data1.gridData), () => {
-    })
+    difficulty
   };
   gamesDb
       .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data, gameId))

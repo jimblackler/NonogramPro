@@ -155,14 +155,11 @@ function draw(parent: HTMLElement, spec: Spec, on: boolean[][], priorOn: boolean
 }
 
 export class Analyze {
-  static analyze(spec: Spec, clues: number[][][],
-                 perRound: (on: boolean[][], priorOn: boolean[][], off: boolean[][],
-                            priorOff: boolean[][]) => void) {
+  static *analyze(spec: Spec, clues: number[][][]) {
     const on = Generate.getEmpty(spec);
     const off = Generate.getEmpty(spec);
     let failed = 0;
     let horizontal = true;
-    let rounds = 0;
 
     while (true) {
       const priorOn = Generate.clone(on);
@@ -176,14 +173,13 @@ export class Analyze {
       } else {
         failed = 0;
       }
-      perRound(Generate.clone(on), priorOn, Generate.clone(off), priorOff);
+      yield {on: Generate.clone(on), priorOn, off:Generate.clone(off), priorOff};
 
       if (Generate.complete(on, off)) {
-        return rounds;
+        return;
       }
 
       horizontal = !horizontal;
-      rounds++;
     }
   }
 
@@ -204,8 +200,11 @@ export class Analyze {
     const header = document.createElement('header');
     div.appendChild(header);
 
-    let difficulty = Analyze.analyze(spec, clues,
-        (on, priorOn, off, priorOff) => draw(div, spec, on, priorOn, off, priorOff));
+    let difficulty = 0;
+    for (const round of Analyze.analyze(spec, clues)) {
+      draw(div, spec, round.on, round.priorOn, round.off, round.priorOff);
+      difficulty++;
+    }
 
     let phrase;
     if (difficulty === -1) {
