@@ -25,62 +25,77 @@ getGame(gameId).then(result => {
   let lastX = -1;
   let lastY = -1;
 
+  function setPoints(points: Iterable<{ x: number, y: number }>) {
+    const columnModified = new Set<number>();
+    const rowModified = new Set<number>();
+    let modified = false;
+
+    for (const p of points) {
+      if (actionMode === ActionMode.SETTING_ON) {
+        if (!on[p.y][p.x]) {
+          on[p.y][p.x] = true;
+          off[p.y][p.x] = false;
+          modified = true;
+          columnModified.add(p.x);
+          rowModified.add(p.y);
+        }
+      } else if (actionMode === ActionMode.SETTING_OFF) {
+        if (!off[p.y][p.x]) {
+          on[p.y][p.x] = false;
+          off[p.y][p.x] = true;
+          modified = true;
+          columnModified.add(p.x);
+          rowModified.add(p.y);
+        }
+      } else if (actionMode === ActionMode.SET_UNKNOWN) {
+        if (on[p.y][p.x] || off[p.y][p.x]) {
+          on[p.y][p.x] = false;
+          off[p.y][p.x] = false;
+          modified = true;
+          columnModified.add(p.x);
+          rowModified.add(p.y);
+        }
+      }
+      lastX = p.x;
+      lastY = p.y;
+    }
+
+    if (modified) {
+      for (const column of columnModified) {
+        checkColumn(column);
+      }
+      for (const row of rowModified) {
+        checkRow(row);
+      }
+      repaint();
+    }
+  }
+
   svg.addEventListener('griddown', evt => {
         const {x, y, which, shiftKey, ctrlKey} = is(CustomEvent, evt).detail as GridDownData;
         if (which === 3 || shiftKey) {
           // Right click.
           if (off[y][x]) {
             actionMode = ActionMode.SET_UNKNOWN;
-            on[y][x] = false;
-            off[y][x] = false;
-            checkColumn(x);
-            checkRow(y);
           } else {
             actionMode = ActionMode.SETTING_OFF;
-            on[y][x] = false;
-            off[y][x] = true;
-            checkColumn(x);
-            checkRow(y);
           }
         } else if (ctrlKey) {
           if (on[y][x]) {
             actionMode = ActionMode.SET_UNKNOWN;
-            on[y][x] = false;
-            off[y][x] = false;
-            checkColumn(x);
-            checkRow(y);
           } else {
             actionMode = ActionMode.SETTING_ON;
-            on[y][x] = true;
-            off[y][x] = false;
-            checkColumn(x);
-            checkRow(y);
           }
         } else {
           if (on[y][x]) {
             actionMode = ActionMode.SETTING_OFF;
-            on[y][x] = false;
-            off[y][x] = true;
-            checkColumn(x);
-            checkRow(y);
           } else if (off[y][x]) {
             actionMode = ActionMode.SET_UNKNOWN;
-            on[y][x] = false;
-            off[y][x] = false;
-            checkColumn(x);
-            checkRow(y);
           } else {
             actionMode = ActionMode.SETTING_ON;
-            on[y][x] = true;
-            off[y][x] = false;
-            checkColumn(x);
-            checkRow(y);
           }
         }
-        lastX = x;
-        lastY = y;
-        repaint()
-
+        setPoints([{x, y}]);
       }
   );
 
@@ -107,48 +122,7 @@ getGame(gameId).then(result => {
             y = rowLock;
           }
 
-          const columnModified = new Set<number>();
-          const rowModified = new Set<number>();
-          let modified = false;
-          for (const p of plotLine(lastX, lastY, x, y)) {
-            if (actionMode === ActionMode.SETTING_ON) {
-              if (!on[p.y][p.x]) {
-                on[p.y][p.x] = true;
-                off[p.y][p.x] = false;
-                modified = true;
-                columnModified.add(p.x);
-                rowModified.add(p.y);
-              }
-            } else if (actionMode === ActionMode.SETTING_OFF) {
-              if (!off[p.y][p.x]) {
-                on[p.y][p.x] = false;
-                off[p.y][p.x] = true;
-                modified = true;
-                columnModified.add(p.x);
-                rowModified.add(p.y);
-              }
-            } else if (actionMode === ActionMode.SET_UNKNOWN) {
-              if (on[p.y][p.x] || off[p.y][p.x]) {
-                on[p.y][p.x] = false;
-                off[p.y][p.x] = false;
-                modified = true;
-                columnModified.add(p.x);
-                rowModified.add(p.y);
-              }
-            }
-          }
-
-          lastX = x;
-          lastY = y;
-          if (modified) {
-            for (const column of columnModified) {
-              checkColumn(column);
-            }
-            for (const row of rowModified) {
-              checkRow(row);
-            }
-            repaint();
-          }
+          setPoints(plotLine(lastX, lastY, x, y));
         }
 
         if (rowLock === false && columnLock === false) {
