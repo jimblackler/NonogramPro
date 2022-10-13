@@ -61,7 +61,7 @@ export const listHandler: RequestHandler = async (req, res, next) => {
       ol.setAttribute('id', 'games');
     },
     addScripts: (document, parent) => {
-      addScripts(document, parent, 'list');
+      addScripts(document, parent, 'listMain');
     }
   });
 };

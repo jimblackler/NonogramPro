@@ -8,8 +8,8 @@ export default function config(env: any, argv: any) {
       editMain: {
         import: './src/client/editMain.ts'
       },
-      list: {
-        import: './src/client/list.ts'
+      listMain: {
+        import: './src/client/listMain.ts'
       },
       playMain: {
         import: './src/client/playMain.ts'
