@@ -154,8 +154,21 @@ function draw(parent: HTMLElement, spec: Spec, on: boolean[][], priorOn: boolean
   renderer.paintOffSquares(off, priorOff);
 }
 
+type Round = { priorOn: boolean[][]; priorOff: boolean[][]; off: boolean[][]; on: boolean[][] };
+
+function isComplete(spec: Spec, round: Round) {
+  for (let y = 0; y !== spec.height; y++) {
+    for (let x = 0; x !== spec.width; x++) {
+      if (!(round.on[y][x] || round.off[y][x])) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
 export class Analyze {
-  static *analyze(spec: Spec, clues: number[][][]) {
+  static* analyze(spec: Spec, clues: number[][][]): Iterable<Round> {
     const on = Generate.getEmpty(spec);
     const off = Generate.getEmpty(spec);
     let failed = 0;
@@ -168,12 +181,12 @@ export class Analyze {
       if (Generate.equals(on, priorOn) && Generate.equals(off, priorOff)) {
         failed++;
         if (failed === 2) {
-          return -1;
+          return;
         }
       } else {
         failed = 0;
       }
-      yield {on: Generate.clone(on), priorOn, off:Generate.clone(off), priorOff};
+      yield {on: Generate.clone(on), priorOn, off: Generate.clone(off), priorOff};
 
       if (Generate.complete(on, off)) {
         return;
@@ -201,16 +214,18 @@ export class Analyze {
     div.appendChild(header);
 
     let difficulty = 0;
+    let lastRound: Round | undefined;
     for (const round of Analyze.analyze(spec, clues)) {
       draw(div, spec, round.on, round.priorOn, round.off, round.priorOff);
       difficulty++;
+      lastRound = round;
     }
 
     let phrase;
-    if (difficulty === -1) {
-      phrase = 'Cannot be completed with standard method.';
-    } else {
+    if (!lastRound || isComplete(spec, lastRound)) {
       phrase = `Requires ${difficulty} rounds to complete with standard method.`;
+    } else {
+      phrase = 'Cannot be completed with standard method.';
     }
     const text = document.createTextNode(phrase);
     header.appendChild(text);
