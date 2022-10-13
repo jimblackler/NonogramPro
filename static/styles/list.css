@@ -76,7 +76,7 @@ span.difficulty {
   font-size: small;
 }
 
-span.playing {
+span.playing, span.completed {
   font-size: small;
 }
 
