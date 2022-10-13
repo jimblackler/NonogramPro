@@ -1,6 +1,6 @@
 export const gamesDb: Promise<IDBDatabase> = new Promise((resolve, reject) => {
-  const request = indexedDB.open('games-store', 2);
-  request.onupgradeneeded = (event) => {
+  const request = indexedDB.open('games-store', 5);
+  request.addEventListener('upgradeneeded', event => {
     let objectStore;
     if (event.oldVersion < 1) {
       objectStore = request.result.createObjectStore('games');
@@ -14,7 +14,7 @@ export const gamesDb: Promise<IDBDatabase> = new Promise((resolve, reject) => {
       objectStore.createIndex('byDifficulty', 'difficulty');
     }
     return objectStore;
-  };
-  request.onerror = () => reject(request.error);
-  request.onsuccess = () => resolve(request.result);
+  });
+  request.addEventListener('error', () => reject(request.error));
+  request.addEventListener('success', () => resolve(request.result));
 });

@@ -4,15 +4,15 @@ export interface Complete {
 
 export const completedDb: Promise<IDBDatabase> = new Promise((resolve, reject) => {
   const request = indexedDB.open('completed-store', 1);
-  request.onupgradeneeded = (event) => {
+  request.addEventListener('upgradeneeded', event => {
     let objectStore;
     if (event.oldVersion < 1) {
       objectStore = request.result.createObjectStore('completed');
     }
     return objectStore;
-  };
-  request.onerror = () => reject(request.error);
-  request.onsuccess = () => resolve(request.result);
+  });
+  request.addEventListener('error', () => reject(request.error));
+  request.addEventListener('success', () => resolve(request.result));
 });
 
 
