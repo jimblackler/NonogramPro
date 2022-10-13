@@ -36,7 +36,7 @@ getGame(gameId).then(result => {
               off[y][x] = false;
               checkColumn(x);
               checkRow(y);
-            } else if (!off[y][x]) {
+            } else {
               actionMode = ActionMode.SETTING_OFF;
               on[y][x] = false;
               off[y][x] = true;
@@ -50,7 +50,7 @@ getGame(gameId).then(result => {
               off[y][x] = false;
               checkColumn(x);
               checkRow(y);
-            } else if (!on[y][x]) {
+            } else {
               actionMode = ActionMode.SETTING_ON;
               on[y][x] = true;
               off[y][x] = false;
