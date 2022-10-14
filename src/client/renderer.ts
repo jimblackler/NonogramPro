@@ -77,7 +77,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
         content.removeChild(content.firstChild);
       }
       spec = spec_;
-      dimensions = dimensions_ || {cellSize: 25, ratioForClues: 0.42};
+      dimensions = dimensions_ || {cellSize: 600 / (spec.width + 5), ratioForClues: 7 / (spec.width + 5)};
 
       const cellSize = dimensions.cellSize;
       leftOffset = dimensions.ratioForClues * cellSize * spec.width;
