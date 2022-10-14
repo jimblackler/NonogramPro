@@ -24,7 +24,7 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
   const existingGame = await getGame(gameId);
 
   if (!existingGame || existingGame.creator !== email) {
-    const nameStub = nameToId(req.body.name);
+    const nameStub = nameToId(req.body.name.toLowerCase());
     let appendNumber = 0;
     while (true) {
       if (appendNumber) {
