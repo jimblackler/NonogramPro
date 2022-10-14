@@ -249,6 +249,6 @@ getGame(gameId).then(result => {
     }
     repaint();
   }
-}, () => {
-  alert('bad game');
+}).catch(err => {
+  alert(err);
 });
