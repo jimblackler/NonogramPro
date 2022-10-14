@@ -231,6 +231,14 @@ importImageButton.addEventListener('click', () => {
 });
 
 publish.addEventListener('click', evt => {
+  publish.setAttribute('disabled', '');
+
+  const aside = document.body.getElementsByTagName('aside')[0];
+  const progress = document.createElement('img');
+  aside.append(progress);
+  progress.setAttribute('src', '/images/progress.svg');
+  progress.setAttribute('style', 'max-width: 4em');
+
   if (name === 'Untitled' || name === '') {
     name = prompt('Enter a name for your puzzle') || '';
     saveLocal();
@@ -273,11 +281,8 @@ publish.addEventListener('click', evt => {
           gamesDb
               .then(db => db.transaction('games', 'readwrite').objectStore('games').put(game, gameId))
               .then(transactionToPromise);
-          publish.setAttribute('disabled', '');
-
-          alert(`Difficulty ${game.difficulty}`);
         }
-      });
+      }).finally(() => progress.remove());
 });
 
 document.addEventListener('mouseup', evt => {
