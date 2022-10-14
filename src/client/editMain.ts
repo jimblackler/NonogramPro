@@ -292,23 +292,18 @@ needsPublish = false;
 const defaultSpec = {width: 20, height: 20};
 
 if (gameId) {
-  getGame(
-      gameId).then(
-      game => {
-        spec = game.spec;
-        if (typeof game.gridData !== 'object') {
-          throw new Error();
-        }
-        data = game.gridData;
-        name = game.name;
-        style = game.style;
-        needsPublish = game.needsPublish || false;
-        renderer.setDimensions(spec);
-        repaint();
-      },
-      () => {
-        makeNewGame(defaultSpec, true);
-      });
+  getGame(gameId).then(game => {
+    spec = game.spec;
+    if (typeof game.gridData !== 'object') {
+      throw new Error();
+    }
+    data = game.gridData;
+    name = game.name;
+    style = game.style;
+    needsPublish = game.needsPublish || false;
+    renderer.setDimensions(spec);
+    repaint();
+  }).catch(() => makeNewGame(defaultSpec, true));
 } else {
   // Otherwise make a new game.
   makeNewGame(defaultSpec, true);
@@ -337,7 +332,7 @@ function saveLocal() {
     needsPublish,
     difficulty
   };
-  gamesDb
+  return gamesDb
       .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data, gameId))
       .then(transactionToPromise);
 }
