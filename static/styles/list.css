@@ -62,6 +62,9 @@ ol#games a.completed {
   background: linear-gradient(darkslategray, seagreen);
 }
 
+ol#games a.draft {
+  background: linear-gradient(black, dimgrey);
+}
 
 ol#games a:hover {
   color: black;
