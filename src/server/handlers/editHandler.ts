@@ -1,4 +1,5 @@
 import {RequestHandler} from 'express';
+import {Spec} from '../../common/spec';
 import {hasGridHtmlRespond} from '../hasGridHtmlRespond';
 import {addScripts} from '../manifest';
 
@@ -89,33 +90,13 @@ export const editHandler: RequestHandler = async (req, res, next) => {
           bordered.append(select);
           select.setAttribute('id', 'gridSize');
 
-          {
+          [5, 10, 15, 20, 25].forEach(number => {
             const option = document.createElement('option');
             select.append(option);
-            option.setAttribute('value', '{"width": 5, "height": 5}');
-            option.append('5x5');
-          }
-
-          {
-            const option = document.createElement('option');
-            select.append(option);
-            option.setAttribute('value', '{"width": 10, "height": 10}');
-            option.append('10x10');
-          }
-
-          {
-            const option = document.createElement('option');
-            select.append(option);
-            option.setAttribute('value', '{"width": 15, "height": 15}');
-            option.append('15x15');
-          }
-
-          {
-            const option = document.createElement('option');
-            select.append(option);
-            option.setAttribute('value', '{"width": 20, "height": 20}');
-            option.append('20x20');
-          }
+            const spec: Spec = {width: number, height: number};
+            option.setAttribute('value', JSON.stringify(spec));
+            option.append(`${number}x${number}`);
+          });
         }
 
         {

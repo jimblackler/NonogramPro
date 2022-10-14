@@ -114,7 +114,7 @@ function repaint() {
   const clues = generateClues(spec, data);
   renderer.paintClues(clues);
 
-  gridSize.value = `{"width": ${spec.width}, "height": ${spec.height}}`;
+  gridSize.value = JSON.stringify(spec);
 
   colorScheme.value = style;
 
