@@ -52,16 +52,11 @@ function addGame(
     dimensions.append(`${game.spec.width} x ${game.spec.height}`);
   }
 
-  if (completed) {
+  if (completed || playing) {
     const span = document.createElement('span');
     anchor.append(span);
-    span.setAttribute('class', 'completed');
-    span.append('Completed');
-  } else if (playing) {
-    const span = document.createElement('span');
-    anchor.append(span);
-    span.setAttribute('class', 'playing');
-    span.append('In progress');
+    span.setAttribute('class', 'status');
+    span.append(completed ? 'Completed' : 'In progress');
   }
 }
 
