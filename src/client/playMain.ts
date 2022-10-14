@@ -1,4 +1,4 @@
-import {Analyze} from './analyze';
+import {checkColumn, checkRow, findHint} from './analyze';
 import {Complete, completedDb} from './db/completedDb';
 import {PlayInDb, playsDb} from './db/playsDb';
 import {getGame} from './fetchGame';
@@ -62,10 +62,10 @@ getGame(gameId).then(result => {
 
     if (modified) {
       for (const column of columnModified) {
-        checkColumn(column);
+        checkColumn_(column);
       }
       for (const row of rowModified) {
-        checkRow(row);
+        checkRow_(row);
       }
       repaint();
     }
@@ -143,7 +143,6 @@ getGame(gameId).then(result => {
     renderer.setHighlightRow(-1);
   });
 
-
   const spec = result.spec;
   const data = result.gridData;
   const style = result.style;
@@ -188,7 +187,7 @@ getGame(gameId).then(result => {
 
   hint.addEventListener('click', () => {
     renderer.setHighlightMode('hint');
-    const hint = Analyze.findHint(spec, clues, on, off);
+    const hint = findHint(spec, clues, on, off);
     renderer.setHighlightRow(hint[0]);
     renderer.setHighlightColumn(hint[1]);
   });
@@ -210,23 +209,17 @@ getGame(gameId).then(result => {
     }
   });
 
-  function checkColumn(column: number) {
+  function checkColumn_(column: number) {
     const clue = clues[1][column];
-    const complete = [];
-    while (complete.length < clue.length) {
-      complete.push(-1);
-    }
-    const valid = Analyze.checkColumn(spec, on, off, column, clue, complete);
+    const complete = clue.map(c => -1);
+    const valid = checkColumn(spec, on, off, column, clue, complete);
     renderer.setColumnValid(column, valid, complete);
   }
 
-  function checkRow(row: number) {
+  function checkRow_(row: number) {
     const clue = clues[0][row];
-    const complete = [];
-    while (complete.length < clue.length) {
-      complete.push(-1);
-    }
-    const valid = Analyze.checkRow(spec, on, off, row, clue, complete);
+    const complete = clue.map(c => -1);
+    const valid = checkRow(spec, on, off, row, clue, complete);
     renderer.setRowValid(row, valid, complete);
   }
 
@@ -249,10 +242,10 @@ getGame(gameId).then(result => {
 
   function fromScratch() {
     for (let column = 0; column !== spec.width; column++) {
-      checkColumn(column);
+      checkColumn_(column);
     }
     for (let row = 0; row !== spec.height; row++) {
-      checkRow(row);
+      checkRow_(row);
     }
     repaint();
   }

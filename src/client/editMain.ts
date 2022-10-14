@@ -2,7 +2,7 @@ import Alea from 'alea';
 import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
 import {Spec} from '../common/spec';
-import {Analyze} from './analyze';
+import {analyzeAll} from './analyze';
 import {gamesDb} from './db/gamesDb';
 import {decode} from './decoder';
 import {encode} from './encoder';
@@ -15,6 +15,7 @@ import {notNull} from './notNull';
 import {plotLine} from './plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';
 import {transactionToPromise} from './transactionToPromise';
+import {visualAnalyze} from './visualAnalyze';
 
 let data: boolean[][] = [];
 let gameId = '';
@@ -78,7 +79,7 @@ play.addEventListener('click', () => {
 
 analyze.addEventListener('click', () => {
   const clues = generateClues(spec, data);
-  Analyze.visualAnalyze(spec, clues);
+  visualAnalyze(spec, clues);
 });
 
 delete_.addEventListener('click', () => {
@@ -328,7 +329,7 @@ function saveLocal() {
     throw new Error();
   }
   let difficulty = 0;
-  for (const round of Analyze.analyze(spec, generateClues(spec, data1.gridData))) {
+  for (const round of analyzeAll(spec, generateClues(spec, data1.gridData))) {
     difficulty++;
   }
   const data: ClientGameData = {

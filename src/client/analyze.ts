@@ -1,9 +1,12 @@
 import {Spec} from '../common/spec';
 import {Generate} from './generate';
-import {enhanceRenderer} from './renderer';
-import {truthy} from './truthy';
 
-require('./dialog');
+export type Round = {
+  priorOn: boolean[][];
+  priorOff: boolean[][];
+  off: boolean[][];
+  on: boolean[][]
+};
 
 function analyzeSequence(
     clue: number[], clueIdx: number, on: boolean[][], off: boolean[][], start: number,
@@ -143,157 +146,94 @@ function analyzePass(
   }
 }
 
-function draw(parent: HTMLElement, spec: Spec, on: boolean[][], priorOn: boolean[][],
-              off: boolean[][], priorOff: boolean[][]) {
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  parent.append(svg);
-  svg.classList.add('mini');
+export function* analyzeAll(spec: Spec, clues: number[][][]): Iterable<Round> {
+  const on = Generate.getEmpty(spec);
+  const off = Generate.getEmpty(spec);
+  let failed = 0;
+  let horizontal = true;
 
-  const renderer = enhanceRenderer(svg);
-  renderer.setDimensions(spec, {cellSize: 10, ratioForClues: 0});
-  renderer.paintOnSquares(on, priorOn);
-  renderer.paintOffSquares(off, priorOff);
-}
-
-type Round = { priorOn: boolean[][]; priorOff: boolean[][]; off: boolean[][]; on: boolean[][] };
-
-function isComplete(spec: Spec, round: Round) {
-  for (let y = 0; y !== spec.height; y++) {
-    for (let x = 0; x !== spec.width; x++) {
-      if (!(round.on[y][x] || round.off[y][x])) {
-        return false;
-      }
-    }
-  }
-  return true;
-}
-
-export class Analyze {
-  static* analyze(spec: Spec, clues: number[][][]): Iterable<Round> {
-    const on = Generate.getEmpty(spec);
-    const off = Generate.getEmpty(spec);
-    let failed = 0;
-    let horizontal = true;
-
-    while (true) {
-      const priorOn = Generate.clone(on);
-      const priorOff = Generate.clone(off);
-      analyzePass(spec, clues, on, off, horizontal);
-      if (Generate.equals(on, priorOn) && Generate.equals(off, priorOff)) {
-        failed++;
-        if (failed === 2) {
-          return;
-        }
-      } else {
-        failed = 0;
-      }
-      yield {on: Generate.clone(on), priorOn, off: Generate.clone(off), priorOff};
-
-      if (Generate.complete(on, off)) {
+  while (true) {
+    const priorOn = Generate.clone(on);
+    const priorOff = Generate.clone(off);
+    analyzePass(spec, clues, on, off, horizontal);
+    if (Generate.equals(on, priorOn) && Generate.equals(off, priorOff)) {
+      failed++;
+      if (failed === 2) {
         return;
       }
-
-      horizontal = !horizontal;
-    }
-  }
-
-  static visualAnalyze(spec: Spec, clues: number[][][]) {
-    const dialog = document.getElementById('dialog');
-    if (!(dialog instanceof HTMLElement)) {
-      throw new Error();
-    }
-    dialog.style.visibility = 'visible';
-    const div = document.getElementById('dialog_content');
-
-    if (!(div instanceof HTMLElement)) {
-      throw new Error();
-    }
-    while (div.firstChild) {
-      div.removeChild(div.firstChild);
-    }
-    const header = document.createElement('header');
-    div.appendChild(header);
-
-    let difficulty = 0;
-    let lastRound: Round | undefined;
-    for (const round of Analyze.analyze(spec, clues)) {
-      draw(div, spec, round.on, round.priorOn, round.off, round.priorOff);
-      difficulty++;
-      lastRound = round;
-    }
-
-    let phrase;
-    if (isComplete(spec, truthy(lastRound))) {
-      phrase = `Requires ${difficulty} rounds to complete with standard method.`;
     } else {
-      phrase = 'Cannot be completed with standard method.';
+      failed = 0;
     }
-    const text = document.createTextNode(phrase);
-    header.appendChild(text);
+    yield {on: Generate.clone(on), priorOn, off: Generate.clone(off), priorOff};
 
-    div.style.width = div.offsetWidth + 'px';  // Fix width for dragging.
+    if (Generate.complete(on, off)) {
+      return;
+    }
+
+    horizontal = !horizontal;
   }
+}
 
-  static checkRow(spec: Spec, on: boolean[][], off: boolean[][], row: number, clue: number[],
-                  complete: number[]) {
-    return analyzeLine(clue, on, off, row, spec.height, true, undefined, undefined, complete);
-  }
+export function checkRow(spec: Spec, on: boolean[][], off: boolean[][], row: number, clue: number[],
+                         complete: number[]) {
+  return analyzeLine(clue, on, off, row, spec.height, true, undefined, undefined, complete);
+}
 
-  static checkColumn(spec: Spec, on: boolean[][], off: boolean[][], column: number, clue: number[],
-                     complete: number[]) {
-    return analyzeLine(clue, on, off, column, spec.width, false, undefined, undefined, complete);
-  }
+export function checkColumn(spec: Spec, on: boolean[][], off: boolean[][], column: number,
+                            clue: number[], complete: number[]) {
+  return analyzeLine(clue, on, off, column, spec.width, false, undefined, undefined, complete);
+}
 
-  static findHint(spec: Spec, clues: number[][][], on: boolean[][], off: boolean[][]) {
-    let maxInferable = 0;
-    let results = [-1, -1];
-    for (let pass = 0; pass < 2; pass++) {
-      const horizontal = pass === 0;
-      const uSize = horizontal ? spec.width : spec.height;
-      const vSize = horizontal ? spec.height : spec.width;
-      for (let v = 0; v < vSize; v++) {
-        const inferOn = [];
-        const inferOff = [];
-        for (let u = 0; u < uSize; u++) {
-          inferOn.push(true);
-          inferOff.push(true);
-        }
-        analyzeLine(clues[horizontal ? 0 : 1][v], on, off, v, uSize, horizontal, inferOn, inferOff);
-        let inferable = 0;
-        for (let u = 0; u < uSize; u++) {
-          if (inferOn[u]) {
-            console.assert(!inferOff[u]);
-            if (horizontal) {
-              if (!on[v][u]) {
-                inferable++;
-              }
-            } else {
-              if (!on[u][v]) {
-                inferable++;
-              }
+export function findHint(spec: Spec, clues: number[][][], on: boolean[][], off: boolean[][]) {
+  let maxInferable = 0;
+  let results = [-1, -1];
+  for (let pass = 0; pass < 2; pass++) {
+    const horizontal = pass === 0;
+    const uSize = horizontal ? spec.width : spec.height;
+    const vSize = horizontal ? spec.height : spec.width;
+    for (let v = 0; v < vSize; v++) {
+      const inferOn = [];
+      const inferOff = [];
+      for (let u = 0; u < uSize; u++) {
+        inferOn.push(true);
+        inferOff.push(true);
+      }
+      analyzeLine(clues[horizontal ? 0 : 1][v], on, off, v, uSize, horizontal, inferOn, inferOff);
+      let inferable = 0;
+      for (let u = 0; u < uSize; u++) {
+        if (inferOn[u]) {
+          console.assert(!inferOff[u]);
+          if (horizontal) {
+            if (!on[v][u]) {
+              inferable++;
             }
-          } else if (inferOff[u]) {
-            if (horizontal) {
-              if (!off[v][u]) {
-                inferable++;
-              }
-            } else {
-              if (!off[u][v]) {
-                inferable++;
-              }
+          } else {
+            if (!on[u][v]) {
+              inferable++;
             }
           }
-        }
-        if (inferable > maxInferable) {
-          maxInferable = inferable;
+        } else if (inferOff[u]) {
           if (horizontal) {
-            results = [v, -1];
+            if (!off[v][u]) {
+              inferable++;
+            }
           } else {
-            results = [-1, v];
+            if (!off[u][v]) {
+              inferable++;
+            }
           }
         }
       }
+      if (inferable > maxInferable) {
+        maxInferable = inferable;
+        if (horizontal) {
+          results = [v, -1];
+        } else {
+          results = [-1, v];
+        }
+      }
     }
-    return results;
   }
+  return results;
 }
+
