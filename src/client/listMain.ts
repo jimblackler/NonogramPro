@@ -103,6 +103,7 @@ async function populate() {
                 .put(game.data, game.key));
           }
         })
+        .catch(e => list.append(e.toString()))
         .finally(() => progress.remove());
   }
 }
