@@ -1,7 +1,7 @@
 import {RequestHandler} from 'express';
 import {getSignInUrl} from '../components/globalControls';
+import {Game} from '../game';
 import {getEmail} from '../getEmail';
-import {getGame} from '../getGame';
 import {getOAuth2} from '../getOAuth2';
 import {datastore} from '../main';
 
@@ -18,7 +18,8 @@ export const deleteHandler: RequestHandler = async (req, res, next) => {
 
   let gameId = req.body.game_id;
 
-  const existingGame = await getGame(gameId);
+  const existingGame = await datastore.get(datastore.key(['game', gameId]))
+      .then(result => result[0] as Game | undefined);
 
   if (!existingGame || existingGame.creator !== email) {
     res.send(JSON.stringify({'exception': 'Not signed in'}, null, 2));

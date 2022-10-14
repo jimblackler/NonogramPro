@@ -1,9 +1,8 @@
 import {RequestHandler} from 'express';
 import {getSignInUrl} from '../components/globalControls';
 import {Game} from '../game';
-import {gameToClientGame} from '../gameToClientGame';
+import {GameInDb, gameToClientGame} from '../gameToClientGame';
 import {getEmail} from '../getEmail';
-import {getGame} from '../getGame';
 import {getOAuth2} from '../getOAuth2';
 import {datastore} from '../main';
 import {nameToId} from '../nameToId';
@@ -21,7 +20,8 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
 
   let gameId = req.body.game_id;
 
-  const existingGame = await getGame(gameId);
+  const existingGame = await datastore.get(datastore.key(['game', gameId]))
+      .then(result => result[0] as GameInDb | undefined);
 
   if (!existingGame || existingGame.creator !== email) {
     const nameStub = nameToId(req.body.name.toLowerCase());
@@ -32,8 +32,8 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
       } else {
         gameId = nameStub;
       }
-      const existingGame0 = await getGame(gameId);
-      if (!existingGame0) {
+      if (await datastore.get(datastore.key(['game', gameId]))
+          .then(result => result.length) === 1) {
         break;
       }
       appendNumber++;
