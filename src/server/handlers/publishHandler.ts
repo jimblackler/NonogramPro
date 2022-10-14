@@ -7,6 +7,14 @@ import {getOAuth2} from '../getOAuth2';
 import {datastore} from '../main';
 import {nameToId} from '../nameToId';
 
+function randomId() {
+  const out: string[] = [];
+  for (let idx = 0; idx !== 4; idx++) {
+    out.push(String.fromCharCode(97 + 26 * Math.random()));
+  }
+  return out.join('');
+}
+
 export const publishHandler: RequestHandler = async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
 
@@ -24,7 +32,10 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
       .then(result => result[0] as GameInDb | undefined);
 
   if (!existingGame || existingGame.creator !== email) {
-    const nameStub = nameToId(req.body.name.toLowerCase());
+    let nameStub = nameToId(req.body.name.toLowerCase());
+    if (!nameStub) {
+      nameStub = randomId();
+    }
     let appendNumber = 0;
     while (true) {
       if (appendNumber) {
