@@ -41,7 +41,6 @@ ol#games li {
 }
 
 ol#games a {
-  background: linear-gradient(purple, rebeccapurple);
   border-radius: 1em;
   display: flex;
   flex-direction: column;
@@ -50,6 +49,19 @@ ol#games a {
   padding: 1em;
   width: 10em;
 }
+
+ol#games a.unstarted {
+  background: linear-gradient(purple, rebeccapurple);
+}
+
+ol#games a.playing {
+  background: linear-gradient(blue, dodgerblue);
+}
+
+ol#games a.completed {
+  background: linear-gradient(darkslategray, seagreen);
+}
+
 
 ol#games a:hover {
   color: black;

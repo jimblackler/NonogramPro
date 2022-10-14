@@ -15,6 +15,7 @@ function addGame(
   const anchor = document.createElement('a');
   li.append(anchor);
   anchor.setAttribute('href', `/play?game=${key}`);
+  anchor.setAttribute('class', completed ? 'completed' : playing ? 'playing' : 'unstarted');
 
   /* Name */
   {
