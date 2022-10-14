@@ -1,6 +1,7 @@
 import {Spec} from '../common/spec';
 import {Generate} from './generate';
 import {enhanceRenderer} from './renderer';
+import {truthy} from './truthy';
 
 require('./dialog');
 
@@ -222,7 +223,7 @@ export class Analyze {
     }
 
     let phrase;
-    if (!lastRound || isComplete(spec, lastRound)) {
+    if (isComplete(spec, truthy(lastRound))) {
       phrase = `Requires ${difficulty} rounds to complete with standard method.`;
     } else {
       phrase = 'Cannot be completed with standard method.';
