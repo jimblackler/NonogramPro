@@ -26,7 +26,6 @@ select {
 
 g.labels text {
   font-weight: bold;
-  font-size: large;
 }
 
 g.column_labels text {

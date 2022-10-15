@@ -10,6 +10,7 @@ const HORIZONTAL_CLUE_BASELINE_POSITION = 0.75;
 interface Dimensions {
   cellSize: number;
   ratioForClues: number;
+  labelSize: number;
 }
 
 export interface GridDownData {
@@ -27,7 +28,7 @@ export interface GridMoveData {
 
 export function enhanceRenderer(svg: SVGSVGElement) {
   let spec: Spec = {width: 0, height: 0};
-  let dimensions: Dimensions = {cellSize: 0, ratioForClues: 0};
+  let dimensions: Dimensions = {cellSize: 0, ratioForClues: 0, labelSize: 0};
   let highlightedColumn = -1;
   let highlightedRow = -1;
   let highlightMode: string | undefined;
@@ -77,9 +78,13 @@ export function enhanceRenderer(svg: SVGSVGElement) {
         content.removeChild(content.firstChild);
       }
       spec = spec_;
-      dimensions = dimensions_ ||
-          {cellSize: 600 / (spec.width + 5), ratioForClues: 10 / (spec.width + 5)};
 
+      dimensions = dimensions_ ||
+          {
+            cellSize: 600 / (spec.width + 5),
+            ratioForClues: 18 / (spec.width + 15),
+            labelSize: 40 / (spec.width + 15)
+          };
       const cellSize = dimensions.cellSize;
       leftOffset = dimensions.ratioForClues * cellSize * spec.width;
       topOffset = dimensions.ratioForClues * cellSize * spec.height;
@@ -90,6 +95,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
       const labels = document.createElementNS(XMLNS, 'g');
       content.append(labels);
       labels.classList.add('labels');
+      labels.setAttribute('style', `font-size: ${dimensions.labelSize}em`);
 
       rowsAndColumns = document.createElementNS(XMLNS, 'g');
       content.append(rowsAndColumns);

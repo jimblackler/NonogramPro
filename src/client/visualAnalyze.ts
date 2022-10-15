@@ -12,7 +12,7 @@ function draw(parent: HTMLElement, spec: Spec, on: boolean[][], priorOn: boolean
   svg.classList.add('mini');
 
   const renderer = enhanceRenderer(svg);
-  renderer.setDimensions(spec, {cellSize: 10, ratioForClues: 0});
+  renderer.setDimensions(spec, {cellSize: 10, ratioForClues: 0, labelSize: 0});
   renderer.paintOnSquares(on, priorOn);
   renderer.paintOffSquares(off, priorOff);
 }
