@@ -83,7 +83,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
       dimensions = dimensions_ || {
         cellSize: 700 / (spec.width + 5),
         ratioForClues: 15 / (spec.width + 15),
-        labelSize: 700 / (spec.width + 15),
+        labelSize: 600 / (spec.width + 15),
         clueToGridMargin: 400 / (spec.width + 15),
         verticalClueSeparation: 800 / (spec.width + 15)
       };
