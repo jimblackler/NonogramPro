@@ -88,7 +88,7 @@ delete_.addEventListener('click', () => {
       .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
       .then(transactionToPromise);
   // Remove delete
-  axios.post('/delete', {game_id: gameId})
+  axios.post('/delete', {gameId})
       .then(response => response.data)
       .then(obj => {
         window.location.href = window.location.origin;
@@ -249,7 +249,7 @@ publish.addEventListener('click', evt => {
     spec,
     name,
     style,
-    game_id: gameId
+    gameId
   }).then(response => response.data)
       .then(obj => {
         if (obj.login) {

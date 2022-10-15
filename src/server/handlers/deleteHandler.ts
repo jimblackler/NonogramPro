@@ -16,7 +16,7 @@ export const deleteHandler: RequestHandler = async (req, res, next) => {
     return;
   }
 
-  let gameId = req.body.game_id;
+  let gameId = req.body.gameId;
 
   const existingGame = await datastore.get(datastore.key(['game', gameId]))
       .then(result => result[0] as Game | undefined);
@@ -28,7 +28,5 @@ export const deleteHandler: RequestHandler = async (req, res, next) => {
 
   await datastore.delete(datastore.key(['game', gameId]));
 
-  res.send(JSON.stringify({
-    'game_id': gameId
-  }, null, 2));
+  res.send(JSON.stringify({gameId}, null, 2));
 };

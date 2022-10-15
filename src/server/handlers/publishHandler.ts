@@ -26,7 +26,7 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
     return;
   }
 
-  let gameId = req.body.game_id;
+  let gameId = req.body.gameId;
 
   const existingGame = await datastore.get(datastore.key(['game', gameId]))
       .then(result => result[0] as GameInDb | undefined);
