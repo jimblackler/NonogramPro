@@ -166,8 +166,13 @@ getGame(gameId).then(result => {
         if (!data) {
           return;
         }
-        on = data.on;
-        off = data.off;
+        if (data.on.length === spec.height &&
+            data.on.every(row => row.length === spec.width) &&
+            data.off.length === spec.height &&
+            data.off.every(row => row.length === spec.width)) {
+          on = data.on;
+          off = data.off;
+        }
         fromScratch();
       });
 
