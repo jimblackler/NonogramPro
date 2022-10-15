@@ -90,7 +90,7 @@ export const editHandler: RequestHandler = async (req, res, next) => {
           bordered.append(select);
           select.setAttribute('id', 'gridSize');
 
-          [5, 10, 15, 20, 25].forEach(number => {
+          [5, 10, 15, 20, 25, 30, 35, 40].forEach(number => {
             const option = document.createElement('option');
             select.append(option);
             const spec: Spec = {width: number, height: number};
