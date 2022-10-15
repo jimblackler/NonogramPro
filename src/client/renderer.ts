@@ -3,14 +3,14 @@ import {Spec} from '../common/spec';
 const XMLNS = 'http://www.w3.org/2000/svg';
 const DIVISIONS = 5;
 const CROSS_RATIO = 0.75;
-const CLUE_TO_GRID_MARGIN = 10;
-const VERTICAL_CLUE_SEPARATION = 20;
 const HORIZONTAL_CLUE_BASELINE_POSITION = 0.75;
 
 interface Dimensions {
   cellSize: number;
   ratioForClues: number;
   labelSize: number;
+  clueToGridMargin: number;
+  verticalClueSeparation: number;
 }
 
 export interface GridDownData {
@@ -28,7 +28,8 @@ export interface GridMoveData {
 
 export function enhanceRenderer(svg: SVGSVGElement) {
   let spec: Spec = {width: 0, height: 0};
-  let dimensions: Dimensions = {cellSize: 0, ratioForClues: 0, labelSize: 0};
+  let dimensions: Dimensions =
+      {cellSize: 0, ratioForClues: 0, labelSize: 0, clueToGridMargin: 0, verticalClueSeparation: 0};
   let highlightedColumn = -1;
   let highlightedRow = -1;
   let highlightMode: string | undefined;
@@ -79,12 +80,13 @@ export function enhanceRenderer(svg: SVGSVGElement) {
       }
       spec = spec_;
 
-      dimensions = dimensions_ ||
-          {
-            cellSize: 600 / (spec.width + 5),
-            ratioForClues: 18 / (spec.width + 15),
-            labelSize: 40 / (spec.width + 15)
-          };
+      dimensions = dimensions_ || {
+        cellSize: 600 / (spec.width + 5),
+        ratioForClues: 15 / (spec.width + 15),
+        labelSize: 500 / (spec.width + 15),
+        clueToGridMargin: 400 / (spec.width + 15),
+        verticalClueSeparation: 800 / (spec.width + 15)
+      };
       const cellSize = dimensions.cellSize;
       leftOffset = dimensions.ratioForClues * cellSize * spec.width;
       topOffset = dimensions.ratioForClues * cellSize * spec.height;
@@ -95,7 +97,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
       const labels = document.createElementNS(XMLNS, 'g');
       content.append(labels);
       labels.classList.add('labels');
-      labels.setAttribute('style', `font-size: ${dimensions.labelSize}em`);
+      labels.setAttribute('style', `font-size: ${dimensions.labelSize}px`);
 
       rowsAndColumns = document.createElementNS(XMLNS, 'g');
       content.append(rowsAndColumns);
@@ -219,7 +221,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
         rowLabelGroup.classList.add('valid');
         const rowLabel = document.createElementNS(XMLNS, 'text');
         rowLabelGroup.append(rowLabel);
-        rowLabel.setAttribute('x', `${leftOffset - CLUE_TO_GRID_MARGIN}px`);
+        rowLabel.setAttribute('x', `${leftOffset - dimensions.clueToGridMargin}px`);
         rowLabel.setAttribute('y',
             `${topOffset + y * cellSize + cellSize * HORIZONTAL_CLUE_BASELINE_POSITION}px`);
         const c2 = clues[0][y];
@@ -236,7 +238,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
       }
       for (let x = 0; x < spec.width; x++) {
         const c = clues[1][x];
-        let yPos = topOffset - CLUE_TO_GRID_MARGIN;
+        let yPos = topOffset - dimensions.clueToGridMargin;
         const columnLabelGroup = document.createElementNS(XMLNS, 'g');
         columnLabels.append(columnLabelGroup);
         columnLabelGroup.classList.add('valid');
@@ -247,7 +249,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
           columnLabel.setAttribute('y', `${yPos}px`);
           const textNode = document.createTextNode('' + c[idx]);
           columnLabel.append(textNode);
-          yPos -= VERTICAL_CLUE_SEPARATION;
+          yPos -= dimensions.verticalClueSeparation;
         }
       }
     },
