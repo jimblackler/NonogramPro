@@ -244,18 +244,13 @@ publish.addEventListener('click', evt => {
     saveLocal();
     repaint();
   }
-  const data = {
-    ...getData(),
+  axios.post('/publish', {
+    gridData: encode(data),
+    spec,
+    name,
+    style,
     game_id: gameId
-  };
-  // We don't technically need to uuencode the grid at this stage, but
-  // big boolean arrays aren't transport or server friendly.
-  if (typeof data.gridData !== 'object') {
-    throw new Error();
-  }
-  data.gridData = encode(data.gridData);
-  axios.post('/publish', data)
-      .then(response => response.data)
+  }).then(response => response.data)
       .then(obj => {
         if (obj.login) {
           window.location.href = obj.login;
@@ -314,30 +309,22 @@ if (gameId) {
   makeNewGame(defaultSpec, true);
 }
 
-function getData() {
-  return {
-    gridData: data as string | boolean[][],
+function saveLocal() {
+  let difficulty = 0;
+  if (false) {
+    for (const round of analyzeAll(spec, generateClues(spec, data))) {
+      difficulty++;
+    }
+  }
+  const data_: ClientGameData = {
+    gridData: data,
     spec,
     name,
     style,
-  };
-}
-
-function saveLocal() {
-  const data1 = getData();
-  if (typeof data1.gridData === 'string') {
-    throw new Error();
-  }
-  let difficulty = 0;
-  for (const round of analyzeAll(spec, generateClues(spec, data1.gridData))) {
-    difficulty++;
-  }
-  const data: ClientGameData = {
-    ...data1,
     needsPublish,
     difficulty
   };
   return gamesDb
-      .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data, gameId))
+      .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data_, gameId))
       .then(transactionToPromise);
 }
