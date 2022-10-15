@@ -83,16 +83,22 @@ analyze.addEventListener('click', () => {
 });
 
 delete_.addEventListener('click', () => {
-  // Local delete
-  gamesDb
-      .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
-      .then(transactionToPromise);
-  // Remove delete
-  axios.post('/delete', {gameId})
-      .then(response => response.data)
-      .then(obj => {
-        window.location.href = window.location.origin;
-      });
+
+  delete_.setAttribute('disabled', '');
+  const progress = addProgress();
+  Promise.all([
+    // Local delete.
+    gamesDb
+        .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
+        .then(transactionToPromise),
+    // Server delete.
+    axios.post('/delete', {gameId})
+  ]).then(() => {
+    window.location.href = window.location.origin;
+  }).finally(() => {
+    progress.remove();
+    delete_.removeAttribute('disabled')
+  });
 });
 
 const DrawMode = {
@@ -230,14 +236,18 @@ importImageButton.addEventListener('click', () => {
   });
 });
 
-publish.addEventListener('click', evt => {
-  publish.setAttribute('disabled', '');
-
+function addProgress() {
   const aside = document.body.getElementsByTagName('aside')[0];
   const progress = document.createElement('img');
   aside.append(progress);
   progress.setAttribute('src', '/images/progress.svg');
   progress.setAttribute('style', 'max-width: 4em');
+  return progress;
+}
+
+publish.addEventListener('click', evt => {
+  publish.setAttribute('disabled', '');
+  const progress = addProgress();
 
   if (name === 'Untitled' || name === '') {
     name = prompt('Enter a name for your puzzle') || '';
