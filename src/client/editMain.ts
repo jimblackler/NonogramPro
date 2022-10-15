@@ -317,9 +317,9 @@ if (gameId) {
 function getData() {
   return {
     gridData: data as string | boolean[][],
-    spec: spec,
-    name: name,
-    style: style,
+    spec,
+    name,
+    style,
   };
 }
 
