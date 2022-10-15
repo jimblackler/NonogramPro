@@ -2,7 +2,7 @@ import {Spec} from '../common/spec';
 
 const XMLNS = 'http://www.w3.org/2000/svg';
 const DIVISIONS = 5;
-const CROSS_MARGIN = 7;
+const CROSS_RATIO = 0.75;
 const CLUE_TO_GRID_MARGIN = 10;
 const VERTICAL_CLUE_SEPARATION = 20;
 const HORIZONTAL_CLUE_BASELINE_POSITION = 0.75;
@@ -289,10 +289,11 @@ export function enhanceRenderer(svg: SVGSVGElement) {
           }
           const line1 = document.createElementNS(XMLNS, 'line');
           crosses.append(line1);
-          line1.setAttribute('x1', `${leftOffset + x * cellSize + CROSS_MARGIN}px`);
-          line1.setAttribute('x2', `${leftOffset + x * cellSize + cellSize - CROSS_MARGIN}px`);
-          line1.setAttribute('y1', `${topOffset + y * cellSize + CROSS_MARGIN}px`);
-          line1.setAttribute('y2', `${topOffset + y * cellSize + cellSize - CROSS_MARGIN}px`);
+          const crossMargin = cellSize * CROSS_RATIO;
+          line1.setAttribute('x1', `${leftOffset + x * cellSize + crossMargin}px`);
+          line1.setAttribute('x2', `${leftOffset + x * cellSize + cellSize - crossMargin}px`);
+          line1.setAttribute('y1', `${topOffset + y * cellSize + crossMargin}px`);
+          line1.setAttribute('y2', `${topOffset + y * cellSize + cellSize - crossMargin}px`);
           if (!priorOff || priorOff[y][x]) {
             line1.classList.add('prior');
           } else {
@@ -301,10 +302,10 @@ export function enhanceRenderer(svg: SVGSVGElement) {
 
           const line2 = document.createElementNS(XMLNS, 'line');
           crosses.append(line2);
-          line2.setAttribute('x1', `${leftOffset + x * cellSize + cellSize - CROSS_MARGIN}px`);
-          line2.setAttribute('x2', `${leftOffset + x * cellSize + CROSS_MARGIN}px`);
-          line2.setAttribute('y1', `${topOffset + y * cellSize + CROSS_MARGIN}px`);
-          line2.setAttribute('y2', `${topOffset + y * cellSize + cellSize - CROSS_MARGIN}px`);
+          line2.setAttribute('x1', `${leftOffset + x * cellSize + cellSize - crossMargin}px`);
+          line2.setAttribute('x2', `${leftOffset + x * cellSize + crossMargin}px`);
+          line2.setAttribute('y1', `${topOffset + y * cellSize + crossMargin}px`);
+          line2.setAttribute('y2', `${topOffset + y * cellSize + cellSize - crossMargin}px`);
           if (!priorOff || priorOff[y][x]) {
             line2.classList.add('prior');
           } else {
