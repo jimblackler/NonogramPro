@@ -87,10 +87,12 @@ function countCube(
     imageData: LocalImageData,
     trueBounds: { top: number; left: number; bottom: number; right: number },
     x: number, y: number, spec: Spec) {
-  const left = Math.floor(x / spec.width * (trueBounds.right - trueBounds.left) + trueBounds.left);
-  const right = Math.floor((x + 1) / spec.width * (trueBounds.right - trueBounds.left) + trueBounds.left);
-  const top = Math.floor(y / spec.height * (trueBounds.bottom - trueBounds.top) + trueBounds.top);
-  const bottom = Math.floor((y + 1) / spec.height * (trueBounds.bottom - trueBounds.top) + trueBounds.top);
+  const width = trueBounds.right - trueBounds.left;
+  const height = trueBounds.bottom - trueBounds.top;
+  const left = Math.floor(x / spec.width * width + trueBounds.left);
+  const right = Math.max(left + 1, Math.floor((x + 1) / spec.width * width + trueBounds.left));
+  const top = Math.floor(y / spec.height * height + trueBounds.top);
+  const bottom = Math.max(Math.floor((y + 1) / spec.height * height + trueBounds.top), top + 1);
   let count = 0;
   for (let y = top; y < bottom; y++) {
     for (let x = left; x < right; x++) {
