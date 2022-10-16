@@ -63,7 +63,7 @@ function findTrueBounds(imageData: LocalImageData) {
 
 function loadFile(input: HTMLInputElement): Promise<{ type: string, data: ArrayBuffer }> {
   return new Promise((resolve, reject) => {
-    input.addEventListener('change', evt => {
+    input.addEventListener('change', () => {
       const file = input.files && input.files[0];
       if (!file) {
         reject();
