@@ -122,7 +122,7 @@ export function importImage(spec: Spec, data: boolean[][]) {
         };
         return imageData;
       } else if (result.type === 'image/svg+xml') {
-        const canvas = truthy(document.createElement('canvas'));
+        const canvas = new OffscreenCanvas(0, 0);
         const ctx = truthy(canvas.getContext('2d'));
         return new Parser().parse(new TextDecoder('utf-8').decode(result.data))
             .then(doc => new Canvg(ctx, doc, {}).render())
