@@ -10,7 +10,6 @@ export const playHandler: RequestHandler = async (req, res, next) => {
       const h1 = document.createElement('h1');
       parent.append(h1);
       h1.setAttribute('id', 'title');
-      h1.setAttribute('contenteditable', 'true');
       h1.append('Title');
 
       const section = document.createElement('section');
