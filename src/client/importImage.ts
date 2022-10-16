@@ -1,5 +1,6 @@
 import {Canvg, Parser} from 'canvg';
 import {Spec} from '../common/spec';
+import {truthy} from './truthy';
 
 require('png-js/zlib.js');
 require('png-js/png.js');
@@ -121,15 +122,9 @@ export function importImage(spec: Spec, data: boolean[][]) {
         };
         return imageData;
       } else if (result.type === 'image/svg+xml') {
-        const canvas = document.createElement('canvas');
-        if (!canvas) {
-          throw new Error();
-        }
-        const ctx = canvas.getContext('2d');
-        if (!ctx) {
-          throw new Error();
-        }
-        return new Parser({}).parse(new TextDecoder('utf-8').decode(result.data))
+        const canvas = truthy(document.createElement('canvas'));
+        const ctx = truthy(canvas.getContext('2d'));
+        return new Parser().parse(new TextDecoder('utf-8').decode(result.data))
             .then(doc => new Canvg(ctx, doc, {}).render())
             .then(() => ctx.getImageData(0, 0, canvas.width, canvas.height));
       }
