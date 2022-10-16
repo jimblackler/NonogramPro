@@ -74,6 +74,7 @@ status.innerText = 'Edit mode';
 createNew.addEventListener('click', () => {
   window.location.href = 'edit';
 });
+
 play.addEventListener('click', () => {
   window.location.href = `/play?game=${gameId}`;
 });
