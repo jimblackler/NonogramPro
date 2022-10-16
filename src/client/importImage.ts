@@ -125,7 +125,11 @@ export function importImage(spec: Spec, data: boolean[][]) {
         const canvas = new OffscreenCanvas(0, 0);
         const ctx = truthy(canvas.getContext('2d'));
         return new Parser().parse(new TextDecoder('utf-8').decode(result.data))
-            .then(doc => new Canvg(ctx, doc, {}).render())
+            .then(doc => {
+              const canvg = new Canvg(ctx, doc, {});
+              canvg.resize(1024, 1024);
+              return canvg.render();
+            })
             .then(() => ctx.getImageData(0, 0, canvas.width, canvas.height));
       }
       throw new Error();
