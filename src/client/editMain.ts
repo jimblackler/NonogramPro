@@ -59,13 +59,14 @@ title.addEventListener('focus', () => {
   selection.addRange(range);
 });
 
-title.addEventListener('blur', evt => {
-  name = title.textContent || '';
-  if (title.textContent === name) {
-    title.textContent = name;
-    needsPublish = true;
-    saveLocal();
+title.addEventListener('blur', () => {
+  const newName = title.textContent || '';
+  if (name === newName) {
+    return;
   }
+  name = newName;
+  needsPublish = true;
+  saveLocal().then(repaint);
 });
 
 status.innerText = 'Edit mode';
