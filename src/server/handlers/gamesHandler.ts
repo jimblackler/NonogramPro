@@ -1,7 +1,7 @@
 import {RequestHandler} from 'express';
 import {GameInDb, gameToClientGame} from '../gameToClientGame';
 import {getParam} from '../getParam';
-import {datastore} from '../main';
+import {datastore} from '../globalDatastore';
 
 export const gamesHandler: RequestHandler = async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');

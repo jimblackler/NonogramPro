@@ -3,7 +3,7 @@ import {getSignInUrl} from '../components/globalControls';
 import {Game} from '../game';
 import {getEmail} from '../getEmail';
 import {getOAuth2} from '../getOAuth2';
-import {datastore} from '../main';
+import {datastore} from '../globalDatastore';
 
 export const deleteHandler: RequestHandler = async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');

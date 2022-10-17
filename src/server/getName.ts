@@ -1,4 +1,4 @@
-import {Datastore} from '@google-cloud/datastore';
+import {datastore} from './globalDatastore';
 import {nameToId} from './nameToId';
 
 function randomId() {
@@ -9,7 +9,7 @@ function randomId() {
   return out.join('');
 }
 
-export async function getName(datastore: Datastore, input: string) {
+export async function getName(input: string) {
   let gameId = '';
   let nameStub = nameToId(input.toLowerCase());
   if (!nameStub) {

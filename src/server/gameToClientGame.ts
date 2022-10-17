@@ -1,6 +1,6 @@
 import {ClientGame} from '../common/clientGame';
 import {Game} from './game';
-import {datastore} from './main';
+import {datastore} from './globalDatastore';
 
 export type GameInDb = Game & { [datastore.KEY]: { name: string } };
 

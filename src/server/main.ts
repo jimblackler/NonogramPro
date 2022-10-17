@@ -1,4 +1,3 @@
-import {Datastore} from '@google-cloud/datastore';
 import express, {Express} from 'express';
 import {cookiesToObject} from './cookieUtils';
 import {authCallbackHandler} from './handlers/authCallbackHandler';
@@ -10,7 +9,6 @@ import {playHandler} from './handlers/playHandler';
 import {publishHandler} from './handlers/publishHandler';
 import {signOutHandler} from './handlers/signOutHandler';
 
-export const datastore = new Datastore();
 const app: Express = express();
 
 app.use(express.urlencoded({extended: true}));

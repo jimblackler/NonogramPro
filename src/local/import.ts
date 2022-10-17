@@ -1,4 +1,3 @@
-import {Datastore} from '@google-cloud/datastore';
 import {readdir, readFile} from 'fs/promises';
 import {JSDOM} from 'jsdom';
 import path from 'path';
@@ -10,8 +9,7 @@ import {Spec} from '../common/spec';
 import {truthy} from '../common/truthy';
 import {Game} from '../server/game';
 import {getName} from '../server/getName';
-
-export const datastore = new Datastore();
+import {datastore} from '../server/globalDatastore';
 
 async function* getFiles(directory: string): AsyncGenerator<string> {
   for (const dirent of await readdir(directory, {withFileTypes: true})) {
@@ -59,7 +57,7 @@ export async function main() {
               gridData: encode(gridData)
             };
 
-            const key = datastore.key(['game', await getName(datastore, stub)]);
+            const key = datastore.key(['game', await getName(stub)]);
             await datastore.save({
               key: key,
               data: game

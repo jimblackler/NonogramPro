@@ -5,7 +5,7 @@ import {GameInDb, gameToClientGame} from '../gameToClientGame';
 import {getEmail} from '../getEmail';
 import {getName} from '../getName';
 import {getOAuth2} from '../getOAuth2';
-import {datastore} from '../main';
+import {datastore} from '../globalDatastore';
 
 export const publishHandler: RequestHandler = async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
@@ -24,7 +24,7 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
       .then(result => result[0] as GameInDb | undefined);
 
   if (!existingGame || existingGame.creator !== email) {
-    gameId = await getName(datastore, req.body.name);
+    gameId = await getName(req.body.name);
   }
 
   const game: Game = {
