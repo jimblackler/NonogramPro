@@ -1,15 +1,15 @@
 import Alea from 'alea';
 import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
+import {Generate} from '../common/generate';
+import {generateClues} from '../common/generateClues';
 import {importImage} from '../common/importImage';
+import {solve} from '../common/solve';
 import {Spec} from '../common/spec';
-import {analyzeAll} from './analyze';
 import {gamesDb} from './db/gamesDb';
 import {decode} from './decoder';
 import {encode} from './encoder';
 import {getGame} from './fetchGame';
-import {Generate} from './generate';
-import {generateClues} from './generateClues';
 import {is} from './is';
 import {notNull} from './notNull';
 import {plotLine} from './plotLine';
@@ -324,7 +324,7 @@ if (gameId) {
 function saveLocal() {
   let difficulty = 0;
   if (false) {
-    for (const round of analyzeAll(spec, generateClues(spec, data))) {
+    for (const round of solve(spec, generateClues(spec, data))) {
       difficulty++;
     }
   }

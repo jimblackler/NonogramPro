@@ -1,5 +1,4 @@
-import Alea from 'alea';
-import {Spec} from '../common/spec';
+import {Spec} from './spec';
 
 export class Generate {
   static getEmpty(spec: Spec): boolean[][] {

@@ -1,4 +1,4 @@
-import {Spec} from '../common/spec';
+import {Spec} from './spec';
 
 export function generateClues(spec: Spec, data: boolean[][]) {
   const rows = [];
