@@ -1,10 +1,10 @@
+import {equals, getEmpty} from '../common/generate';
+import {generateClues} from '../common/generateClues';
 import {truthy} from '../common/truthy';
 import {checkColumn, checkRow, findHint} from './analyze';
 import {Complete, completedDb} from './db/completedDb';
 import {PlayInDb, playsDb} from './db/playsDb';
 import {getGame} from './fetchGame';
-import {Generate} from './generate';
-import {generateClues} from './generateClues';
 import {is} from './is';
 import {notNull} from './notNull';
 import {plotLine} from './plotLine';
@@ -146,8 +146,8 @@ getGame(gameId).then(result => {
   const spec = result.spec;
   const data = result.gridData;
   const style = result.style;
-  let on = Generate.getEmpty(spec);
-  let off = Generate.getEmpty(spec);
+  let on = getEmpty(spec);
+  let off = getEmpty(spec);
   renderer.setDimensions(spec);
 
   const colorSchemeStylesheet =
@@ -181,8 +181,8 @@ getGame(gameId).then(result => {
   const hint = notNull(document.body.querySelector('#hint'));
 
   replay.addEventListener('click', () => {
-    on = Generate.getEmpty(spec);
-    off = Generate.getEmpty(spec);
+    on = getEmpty(spec);
+    off = getEmpty(spec);
     fromScratch();
   });
 
@@ -233,7 +233,7 @@ getGame(gameId).then(result => {
         .put({on, off}, gameId));
     renderer.paintOnSquares(on);
     renderer.paintOffSquares(off); /* Check is complete */
-    if (Generate.equals(on, data)) {
+    if (equals(on, data)) {
       svg.classList.add('gameComplete');
       const value: Complete = {completed: true};
       completedDb

@@ -1,7 +1,7 @@
 import {readdir, readFile} from 'fs/promises';
 import {JSDOM} from 'jsdom';
 import path from 'path';
-import {Generate} from '../common/generate';
+import {getEmpty} from '../common/generate';
 import {generateClues} from '../common/generateClues';
 import {getImageData, imageDataToGridData} from '../common/importImage';
 import {isComplete, Round, solve} from '../common/solve';
@@ -25,7 +25,7 @@ export async function main() {
   global.DOMParser = window.DOMParser;
   const path = '/Users/jimblackler/code/material-design-icons/src/communication';
   const spec: Spec = {width: 20, height: 20};
-  const gridData = Generate.getEmpty(spec);
+  const gridData = getEmpty(spec);
   for await (const file of getFiles(path)) {
     if (!file.endsWith('.svg')) {
       continue;

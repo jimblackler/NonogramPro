@@ -1,4 +1,4 @@
-import {Generate} from './generate';
+import {clone, complete, equals, getEmpty} from './generate';
 import {Spec} from './spec';
 
 export type Round = {
@@ -147,16 +147,16 @@ function analyzePass(
 }
 
 export function* solve(spec: Spec, clues: number[][][]): Iterable<Round> {
-  const on = Generate.getEmpty(spec);
-  const off = Generate.getEmpty(spec);
+  const on = getEmpty(spec);
+  const off = getEmpty(spec);
   let failed = 0;
   let horizontal = true;
 
   while (true) {
-    const priorOn = Generate.clone(on);
-    const priorOff = Generate.clone(off);
+    const priorOn = clone(on);
+    const priorOff = clone(off);
     analyzePass(spec, clues, on, off, horizontal);
-    if (Generate.equals(on, priorOn) && Generate.equals(off, priorOff)) {
+    if (equals(on, priorOn) && equals(off, priorOff)) {
       failed++;
       if (failed === 2) {
         return;
@@ -164,9 +164,9 @@ export function* solve(spec: Spec, clues: number[][][]): Iterable<Round> {
     } else {
       failed = 0;
     }
-    yield {on: Generate.clone(on), priorOn, off: Generate.clone(off), priorOff};
+    yield {on: clone(on), priorOn, off: clone(off), priorOff};
 
-    if (Generate.complete(on, off)) {
+    if (complete(on, off)) {
       return;
     }
 

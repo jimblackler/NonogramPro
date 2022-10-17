@@ -1,7 +1,7 @@
 import Alea from 'alea';
 import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
-import {Generate} from '../common/generate';
+import {getEmpty} from '../common/generate';
 import {generateClues} from '../common/generateClues';
 import {importImage} from '../common/importImage';
 import {solve} from '../common/solve';
@@ -148,7 +148,7 @@ function makeNewGame(spec_: Spec, replace: boolean) {
   }
   spec = spec_;
   style = 'midnight';
-  data = Generate.getEmpty(spec);
+  data = getEmpty(spec);
   name = 'Untitled';
   renderer.setDimensions(spec);
   repaint();
@@ -156,7 +156,7 @@ function makeNewGame(spec_: Spec, replace: boolean) {
 
 gridSize.addEventListener('change', evt => {
   spec = JSON.parse(gridSize.value);
-  data = Generate.getEmpty(spec);
+  data = getEmpty(spec);
   renderer.setDimensions(spec);
   repaint();
 });
