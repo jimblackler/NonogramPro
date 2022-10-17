@@ -1,12 +1,17 @@
+import {Datastore} from '@google-cloud/datastore';
 import {readdir, readFile} from 'fs/promises';
 import {JSDOM} from 'jsdom';
 import path from 'path';
-import {getEmpty} from '../common/generate';
+import {encode} from '../client/encoder';
 import {generateClues} from '../common/generateClues';
 import {getImageData, imageDataToGridData} from '../common/importImage';
 import {isComplete, Round, solve} from '../common/solve';
 import {Spec} from '../common/spec';
 import {truthy} from '../common/truthy';
+import {Game} from '../server/game';
+import {getName} from '../server/getName';
+
+export const datastore = new Datastore();
 
 async function* getFiles(directory: string): AsyncGenerator<string> {
   for (const dirent of await readdir(directory, {withFileTypes: true})) {
@@ -23,16 +28,15 @@ export async function main() {
   const window = new JSDOM().window;
   const document = window.document;
   global.DOMParser = window.DOMParser;
-  const path = '/Users/jimblackler/code/material-design-icons/src/communication';
+  const path = '/Users/jimblackler/code/material-design-icons/src/social';
   const spec: Spec = {width: 20, height: 20};
-  const gridData = getEmpty(spec);
   for await (const file of getFiles(path)) {
     if (!file.endsWith('.svg')) {
       continue;
     }
     await readFile(file).then(result => getImageData('image/svg+xml', result.buffer, document))
         .then(imageData => imageDataToGridData(imageData, spec))
-        .then(gridData => {
+        .then(async gridData => {
           const clues = generateClues(spec, gridData);
           let difficulty = 0;
           let lastRound: Round | undefined;
@@ -42,7 +46,24 @@ export async function main() {
           }
 
           if (isComplete(spec, truthy(lastRound))) {
+            const parts = file.split('/');
+            const stub = parts[parts.length - 3];
             console.log(`Requires ${difficulty} rounds to complete with standard method.`);
+            const game: Game = {
+              name: stub,
+              width: spec.width,
+              height: spec.height,
+              style: 'midnight',
+              creator: 'auto',
+              difficulty,
+              gridData: encode(gridData)
+            };
+
+            const key = datastore.key(['game', await getName(datastore, stub)]);
+            await datastore.save({
+              key: key,
+              data: game
+            });
           } else {
             console.log('Cannot be completed with standard method.');
           }

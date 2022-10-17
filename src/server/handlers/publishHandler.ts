@@ -3,17 +3,9 @@ import {getSignInUrl} from '../components/globalControls';
 import {Game} from '../game';
 import {GameInDb, gameToClientGame} from '../gameToClientGame';
 import {getEmail} from '../getEmail';
+import {getName} from '../getName';
 import {getOAuth2} from '../getOAuth2';
 import {datastore} from '../main';
-import {nameToId} from '../nameToId';
-
-function randomId() {
-  const out: string[] = [];
-  for (let idx = 0; idx !== 4; idx++) {
-    out.push(String.fromCharCode(97 + 26 * Math.random()));
-  }
-  return out.join('');
-}
 
 export const publishHandler: RequestHandler = async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
@@ -32,23 +24,7 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
       .then(result => result[0] as GameInDb | undefined);
 
   if (!existingGame || existingGame.creator !== email) {
-    let nameStub = nameToId(req.body.name.toLowerCase());
-    if (!nameStub) {
-      nameStub = randomId();
-    }
-    let appendNumber = 0;
-    while (true) {
-      if (appendNumber) {
-        gameId = `${nameStub}_${appendNumber}`;
-      } else {
-        gameId = nameStub;
-      }
-      if (await datastore.get(datastore.key(['game', gameId]))
-          .then(result => result.length) === 1) {
-        break;
-      }
-      appendNumber++;
-    }
+    gameId = await getName(datastore, req.body.name);
   }
 
   const game: Game = {
