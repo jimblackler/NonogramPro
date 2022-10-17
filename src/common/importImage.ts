@@ -1,3 +1,4 @@
+import {getEmpty} from './generate';
 import {Spec} from './spec';
 import {truthy} from './truthy';
 
@@ -58,7 +59,7 @@ function findTrueBounds(imageData: LocalImageData) {
   }
 }
 
-function loadFile(input: HTMLInputElement): Promise<{ type: string, data: ArrayBuffer }> {
+export function loadFile(input: HTMLInputElement): Promise<{ type: string, data: ArrayBuffer }> {
   return new Promise((resolve, reject) => {
     input.addEventListener('change', () => {
       const file = input.files && input.files[0];
@@ -130,25 +131,13 @@ export function getImageData(type: string, data: ArrayBuffer, document_: Documen
   throw new Error(`Unhandled type ${type}`);
 }
 
-// TODO: use return value not parameter for gridData.
-export function imageDataToGridData(imageData: LocalImageData, spec: Spec, data: boolean[][]) {
+export function imageDataToGridData(imageData: LocalImageData, spec: Spec) {
+  const data = getEmpty(spec);
   const trueBounds = findTrueBounds(imageData);
   for (let y = 0; y < spec.height; y++) {
     for (let x = 0; x < spec.width; x++) {
       data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
     }
   }
-}
-
-export function importImage(spec: Spec, data: boolean[][]) {
-  return new Promise<void>((resolve, reject) => {
-    const input = document.createElement('input');
-    input.setAttribute('type', 'file');
-    input.setAttribute('accept', 'image/svg+xml, image/png');
-
-    loadFile(input).then(result => getImageData(result.type, result.data, document))
-        .then(imageData => imageDataToGridData(imageData, spec, data))
-        .then(() => resolve()).catch(err => reject(err));
-    input.click();
-  });
+  return data;
 }

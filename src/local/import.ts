@@ -31,9 +31,8 @@ export async function main() {
       continue;
     }
     await readFile(file).then(result => getImageData('image/svg+xml', result.buffer, document))
-        .then(imageData => imageDataToGridData(imageData, spec, gridData))
-        .then(() => console.log(gridData))
-        .then(() => {
+        .then(imageData => imageDataToGridData(imageData, spec))
+        .then(gridData => {
           const clues = generateClues(spec, gridData);
           let difficulty = 0;
           let lastRound: Round | undefined;

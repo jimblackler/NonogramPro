@@ -3,7 +3,7 @@ import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
 import {getEmpty} from '../common/generate';
 import {generateClues} from '../common/generateClues';
-import {importImage} from '../common/importImage';
+import {getImageData, imageDataToGridData, loadFile} from '../common/importImage';
 import {solve} from '../common/solve';
 import {Spec} from '../common/spec';
 import {gamesDb} from './db/gamesDb';
@@ -232,10 +232,17 @@ cancel.addEventListener('click', evt => {
 });
 
 importImageButton.addEventListener('click', () => {
-  importImage(spec, data).then(() => {
-    needsPublish = true;
-    repaint();
-  });
+  const input = document.createElement('input');
+  input.setAttribute('type', 'file');
+  input.setAttribute('accept', 'image/svg+xml, image/png');
+  input.click();
+  loadFile(input).then(result => getImageData(result.type, result.data, document))
+      .then(imageData => imageDataToGridData(imageData, spec))
+      .then(data_ => {
+        data = data_;
+        needsPublish = true;
+        repaint();
+      });
 });
 
 function addProgress() {
