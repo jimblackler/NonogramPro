@@ -105,43 +105,48 @@ function countCube(
   return count / ((right - left) * (bottom - top));
 }
 
+function getImageData(type: string, data: ArrayBuffer) {
+  if (type === 'image/png') {
+    const png = new (window as any).PNG(new Uint8Array(data));
+    const pixels = png.decode();
+    const imageData: LocalImageData = {
+      data: pixels,
+      width: png.width,
+      height: png.height
+    };
+    return imageData;
+  } else if (type === 'image/svg+xml') {
+    const canvas = new OffscreenCanvas(0, 0);
+    const ctx = truthy(canvas.getContext('2d'));
+    return new Parser().parse(new TextDecoder('utf-8').decode(data))
+        .then(doc => {
+          const canvg = new Canvg(ctx, doc, {});
+          canvg.resize(1024, 1024);
+          return canvg.render();
+        })
+        .then(() => ctx.getImageData(0, 0, canvas.width, canvas.height));
+  }
+  throw new Error();
+}
+
+function imageDataToGridData(imageData: LocalImageData, spec: Spec, data: boolean[][]) {
+  const trueBounds = findTrueBounds(imageData);
+  for (let y = 0; y < spec.height; y++) {
+    for (let x = 0; x < spec.width; x++) {
+      data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
+    }
+  }
+}
+
 export function importImage(spec: Spec, data: boolean[][]) {
   return new Promise<void>((resolve, reject) => {
     const input = document.createElement('input');
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/svg+xml, image/png');
 
-    loadFile(input).then(result => {
-      if (result.type === 'image/png') {
-        const png = new (window as any).PNG(new Uint8Array(result.data));
-        const pixels = png.decode();
-        const imageData: LocalImageData = {
-          data: pixels,
-          width: png.width,
-          height: png.height
-        };
-        return imageData;
-      } else if (result.type === 'image/svg+xml') {
-        const canvas = new OffscreenCanvas(0, 0);
-        const ctx = truthy(canvas.getContext('2d'));
-        return new Parser().parse(new TextDecoder('utf-8').decode(result.data))
-            .then(doc => {
-              const canvg = new Canvg(ctx, doc, {});
-              canvg.resize(1024, 1024);
-              return canvg.render();
-            })
-            .then(() => ctx.getImageData(0, 0, canvas.width, canvas.height));
-      }
-      throw new Error();
-    }).then(imageData => {
-      const trueBounds = findTrueBounds(imageData);
-      for (let y = 0; y < spec.height; y++) {
-        for (let x = 0; x < spec.width; x++) {
-          data[y][x] = countCube(imageData, trueBounds, x, y, spec) > 0.5;
-        }
-      }
-      resolve();
-    }).catch(err => reject(err));
+    loadFile(input).then(result => getImageData(result.type, result.data))
+        .then(imageData => imageDataToGridData(imageData, spec, data))
+        .then(() => resolve()).catch(err => reject(err));
     input.click();
   });
 }
