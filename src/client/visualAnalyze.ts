@@ -1,7 +1,7 @@
 import {Spec} from '../common/spec';
+import {truthy} from '../common/truthy';
 import {analyzeAll, Round} from './analyze';
 import {enhanceRenderer} from './renderer';
-import {truthy} from './truthy';
 
 require('./dialog');
 

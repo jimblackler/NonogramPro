@@ -1,3 +1,4 @@
+import {truthy} from '../common/truthy';
 import {checkColumn, checkRow, findHint} from './analyze';
 import {Complete, completedDb} from './db/completedDb';
 import {PlayInDb, playsDb} from './db/playsDb';
@@ -9,7 +10,6 @@ import {notNull} from './notNull';
 import {plotLine} from './plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';
 import {transactionToPromise} from './transactionToPromise';
-import {truthy} from './truthy';
 
 const gameId = new URL(window.location.href).searchParams.get('game') || '';
 

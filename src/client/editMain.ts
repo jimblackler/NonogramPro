@@ -1,6 +1,7 @@
 import Alea from 'alea';
 import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
+import {importImage} from '../common/importImage';
 import {Spec} from '../common/spec';
 import {analyzeAll} from './analyze';
 import {gamesDb} from './db/gamesDb';
@@ -9,7 +10,6 @@ import {encode} from './encoder';
 import {getGame} from './fetchGame';
 import {Generate} from './generate';
 import {generateClues} from './generateClues';
-import {importImage} from './importImage';
 import {is} from './is';
 import {notNull} from './notNull';
 import {plotLine} from './plotLine';

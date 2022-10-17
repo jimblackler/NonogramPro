@@ -1,9 +1,5 @@
-import {Canvg, Parser} from 'canvg';
-import {Spec} from '../common/spec';
+import {Spec} from './spec';
 import {truthy} from './truthy';
-
-require('png-js/zlib.js');
-require('png-js/png.js');
 
 interface LocalImageData {
   data: ArrayLike<number>;
@@ -105,8 +101,11 @@ function countCube(
   return count / ((right - left) * (bottom - top));
 }
 
-function getImageData(type: string, data: ArrayBuffer) {
+export function getImageData(type: string, data: ArrayBuffer, document_: Document) {
   if (type === 'image/png') {
+    require('png-js/zlib.js');
+    require('png-js/png.js');
+
     const png = new (window as any).PNG(new Uint8Array(data));
     const pixels = png.decode();
     const imageData: LocalImageData = {
@@ -116,20 +115,23 @@ function getImageData(type: string, data: ArrayBuffer) {
     };
     return imageData;
   } else if (type === 'image/svg+xml') {
-    const canvas = new OffscreenCanvas(0, 0);
-    const ctx = truthy(canvas.getContext('2d'));
-    return new Parser().parse(new TextDecoder('utf-8').decode(data))
-        .then(doc => {
-          const canvg = new Canvg(ctx, doc, {});
-          canvg.resize(1024, 1024);
-          return canvg.render();
-        })
-        .then(() => ctx.getImageData(0, 0, canvas.width, canvas.height));
+    return import('canvg').then(({Canvg, Parser}) => {
+      const canvas = document_.createElement('canvas');
+      const ctx = truthy(canvas.getContext('2d'));
+      return new Parser().parse(new TextDecoder('utf-8').decode(data))
+          .then(doc => {
+            const canvg = new Canvg(ctx, doc, {});
+            canvg.resize(1024, 1024);
+            return canvg.render();
+          })
+          .then(() => ctx.getImageData(0, 0, canvas.width, canvas.height));
+    });
   }
-  throw new Error();
+  throw new Error(`Unhandled type ${type}`);
 }
 
-function imageDataToGridData(imageData: LocalImageData, spec: Spec, data: boolean[][]) {
+// TODO: use return value not parameter for gridData.
+export function imageDataToGridData(imageData: LocalImageData, spec: Spec, data: boolean[][]) {
   const trueBounds = findTrueBounds(imageData);
   for (let y = 0; y < spec.height; y++) {
     for (let x = 0; x < spec.width; x++) {
@@ -144,7 +146,7 @@ export function importImage(spec: Spec, data: boolean[][]) {
     input.setAttribute('type', 'file');
     input.setAttribute('accept', 'image/svg+xml, image/png');
 
-    loadFile(input).then(result => getImageData(result.type, result.data))
+    loadFile(input).then(result => getImageData(result.type, result.data, document))
         .then(imageData => imageDataToGridData(imageData, spec, data))
         .then(() => resolve()).catch(err => reject(err));
     input.click();
