@@ -23,7 +23,7 @@ export async function getName(datastore: Datastore, input: string) {
       gameId = nameStub;
     }
     if (await datastore.get(datastore.key(['game', gameId]))
-        .then(result => result.length) === 1) {
+        .then(result => result[0]) === undefined) {
       break;
     }
     appendNumber++;
