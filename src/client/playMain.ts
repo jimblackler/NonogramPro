@@ -138,7 +138,7 @@ getGame(gameId).then(result => {
       }
   );
 
-  svg.addEventListener('mouseout', evt => {
+  svg.addEventListener('mouseout', () => {
     renderer.setHighlightColumn(-1);
     renderer.setHighlightRow(-1);
   });
