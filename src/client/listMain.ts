@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {ClientGameData} from '../common/clientGame';
+import {ClientGame, ClientGameData} from '../common/clientGame';
 import {completedDb} from './db/completedDb';
 import {gamesDb} from './db/gamesDb';
 import {playsDb} from './db/playsDb';
@@ -93,10 +93,13 @@ async function populate() {
     progress.remove();
   } else {
     axios.get('/games')
-        .then(response => response.data)
+        .then(response => response.data as ClientGame[])
         .then(obj => {
-          for (let game of obj.results) {
+          for (let game of obj) {
             addGame(game.key, game.data, plays.has(game.key), completed.has(game.key), list);
+            if (typeof game.data.gridData !== 'string') {
+              throw new Error();
+            }
             // We write the incoming games to the local database (which needs
             // the grid decoding). Might not always be desirable.
             game.data.gridData = decode(game.data.spec, game.data.gridData);

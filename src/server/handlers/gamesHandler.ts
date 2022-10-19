@@ -13,5 +13,5 @@ export const gamesHandler: RequestHandler = async (req, res, next) => {
     return;
   }
   const results = await datastore.createQuery('game').run().then(result => result[0]);
-  res.send(JSON.stringify({results: results.map(game => gameToClientGame(game))}, null, 2));
+  res.send(JSON.stringify(results.map(game => gameToClientGame(game)), null, 2));
 };
