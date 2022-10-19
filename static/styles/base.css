@@ -26,13 +26,8 @@ button:disabled {
   opacity: 0.5;
 }
 
-a#productName {
-  margin-right: 20px;
-}
-
 h1 {
   font-size: xx-large;
-  margin: 20px 0px;
 }
 
 a {
@@ -45,14 +40,21 @@ a:hover {
 }
 
 section.bordered {
-  padding: 12px;
-  border-radius: 12px;
   border: 1px dashed rgba(255, 255, 255, 0.59);
+  border-radius: 12px;
+  padding: 12px;
 }
 
 section.buttonRow {
   display: flex;
   flex-wrap: wrap;
   gap: 1em;
+}
+
+section.infoRow {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2em;
 }
 

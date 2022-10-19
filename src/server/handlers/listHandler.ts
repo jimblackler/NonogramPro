@@ -21,11 +21,21 @@ export const listHandler: RequestHandler = async (req, res, next) => {
       addGlobalControls(document, parent, req, oAuth, email);
       const section = document.createElement('section');
       parent.append(section);
+      section.setAttribute('class', 'infoRow');
 
-      const a = document.createElement('a');
-      section.append(a);
-      a.setAttribute('href', 'about:blank');
-      a.append('Click for game information and play guide');
+      {
+        const a = document.createElement('a');
+        section.append(a);
+        a.setAttribute('href', 'about:blank');
+        a.append('Click for game information and play guide');
+      }
+
+      {
+        const a = document.createElement('a');
+        section.append(a);
+        a.setAttribute('href', '/edit');
+        a.append('Design a game');
+      }
     },
     addMain: (document, parent) => {
       const section = document.createElement('section');
@@ -48,13 +58,6 @@ export const listHandler: RequestHandler = async (req, res, next) => {
         a.append('Published games');
       }
 
-      {
-        const a = document.createElement('a');
-        section.append(a);
-        a.setAttribute('class', 'link_button');
-        a.setAttribute('href', '/edit');
-        a.append('Design a game');
-      }
 
       const ol = document.createElement('ol');
       parent.append(ol);
