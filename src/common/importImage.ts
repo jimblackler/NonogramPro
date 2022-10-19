@@ -116,7 +116,7 @@ export function getImageData(type: string, data: ArrayBuffer, document_: Documen
     };
     return imageData;
   } else if (type === 'image/svg+xml') {
-    return import('canvg').then(({Canvg, Parser}) => {
+    return import('@jimblackler/canvg/dist').then(({Canvg, Parser}) => {
       const canvas = document_.createElement('canvas');
       const ctx = truthy(canvas.getContext('2d'));
       return new Parser().parse(new TextDecoder('utf-8').decode(data))
