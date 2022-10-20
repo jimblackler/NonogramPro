@@ -46,6 +46,8 @@ export async function main() {
           if (isComplete(spec, truthy(lastRound))) {
             const parts = file.split('/');
             const stub = parts[parts.length - 3];
+            const name = stub.split('_')
+                .map(part => part.substring(0, 1).toUpperCase() + part.substring(1)).join(' ');
             console.log(`Requires ${difficulty} rounds to complete with standard method.`);
             const gridDataEncoded = encode(gridData);
             const existing =
@@ -55,7 +57,7 @@ export async function main() {
             }
 
             const game: Game = {
-              name: stub,
+              name,
               width: spec.width,
               height: spec.height,
               style: 'midnight',
