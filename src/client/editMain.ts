@@ -99,7 +99,6 @@ analyze.addEventListener('click', () => {
 });
 
 delete_.addEventListener('click', () => {
-
   delete_.setAttribute('disabled', '');
   const progress = addProgress();
   Promise.all([
