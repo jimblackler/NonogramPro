@@ -222,7 +222,7 @@ svg.addEventListener('gridmove', evt => {
     }
 );
 
-function getGameFunction (game:ClientGameData) {
+function getGameFunction(game: ClientGameData) {
   spec = game.spec;
   if (typeof game.gridData !== 'object') {
     throw new Error();
