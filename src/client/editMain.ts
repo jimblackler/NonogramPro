@@ -222,6 +222,19 @@ svg.addEventListener('gridmove', evt => {
     }
 );
 
+function getGameFunction (game:ClientGameData) {
+  spec = game.spec;
+  if (typeof game.gridData !== 'object') {
+    throw new Error();
+  }
+  data = game.gridData;
+  name = game.name;
+  style = game.style;
+  setNeedsPublish(game.needsPublish || false);
+  renderer.setDimensions(spec);
+  repaint();
+}
+
 cancel.addEventListener('click', evt => {
   // Defined as 'delete any local changes and restore to the published
   // version'.
@@ -231,15 +244,8 @@ cancel.addEventListener('click', evt => {
 
   setNeedsPublish(false);
   const progress = addProgress();
-  getGameInternet(gameId).then(game => {
-    if (typeof game.gridData !== 'object') {
-      throw new Error();
-    }
-    spec = game.spec;
-    data = game.gridData;
-    name = game.name;
-    repaint();
-  }).catch(() => setNeedsPublish(true)).finally(() => progress.remove());
+  getGameInternet(gameId).then(getGameFunction)
+      .catch(() => setNeedsPublish(true)).finally(() => progress.remove());
 });
 
 importImageButton.addEventListener('click', () => {
@@ -324,18 +330,7 @@ gameId = new URL(window.location.href).searchParams.get('game') || '';
 const defaultSpec = {width: 20, height: 20};
 
 if (gameId) {
-  getGame(gameId).then(game => {
-    spec = game.spec;
-    if (typeof game.gridData !== 'object') {
-      throw new Error();
-    }
-    data = game.gridData;
-    name = game.name;
-    style = game.style;
-    setNeedsPublish(game.needsPublish || false);
-    renderer.setDimensions(spec);
-    repaint();
-  }).catch(() => makeNewGame(defaultSpec, true));
+  getGame(gameId).then(getGameFunction).catch(() => makeNewGame(defaultSpec, true));
 } else {
   // Otherwise make a new game.
   makeNewGame(defaultSpec, true);
