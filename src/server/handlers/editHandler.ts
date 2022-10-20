@@ -40,8 +40,8 @@ export const editHandler: RequestHandler = async (req, res, next) => {
         {
           const button = document.createElement('button');
           bordered.append(button);
-          button.setAttribute('id', 'createNew');
-          button.append('New');
+          button.setAttribute('id', 'delete');
+          button.append('Delete');
         }
       }
 
@@ -53,9 +53,23 @@ export const editHandler: RequestHandler = async (req, res, next) => {
         {
           const button = document.createElement('button');
           bordered.append(button);
+          button.setAttribute('id', 'createNew');
+          button.append('New');
+        }
+
+        {
+          const button = document.createElement('button');
+          bordered.append(button);
           button.setAttribute('id', 'importImage');
           button.append('Import SVG/PNG');
         }
+      }
+
+      {
+        const bordered = document.createElement('section');
+        parent.append(bordered);
+        bordered.setAttribute('class', 'buttonRow bordered');
+
 
         {
           const button = document.createElement('button');
@@ -70,13 +84,6 @@ export const editHandler: RequestHandler = async (req, res, next) => {
           bordered.append(button);
           button.setAttribute('id', 'cancel');
           button.append('Cancel');
-        }
-
-        {
-          const button = document.createElement('button');
-          bordered.append(button);
-          button.setAttribute('id', 'delete');
-          button.append('Delete');
         }
       }
 
