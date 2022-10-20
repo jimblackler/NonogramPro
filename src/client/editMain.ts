@@ -5,7 +5,6 @@ import {encode} from '../common/encoder';
 import {getEmpty} from '../common/generate';
 import {generateClues} from '../common/generateClues';
 import {getImageData, imageDataToGridData, loadFile} from '../common/importImage';
-import {solve} from '../common/solve';
 import {Spec} from '../common/spec';
 import {gamesDb} from './db/gamesDb';
 import {decode} from './decoder';
@@ -337,19 +336,13 @@ if (gameId) {
 }
 
 function saveLocal() {
-  let difficulty = 0;
-  if (false) {
-    for (const round of solve(spec, generateClues(spec, data))) {
-      difficulty++;
-    }
-  }
   const data_: ClientGameData = {
     gridData: data,
     spec,
     name,
     style,
     needsPublish: needsPublish,
-    difficulty
+    difficulty: -1
   };
   return gamesDb
       .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data_, gameId))
