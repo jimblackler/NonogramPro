@@ -82,7 +82,8 @@ async function populate() {
     completed.add(currentTarget.key.toString());
   }
 
-  if ((new URL(window.location.href).searchParams.get('v') || 'local') === 'local') {
+  const params = new URL(window.location.href).searchParams;
+  if ((params.get('v') || 'local') === 'local') {
     for await (const result of await gamesDb
         .then(db => db.transaction('games', 'readonly')
             .objectStore('games').index('byDifficulty').openCursor())
@@ -92,7 +93,14 @@ async function populate() {
     }
     progress.remove();
   } else {
-    axios.get('/games')
+    const getParams = new URLSearchParams();
+    ['creator'].forEach(param => {
+      const value = params.get(param);
+      if (value) {
+        getParams.set(param, value);
+      }
+    });
+    axios.get(`/games?${getParams}`)
         .then(response => response.data as ClientGame[])
         .then(obj => {
           for (let game of obj) {
