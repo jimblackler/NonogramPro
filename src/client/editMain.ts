@@ -112,7 +112,7 @@ delete_.addEventListener('click', () => {
     window.location.href = window.location.origin;
   }).finally(() => {
     progress.remove();
-    delete_.removeAttribute('disabled')
+    delete_.removeAttribute('disabled');
   });
 });
 
