@@ -58,7 +58,6 @@ export const listHandler: RequestHandler = async (req, res, next) => {
         a.append('Published games');
       }
 
-
       const ol = document.createElement('ol');
       parent.append(ol);
       ol.setAttribute('id', 'games');
