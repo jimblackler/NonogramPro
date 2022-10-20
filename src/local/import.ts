@@ -1,7 +1,7 @@
 import {readdir, readFile} from 'fs/promises';
 import {JSDOM} from 'jsdom';
 import path from 'path';
-import {encode} from '../client/encoder';
+import {encode} from '../common/encoder';
 import {generateClues} from '../common/generateClues';
 import {getImageData, imageDataToGridData} from '../common/importImage';
 import {isComplete, Round, solve} from '../common/solve';

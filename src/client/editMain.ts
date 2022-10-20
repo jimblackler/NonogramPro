@@ -1,6 +1,7 @@
 import Alea from 'alea';
 import axios from 'axios';
 import {ClientGameData} from '../common/clientGame';
+import {encode} from '../common/encoder';
 import {getEmpty} from '../common/generate';
 import {generateClues} from '../common/generateClues';
 import {getImageData, imageDataToGridData, loadFile} from '../common/importImage';
@@ -8,7 +9,6 @@ import {solve} from '../common/solve';
 import {Spec} from '../common/spec';
 import {gamesDb} from './db/gamesDb';
 import {decode} from './decoder';
-import {encode} from './encoder';
 import {getGame, getGameInternet} from './fetchGame';
 import {is} from './is';
 import {notNull} from './notNull';
