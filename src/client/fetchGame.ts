@@ -4,7 +4,7 @@ import {gamesDb} from './db/gamesDb';
 import {decode} from './decoder';
 import {transactionToPromise} from './transactionToPromise';
 
-function getGameInternet(gameId: string): Promise<ClientGameData> {
+export function getGameInternet(gameId: string): Promise<ClientGameData> {
   return axios.get(`/games?id=${gameId}`)
       .then(value => value.data)
       .then(obj => {

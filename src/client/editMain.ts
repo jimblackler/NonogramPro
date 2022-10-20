@@ -9,7 +9,7 @@ import {Spec} from '../common/spec';
 import {gamesDb} from './db/gamesDb';
 import {decode} from './decoder';
 import {encode} from './encoder';
-import {getGame} from './fetchGame';
+import {getGame, getGameInternet} from './fetchGame';
 import {is} from './is';
 import {notNull} from './notNull';
 import {plotLine} from './plotLine';
@@ -20,7 +20,6 @@ import {visualAnalyze} from './visualAnalyze';
 let data: boolean[][] = [];
 let gameId = '';
 let name = '';
-let needsPublish = false;
 let spec: Spec = {width: 0, height: 0};
 let style = '';
 let setStyle = '';
@@ -38,6 +37,22 @@ const cancel = notNull(document.body.querySelector('#cancel'));
 const delete_ = notNull(document.body.querySelector('#delete'));
 const gridSize = is(HTMLSelectElement, document.body.querySelector('select#gridSize'));
 const colorScheme = is(HTMLSelectElement, document.body.querySelector('select#colorScheme'));
+
+let needsPublish = false;
+
+function setNeedsPublish(value: boolean) {
+  if (needsPublish === value) {
+    return;
+  }
+  needsPublish = value;
+  if (value) {
+    publish.removeAttribute('disabled');
+    cancel.removeAttribute('disabled');
+  } else {
+    publish.setAttribute('disabled', '');
+    cancel.setAttribute('disabled', '');
+  }
+}
 
 title.setAttribute('contenteditable', 'true');
 
@@ -65,7 +80,7 @@ title.addEventListener('blur', () => {
     return;
   }
   name = newName;
-  needsPublish = true;
+  setNeedsPublish(true);
   saveLocal().then(repaint);
 });
 
@@ -126,11 +141,6 @@ function repaint() {
 
   colorScheme.value = style;
 
-  if (needsPublish) {
-    publish.removeAttribute('disabled');
-  } else {
-    publish.setAttribute('disabled', '');
-  }
   if (setStyle !== style) {
     colorSchemeStylesheet.href = `/styles/color_schemes/${style}.css`;
     setStyle = style;
@@ -163,7 +173,7 @@ gridSize.addEventListener('change', evt => {
 
 colorScheme.addEventListener('change', evt => {
   style = colorScheme.value;
-  needsPublish = true;
+  setNeedsPublish(true);
   repaint();
   saveLocal();
 });
@@ -173,12 +183,11 @@ svg.addEventListener('griddown', evt => {
       if (data[y][x]) {
         drawMode = DrawMode.DELETING;
         data[y][x] = false;
-        needsPublish = true;
       } else {
         drawMode = DrawMode.SETTING;
         data[y][x] = true;
-        needsPublish = true;
       }
+      setNeedsPublish(true);
       lastX = x;
       lastY = y;
       repaint();
@@ -196,19 +205,18 @@ svg.addEventListener('gridmove', evt => {
           if (!data[p.y][p.x]) {
             data[p.y][p.x] = true;
             modified = true;
-            needsPublish = true;
           }
         } else if (drawMode === DrawMode.DELETING) {
           if (data[p.y][p.x]) {
             data[p.y][p.x] = false;
             modified = true;
-            needsPublish = true;
           }
         }
       }
       lastX = x;
       lastY = y;
       if (modified) {
+        setNeedsPublish(true);
         repaint();
       }
     }
@@ -220,7 +228,10 @@ cancel.addEventListener('click', evt => {
 
   // We don't have a local copy so must refresh from server. Requires
   // internet. May not be the best solution.
-  getGame(gameId).then(game => {
+
+  setNeedsPublish(false);
+  const progress = addProgress();
+  getGameInternet(gameId).then(game => {
     if (typeof game.gridData !== 'object') {
       throw new Error();
     }
@@ -228,7 +239,7 @@ cancel.addEventListener('click', evt => {
     data = game.gridData;
     name = game.name;
     repaint();
-  });
+  }).catch(() => setNeedsPublish(true)).finally(() => progress.remove());
 });
 
 importImageButton.addEventListener('click', () => {
@@ -240,7 +251,7 @@ importImageButton.addEventListener('click', () => {
       .then(imageData => imageDataToGridData(imageData, spec))
       .then(data_ => {
         data = data_;
-        needsPublish = true;
+        setNeedsPublish(true);
         repaint();
       });
 });
@@ -255,7 +266,7 @@ function addProgress() {
 }
 
 publish.addEventListener('click', evt => {
-  publish.setAttribute('disabled', '');
+  setNeedsPublish(false);
   const progress = addProgress();
 
   if (name === 'Untitled' || name === '') {
@@ -273,30 +284,33 @@ publish.addEventListener('click', evt => {
       .then(obj => {
         if (obj.login) {
           window.location.href = obj.login;
-        } else if (obj.exception) {
-          alert(obj.exception);
-        } else {
-          const game = obj.game.data;
-          const newId = obj.game.key;
-          if (typeof game.gridData != 'string') {
-            throw new Error();
-          }
-
-          game.gridData = decode(game.spec, game.gridData);
-
-          needsPublish = false;
-          if (gameId !== newId) {
-            gamesDb
-                .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
-                .then(transactionToPromise).then(
-                () => window.history.replaceState({}, '', `edit?game=${gameId}`));
-            gameId = newId;
-          }
-          gamesDb
-              .then(db => db.transaction('games', 'readwrite').objectStore('games').put(game, gameId))
-              .then(transactionToPromise);
+          return;
         }
-      }).finally(() => progress.remove());
+        if (obj.exception) {
+          alert(obj.exception);
+          return;
+        }
+        const game = obj.game.data;
+        const newId = obj.game.key;
+        if (typeof game.gridData != 'string') {
+          throw new Error();
+        }
+
+        game.gridData = decode(game.spec, game.gridData);
+        if (gameId !== newId) {
+          gamesDb
+              .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
+              .then(transactionToPromise).then(
+              () => window.history.replaceState({}, '', `edit?game=${gameId}`));
+          gameId = newId;
+          return;
+        }
+        gamesDb
+            .then(db => db.transaction('games', 'readwrite').objectStore('games').put(game, gameId))
+            .then(transactionToPromise);
+      })
+      .catch(() => setNeedsPublish(true))
+      .finally(() => progress.remove());
 });
 
 document.addEventListener('mouseup', evt => {
@@ -307,7 +321,6 @@ document.addEventListener('mouseup', evt => {
 });
 
 gameId = new URL(window.location.href).searchParams.get('game') || '';
-needsPublish = false;
 const defaultSpec = {width: 20, height: 20};
 
 if (gameId) {
@@ -319,7 +332,7 @@ if (gameId) {
     data = game.gridData;
     name = game.name;
     style = game.style;
-    needsPublish = game.needsPublish || false;
+    setNeedsPublish(game.needsPublish || false);
     renderer.setDimensions(spec);
     repaint();
   }).catch(() => makeNewGame(defaultSpec, true));
@@ -340,7 +353,7 @@ function saveLocal() {
     spec,
     name,
     style,
-    needsPublish,
+    needsPublish: needsPublish,
     difficulty
   };
   return gamesDb
