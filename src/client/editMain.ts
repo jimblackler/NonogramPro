@@ -164,14 +164,14 @@ function makeNewGame(spec_: Spec, replace: boolean) {
   repaint();
 }
 
-gridSize.addEventListener('change', evt => {
+gridSize.addEventListener('change', () => {
   spec = JSON.parse(gridSize.value);
   data = getEmpty(spec);
   renderer.setDimensions(spec);
   repaint();
 });
 
-colorScheme.addEventListener('change', evt => {
+colorScheme.addEventListener('change', () => {
   style = colorScheme.value;
   setNeedsPublish(true);
   repaint();
