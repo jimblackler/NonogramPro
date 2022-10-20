@@ -340,7 +340,7 @@ function saveLocal() {
     spec,
     name,
     style,
-    needsPublish: needsPublish,
+    needsPublish,
     difficulty: -1
   };
   return gamesDb
