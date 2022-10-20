@@ -47,6 +47,13 @@ export async function main() {
             const parts = file.split('/');
             const stub = parts[parts.length - 3];
             console.log(`Requires ${difficulty} rounds to complete with standard method.`);
+            const gridDataEncoded = encode(gridData);
+            const existing =
+                await datastore.createQuery('game').filter('gridData', gridDataEncoded).run();
+            if (existing[0].length) {
+              return;
+            }
+
             const game: Game = {
               name: stub,
               width: spec.width,
@@ -54,7 +61,7 @@ export async function main() {
               style: 'midnight',
               creator: 'auto',
               difficulty,
-              gridData: encode(gridData)
+              gridData: gridDataEncoded
             };
 
             const key = datastore.key(['game', await getName(stub)]);
