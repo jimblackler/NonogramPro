@@ -26,13 +26,13 @@ body, button, a {
 
 a.link_button {
   background-color: #b3002f;
-  padding: 10px;
   display: inline-block;
+  padding: 10px;
 }
 
 a.link_button:hover {
-  color: black;
   background: white;
+  color: black;
   text-decoration: none;
 }
 
@@ -45,18 +45,24 @@ ol#games {
 }
 
 ol#games li {
+  display: flex;
   list-style-type: none;
-  display: inline-block;
 }
 
 ol#games a {
   border-radius: 1em;
   display: flex;
-  flex-direction: column;
-  height: 5em;
   overflow: hidden;
-  padding: 1em;
-  width: 10em;
+  padding: 0.5em;
+}
+
+ol#games section.thumbnail {
+}
+
+ol#games section.puzzleInfo {
+  display: flex;
+  flex-direction: column;
+  padding: 0.5em;
 }
 
 ol#games a.unstarted {
@@ -76,8 +82,8 @@ ol#games a.draft {
 }
 
 ol#games a:hover {
-  color: black;
   background: white;
+  color: black;
   text-decoration: none;
 }
 
@@ -87,9 +93,9 @@ button:hover:enabled, select:hover:enabled {
 }
 
 span.name {
+  flex-grow: 1;
   font-weight: bold;
   white-space: nowrap;
-  flex-grow: 1;
 }
 
 span.creator {

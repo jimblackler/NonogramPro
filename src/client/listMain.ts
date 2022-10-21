@@ -7,8 +7,8 @@ import {decode} from './decoder';
 import {notNull} from './notNull';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 
-function addGame(
-    key: string, game: ClientGameData, playing: boolean, completed: boolean, list: HTMLElement) {
+function addGame(key: string, game: ClientGameData, playing: boolean, completed: boolean,
+                 list: HTMLElement, full: boolean) {
   const li = document.createElement('li');
   list.append(li);
 
@@ -18,45 +18,56 @@ function addGame(
   anchor.setAttribute('class',
       completed ? 'completed' : playing ? 'playing' : game.needsPublish ? 'draft' : 'unstarted');
 
+  if (full) {
+    const thumbnail = document.createElement('section');
+    anchor.append(thumbnail);
+    thumbnail.setAttribute('class', 'thumbnail');
+    thumbnail.append('place holder');
+  }
+
+  const section = document.createElement('section');
+  anchor.append(section);
+  section.setAttribute('class', 'puzzleInfo');
+
   /* Name */
   {
     const name = document.createElement('span');
-    anchor.append(name);
+    section.append(name);
     name.setAttribute('class', 'name');
     name.append(game.name);
   }
 
   if (game.creator) {
     const creator = document.createElement('span');
-    anchor.append(creator);
+    section.append(creator);
     creator.setAttribute('class', 'creator');
     creator.append(`by ${game.creator}`);
   }
 
   if (game.difficulty) {
     const name = document.createElement('span');
-    anchor.append(name);
+    section.append(name);
     name.setAttribute('class', 'difficulty');
     name.append(`Difficulty ${game.difficulty}`);
   }
 
   if (game.needsPublish) {
     const name = document.createElement('span');
-    anchor.append(name);
+    section.append(name);
     name.append('Draft');
   }
 
   /* Dimensions */
   {
     const dimensions = document.createElement('span');
-    anchor.append(dimensions);
+    section.append(dimensions);
     dimensions.setAttribute('class', 'dimensions');
     dimensions.append(`${game.spec.width} x ${game.spec.height}`);
   }
 
   if (completed || playing) {
     const span = document.createElement('span');
-    anchor.append(span);
+    section.append(span);
     span.setAttribute('class', 'status');
     span.append(completed ? 'Completed' : 'In progress');
   }
@@ -83,13 +94,14 @@ async function main() {
   }
 
   const params = new URL(window.location.href).searchParams;
+  const full = params.has('full');
   if ((params.get('v') || 'local') === 'local') {
     for await (const result of await gamesDb
         .then(db => db.transaction('games', 'readonly')
             .objectStore('games').index('byDifficulty').openCursor())
         .then(requestToAsyncGenerator)) {
       const key = result.primaryKey.toString();
-      addGame(key, result.value, plays.has(key), completed.has(key), list);
+      addGame(key, result.value, plays.has(key), completed.has(key), list, full);
     }
     progress.remove();
   } else {
@@ -104,7 +116,7 @@ async function main() {
         .then(response => response.data as ClientGame[])
         .then(obj => {
           for (let game of obj) {
-            addGame(game.key, game.data, plays.has(game.key), completed.has(game.key), list);
+            addGame(game.key, game.data, plays.has(game.key), completed.has(game.key), list, full);
             if (typeof game.data.gridData !== 'string') {
               throw new Error();
             }
