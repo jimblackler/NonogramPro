@@ -127,7 +127,10 @@ async function main() {
                 .put(game.data, game.key));
           }
         })
-        .catch(e => list.append(e.toString()))
+        .catch(e => {
+          console.error(e);
+          list.append(e.toString());
+        })
         .finally(() => progress.remove());
   }
 }
