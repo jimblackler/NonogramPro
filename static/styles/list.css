@@ -56,7 +56,8 @@ ol#games a {
   padding: 0.5em;
 }
 
-ol#games section.thumbnail {
+ol#games canvas.thumbnail {
+  align-self: center;
 }
 
 ol#games section.puzzleInfo {

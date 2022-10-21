@@ -14,7 +14,7 @@ function createThumbnail(parent: HTMLElement, game: ClientGameData) {
   if (typeof game.gridData === 'string') {
     throw new Error();
   }
-  const cellSize = 4;
+  const cellSize = Math.ceil(60 / game.spec.width);
   canvas.width = game.spec.width * cellSize;
   canvas.height = game.spec.height * cellSize;
   ctx.fillStyle = 'lightblue';
