@@ -31,6 +31,18 @@ function addGame(key: string, game: ClientGameData, playing: boolean, completed:
   const li = document.createElement('li');
   list.append(li);
 
+  li.addEventListener('click', evt => {
+    if (!evt.ctrlKey) {
+      return;
+    }
+    if (li.classList.contains('selected')) {
+      li.classList.remove('selected');
+    } else {
+      li.classList.add('selected');
+    }
+    evt.preventDefault();
+  });
+
   const anchor = document.createElement('a');
   li.append(anchor);
   anchor.setAttribute('href', `/play?game=${key}`);

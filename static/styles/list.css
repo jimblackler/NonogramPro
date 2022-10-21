@@ -66,6 +66,15 @@ ol#games section.puzzleInfo {
   padding: 0.5em;
 }
 
+ol#games li.selected a {
+  background: lightgoldenrodyellow;
+  color: black;
+}
+
+ol#games li.selected canvas {
+  filter: invert(1);
+}
+
 ol#games a.unstarted {
   background: linear-gradient(purple, rebeccapurple);
 }
