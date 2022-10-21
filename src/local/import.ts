@@ -27,36 +27,38 @@ export async function main() {
   const document = window.document;
   global.DOMParser = window.DOMParser;
   const path = '/Users/jimblackler/code/material-design-icons/src/social';
-  const spec: Spec = {width: 20, height: 20};
+
   for await (const file of getFiles(path)) {
     if (!file.endsWith('.svg')) {
       continue;
     }
-    await readFile(file).then(result => getImageData('image/svg+xml', result.buffer, document))
-        .then(imageData => imageDataToGridData(imageData, spec))
-        .then(async gridData => {
-          const clues = generateClues(spec, gridData);
-          let difficulty = 0;
-          let lastRound: Round | undefined;
-          for (const round of solve(spec, clues)) {
-            difficulty++;
-            lastRound = round;
-          }
 
-          if (isComplete(spec, truthy(lastRound))) {
-            const parts = file.split('/');
-            const stub = parts[parts.length - 3];
-            const name = stub.split('_')
-                .map(part => part.substring(0, 1).toUpperCase() + part.substring(1)).join(' ');
-            console.log(`Requires ${difficulty} rounds to complete with standard method.`);
-            const gridDataEncoded = encode(gridData);
-            const existing =
-                await datastore.createQuery('game').filter('gridData', gridDataEncoded).run();
+    readFile(file).then(result => getImageData('image/svg+xml', result.buffer, document)).then(imageData => {
+
+      [5, 10, 20, 25, 30].forEach(size => {
+        const spec: Spec = {width: size, height: size};
+        const gridData = imageDataToGridData(imageData, spec);
+        const clues = generateClues(spec, gridData);
+        let difficulty = 0;
+        let lastRound: Round | undefined;
+        for (const round of solve(spec, clues)) {
+          difficulty++;
+          lastRound = round;
+        }
+
+        if (isComplete(spec, truthy(lastRound))) {
+          const parts = file.split('/');
+          const stub = parts[parts.length - 3];
+          const name = stub.split('_')
+              .map(part => part.substring(0, 1).toUpperCase() + part.substring(1)).join(' ');
+          console.log(`Requires ${difficulty} rounds to complete with standard method.`);
+          const gridDataEncoded = encode(gridData);
+          datastore.createQuery('game').filter('gridData', gridDataEncoded).run().then(existing => {
             if (existing[0].length) {
               return;
             }
 
-            const game: Game = {
+            const data: Game = {
               name,
               width: spec.width,
               height: spec.height,
@@ -66,14 +68,15 @@ export async function main() {
               gridData: gridDataEncoded
             };
 
-            const key = datastore.key(['game', await getName(stub)]);
-            await datastore.save({
-              key: key,
-              data: game
+            getName(stub).then(name => {
+              const key = datastore.key(['game', name]);
+              datastore.save({key, data});
             });
-          } else {
-            console.log('Cannot be completed with standard method.');
-          }
-        });
+          });
+        } else {
+          console.log('Cannot be completed with standard method.');
+        }
+      });
+    })
   }
 }
