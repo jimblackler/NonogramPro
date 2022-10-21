@@ -17,6 +17,11 @@ export const gamesHandler: RequestHandler = async (req, res, next) => {
   if (creator) {
     query.filter('creator', creator);
   }
+
+  const limit = getParam(req.query, 'limit');
+  if (limit) {
+    query.limit(Number.parseInt(limit));
+  }
   const results = await query.run().then(result => result[0]);
   res.send(JSON.stringify(results.map(game => gameToClientGame(game)), null, 2));
 };
