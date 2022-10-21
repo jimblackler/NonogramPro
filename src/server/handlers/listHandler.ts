@@ -38,13 +38,17 @@ export const listHandler: RequestHandler = async (req, res, next) => {
       }
     },
     addMain: (document, parent) => {
-      const section = document.createElement('section');
-      parent.append(section);
-      section.setAttribute('class', 'buttonRow');
+      const topRow = document.createElement('section');
+      parent.append(topRow);
+      topRow.setAttribute('class', 'topRow');
+
+      const buttonRow = document.createElement('section');
+      topRow.append(buttonRow);
+      buttonRow.setAttribute('class', 'buttonRow');
 
       {
         const a = document.createElement('a');
-        section.append(a);
+        buttonRow.append(a);
         a.setAttribute('class', 'link_button');
         a.setAttribute('href', '?v=local');
         a.append('Local games');
@@ -52,11 +56,30 @@ export const listHandler: RequestHandler = async (req, res, next) => {
 
       {
         const a = document.createElement('a');
-        section.append(a);
+        buttonRow.append(a);
         a.setAttribute('class', 'link_button');
         a.setAttribute('href', '?v=published');
         a.append('Published games');
       }
+
+      const editSection = document.createElement('section');
+      topRow.append(editSection);
+      editSection.setAttribute('class', 'editSection');
+      editSection.setAttribute('style', 'visibility: hidden');
+
+      const tagForm = document.createElement('form');
+      editSection.append(tagForm);
+      tagForm.setAttribute('class', 'tagForm');
+
+      const tagInput = document.createElement('input');
+      tagForm.append(tagInput);
+      tagInput.setAttribute('type', 'text');
+      tagInput.setAttribute('name', 'tag');
+
+      const tagSubmit = document.createElement('input');
+      tagForm.append(tagSubmit);
+      tagSubmit.setAttribute('type', 'submit');
+      tagSubmit.setAttribute('value', 'Tag');
 
       const ol = document.createElement('ol');
       parent.append(ol);

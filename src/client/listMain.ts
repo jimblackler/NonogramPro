@@ -4,13 +4,14 @@ import {completedDb} from './db/completedDb';
 import {gamesDb} from './db/gamesDb';
 import {playsDb} from './db/playsDb';
 import {decode} from './decoder';
+import {is} from './is';
 import {notNull} from './notNull';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 
 function createThumbnail(parent: HTMLElement, game: ClientGameData) {
   const canvas = document.createElement('canvas');
   parent.append(canvas);
-  const ctx = canvas.getContext('2d');
+  const ctx = notNull(canvas.getContext('2d'));
   if (typeof game.gridData === 'string') {
     throw new Error();
   }
@@ -27,21 +28,11 @@ function createThumbnail(parent: HTMLElement, game: ClientGameData) {
 }
 
 function addGame(key: string, game: ClientGameData, playing: boolean, completed: boolean,
-                 list: HTMLElement, full: boolean) {
+                 list: HTMLElement, full: boolean, clickListener: (evt: MouseEvent) => void) {
   const li = document.createElement('li');
   list.append(li);
 
-  li.addEventListener('click', evt => {
-    if (!evt.ctrlKey) {
-      return;
-    }
-    if (li.classList.contains('selected')) {
-      li.classList.remove('selected');
-    } else {
-      li.classList.add('selected');
-    }
-    evt.preventDefault();
-  });
+  li.addEventListener('click', clickListener);
 
   const anchor = document.createElement('a');
   li.append(anchor);
@@ -107,6 +98,8 @@ async function main() {
   list.append(progress);
   progress.setAttribute('src', '/images/progress.svg');
 
+  const editSection = is(HTMLElement, document.body.querySelector('section.editSection'));
+
   const plays = new Set<string>();
   for await (const currentTarget of await playsDb
       .then(db => db.transaction('plays', 'readonly').objectStore('plays').openCursor())
@@ -123,13 +116,40 @@ async function main() {
 
   const params = new URL(window.location.href).searchParams;
   const full = params.has('full');
+
+  function clickEvent(evt: MouseEvent) {
+    const li = evt.currentTarget;
+    if (!(li instanceof HTMLLIElement)) {
+      return;
+    }
+    if (!evt.ctrlKey && !evt.metaKey) {
+      return;
+    }
+    if (li.classList.contains('selected')) {
+      li.classList.remove('selected');
+    } else {
+      li.classList.add('selected');
+    }
+    const numberSelected = list.querySelectorAll('li.selected').length;
+    if (numberSelected === 0) {
+      if (editSection.style.getPropertyValue('visibility') === 'visible') {
+        editSection.style.setProperty('visibility', 'hidden');
+      }
+    } else {
+      if (editSection.style.getPropertyValue('visibility') === 'hidden') {
+        editSection.style.setProperty('visibility', 'visible');
+      }
+    }
+    evt.preventDefault();
+  }
+
   if ((params.get('v') || 'local') === 'local') {
     for await (const result of await gamesDb
         .then(db => db.transaction('games', 'readonly')
             .objectStore('games').index('byDifficulty').openCursor())
         .then(requestToAsyncGenerator)) {
       const key = result.primaryKey.toString();
-      addGame(key, result.value, plays.has(key), completed.has(key), list, full);
+      addGame(key, result.value, plays.has(key), completed.has(key), list, full, clickEvent);
     }
     progress.remove();
   } else {
@@ -150,7 +170,8 @@ async function main() {
             // We write the incoming games to the local database (which needs
             // the grid decoding). Might not always be desirable.
             game.data.gridData = decode(game.data.spec, game.data.gridData);
-            addGame(game.key, game.data, plays.has(game.key), completed.has(game.key), list, full);
+            addGame(game.key, game.data, plays.has(game.key), completed.has(game.key), list, full,
+                clickEvent);
             gamesDb.then(db => db.transaction('games', 'readwrite').objectStore('games')
                 .put(game.data, game.key));
           }

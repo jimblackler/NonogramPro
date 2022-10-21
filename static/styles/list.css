@@ -123,3 +123,15 @@ span.status {
 section.bordered {
   border: 1px dashed rgba(255, 255, 255, 0.59);
 }
+
+section.topRow {
+  align-items: baseline;
+  display: flex;
+  gap: 2em;
+}
+
+form.tagForm {
+  align-items: baseline;
+  display: flex;
+  gap: 1em;
+}
