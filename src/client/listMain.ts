@@ -7,6 +7,25 @@ import {decode} from './decoder';
 import {notNull} from './notNull';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 
+function createThumbnail(parent: HTMLElement, game: ClientGameData) {
+  const canvas = document.createElement('canvas');
+  parent.append(canvas);
+  const ctx = canvas.getContext('2d');
+  if (typeof game.gridData === 'string') {
+    throw new Error();
+  }
+  const cellSize = 4;
+  canvas.width = game.spec.width * cellSize;
+  canvas.height = game.spec.height * cellSize;
+  ctx.fillStyle = 'lightblue';
+  game.gridData.forEach((row, rowNumber) => row.forEach((cell, columnNumber) => {
+    if (cell) {
+      ctx.fillRect(columnNumber * cellSize, rowNumber * cellSize, cellSize, cellSize);
+    }
+  }));
+  canvas.setAttribute('class', 'thumbnail');
+}
+
 function addGame(key: string, game: ClientGameData, playing: boolean, completed: boolean,
                  list: HTMLElement, full: boolean) {
   const li = document.createElement('li');
@@ -19,10 +38,7 @@ function addGame(key: string, game: ClientGameData, playing: boolean, completed:
       completed ? 'completed' : playing ? 'playing' : game.needsPublish ? 'draft' : 'unstarted');
 
   if (full) {
-    const thumbnail = document.createElement('section');
-    anchor.append(thumbnail);
-    thumbnail.setAttribute('class', 'thumbnail');
-    thumbnail.append('place holder');
+    createThumbnail(anchor, game);
   }
 
   const section = document.createElement('section');
@@ -116,13 +132,13 @@ async function main() {
         .then(response => response.data as ClientGame[])
         .then(obj => {
           for (let game of obj) {
-            addGame(game.key, game.data, plays.has(game.key), completed.has(game.key), list, full);
             if (typeof game.data.gridData !== 'string') {
               throw new Error();
             }
             // We write the incoming games to the local database (which needs
             // the grid decoding). Might not always be desirable.
             game.data.gridData = decode(game.data.spec, game.data.gridData);
+            addGame(game.key, game.data, plays.has(game.key), completed.has(game.key), list, full);
             gamesDb.then(db => db.transaction('games', 'readwrite').objectStore('games')
                 .put(game.data, game.key));
           }
