@@ -6,13 +6,22 @@ body {
   background: linear-gradient(to bottom, #020202, #142a3e) no-repeat;
 }
 
-body, button, a {
-  color: white;
+header {
+  display: flex;
+  flex-direction: column;
+  gap: 1em;
+  padding: 2em;
 }
 
-section {
-  margin: 8px;
-  padding: 10px;
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 2em;
+  padding: 2em;
+}
+
+body, button, a {
+  color: white;
 }
 
 a.link_button {
@@ -31,7 +40,7 @@ ol#games {
   display: flex;
   flex-wrap: wrap;
   gap: 1em;
-  margin: 1em;
+  margin: 0;
   padding: 0;
 }
 
