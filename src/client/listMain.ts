@@ -62,7 +62,7 @@ function addGame(
   }
 }
 
-async function populate() {
+async function main() {
   const list = notNull(document.getElementById('games'));
   const progress = document.createElement('img');
   list.append(progress);
@@ -120,4 +120,4 @@ async function populate() {
   }
 }
 
-populate().then();
+main().then();
