@@ -96,7 +96,7 @@ button:hover:enabled, select:hover:enabled {
 span.name {
   flex-grow: 1;
   font-weight: bold;
-  white-space: nowrap;
+  width: 6em;
 }
 
 span.creator {
