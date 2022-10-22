@@ -47,35 +47,36 @@ export async function main() {
               lastRound = round;
             }
 
-            if (isComplete(spec, truthy(lastRound))) {
-              const parts = file.split('/');
-              const stub = parts[parts.length - 3];
-              const name = stub.split('_')
-                  .map(part => part.substring(0, 1).toUpperCase() + part.substring(1)).join(' ');
-              console.log(`Requires ${difficulty} rounds to complete with standard method.`);
-              const gridDataEncoded = encode(gridData);
-              datastore.createQuery('game').filter('gridData', gridDataEncoded).run().then(existing => {
-                if (existing[0].length) {
-                  return;
-                }
-
-                const data: GameData = {
-                  name,
-                  spec,
-                  style: 'midnight',
-                  creator: 'auto',
-                  difficulty,
-                  gridData: gridDataEncoded
-                };
-
-                getName(stub).then(name => {
-                  const key = datastore.key(['game', name]);
-                  datastore.save({key, data});
-                });
-              });
-            } else {
+            if (!isComplete(spec, truthy(lastRound))) {
               console.log('Cannot be completed with standard method.');
+              return;
             }
+            const parts = file.split('/');
+            const stub = parts[parts.length - 3];
+            const name = stub.split('_')
+                .map(part => part.substring(0, 1).toUpperCase() + part.substring(1)).join(' ');
+            console.log(`Requires ${difficulty} rounds to complete with standard method.`);
+            const gridDataEncoded = encode(gridData);
+            datastore.createQuery('game').filter('gridData', gridDataEncoded)
+                .run().then(existing => {
+              if (existing[0].length) {
+                return;
+              }
+
+              const data: GameData = {
+                name,
+                spec,
+                style: 'midnight',
+                creator: 'auto',
+                difficulty,
+                gridData: gridDataEncoded
+              };
+
+              getName(stub).then(name => {
+                const key = datastore.key(['game', name]);
+                datastore.save({key, data});
+              });
+            });
           });
         })
   }
