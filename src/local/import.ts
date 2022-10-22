@@ -22,6 +22,17 @@ async function* getFiles(directory: string): AsyncGenerator<string> {
   }
 }
 
+const checked = new Set<string>();
+
+function gameExists(gridDataEncoded: string) {
+  if (checked.has(gridDataEncoded)) {
+    return Promise.resolve(true);
+  }
+  checked.add(gridDataEncoded);
+  return datastore.createQuery('game').filter('gridData', gridDataEncoded).run()
+      .then(result => result[0].length !== 0);
+}
+
 export async function main() {
   const window = new JSDOM().window;
   const document = window.document;
@@ -57,9 +68,8 @@ export async function main() {
                 .map(part => part.substring(0, 1).toUpperCase() + part.substring(1)).join(' ');
             console.log(`Requires ${difficulty} rounds to complete with standard method.`);
             const gridDataEncoded = encode(gridData);
-            datastore.createQuery('game').filter('gridData', gridDataEncoded)
-                .run().then(existing => {
-              if (existing[0].length) {
+            gameExists(gridDataEncoded).then(exists => {
+              if (exists) {
                 return;
               }
 
