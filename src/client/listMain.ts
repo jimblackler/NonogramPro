@@ -168,7 +168,7 @@ async function main() {
     progress.remove();
   } else {
     const getParams = new URLSearchParams();
-    ['creator', 'limit'].forEach(param => {
+    ['creator', 'limit', 'include', 'exclude'].forEach(param => {
       const value = params.get(param);
       if (value) {
         getParams.set(param, value);
