@@ -22,6 +22,6 @@ export const gamesHandler: RequestHandler = async (req, res, next) => {
   if (limit) {
     query.limit(Number.parseInt(limit));
   }
-  const results = await query.run().then(result => result[0]);
+  const results = await query.run().then(result => result[0] as GameInDb[]);
   res.send(JSON.stringify(results.map(game => gameToClientGame(game)), null, 2));
 };
