@@ -1,4 +1,5 @@
 import {RequestHandler} from 'express';
+import {shard} from '../../local/shard';
 import {getSignInUrl} from '../components/globalControls';
 import {getEmail} from '../getEmail';
 import {getOAuth2} from '../getOAuth2';
@@ -18,8 +19,10 @@ export const tagHandler: RequestHandler = async (req, res, next) => {
   const games = req.body.games as string[];
   const tag = req.body.tag;
 
-  await datastore.save(
-      games.map(game => ({key: datastore.key('tag'), data: {game, tag, user: email}})));
+  await Promise.all(shard(games.map(game => ({
+    key: datastore.key('tag'),
+    data: {game, tag, user: email}
+  })), 500).map(entities => datastore.save(entities)));
 
   res.send(JSON.stringify({}, null, 2));
 };
