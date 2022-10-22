@@ -1,8 +1,7 @@
-import {ClientGame} from '../common/clientGame';
-import {Game} from './game';
+import {ClientGame, ClientGameData} from '../common/clientGame';
 import {datastore} from './globalDatastore';
 
-export type GameInDb = Game & { [datastore.KEY]: { name: string } };
+export type GameInDb = ClientGameData & { [datastore.KEY]: { name: string } };
 
 export function gameToClientGame(game: GameInDb): ClientGame {
   return {
@@ -11,9 +10,7 @@ export function gameToClientGame(game: GameInDb): ClientGame {
       creator: game.creator,
       difficulty: game.difficulty,
       gridData: game.gridData,
-      spec: {
-        width: game.width, height: game.height
-      },
+      spec: game.spec,
       name: game.name,
       style: game.style
     }
