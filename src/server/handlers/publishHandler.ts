@@ -27,7 +27,7 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
     gameId = await getName(req.body.name);
   }
 
-  const game: Game = {
+  const data: Game = {
     name: req.body.name,
     width: req.body.spec.width,
     height: req.body.spec.height,
@@ -38,10 +38,7 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
   };
 
   const key = datastore.key(['game', gameId]);
-  await datastore.save({
-    key: key,
-    data: game
-  });
+  await datastore.save({key, data});
 
   res.send(JSON.stringify({
     game: gameToClientGame((await datastore.get(key))[0])
