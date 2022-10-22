@@ -2,6 +2,7 @@ import {RequestHandler} from 'express';
 import {getSignInUrl} from '../components/globalControls';
 import {getEmail} from '../getEmail';
 import {getOAuth2} from '../getOAuth2';
+import {datastore} from '../globalDatastore';
 
 export const tagHandler: RequestHandler = async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
@@ -14,8 +15,11 @@ export const tagHandler: RequestHandler = async (req, res, next) => {
     return;
   }
 
-  const games = req.body.games;
+  const games = req.body.games as string[];
   const tag = req.body.tag;
+
+  await datastore.save(
+      games.map(game => ({key: datastore.key('tag'), data: {game, tag, user: email}})));
 
   res.send(JSON.stringify({}, null, 2));
 };

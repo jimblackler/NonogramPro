@@ -10,5 +10,5 @@ function deleteAll(kind: string) {
 }
 
 export async function main() {
-  await Promise.all(['game'].map(entity => deleteAll(entity)));
+  await Promise.all(['game', 'tag'].map(entity => deleteAll(entity)));
 }
