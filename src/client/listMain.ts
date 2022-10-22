@@ -5,6 +5,7 @@ import {gamesDb} from './db/gamesDb';
 import {playsDb} from './db/playsDb';
 import {decode} from './decoder';
 import {is} from './is';
+import {isString} from './isString';
 import {notNull} from './notNull';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 
@@ -97,6 +98,19 @@ async function main() {
   const progress = document.createElement('img');
   list.append(progress);
   progress.setAttribute('src', '/images/progress.svg');
+
+  const tagForm = is(HTMLFormElement, document.body.querySelector('form.tagForm'));
+  tagForm.addEventListener('submit', evt => {
+    const gameIds = [...list.querySelectorAll('li.selected')].map(li => {
+      const anchor = notNull(li.querySelector('a'));
+      const url = new URL(anchor.href);
+      return isString(url.searchParams.get('game'));
+    });
+    const formData = new FormData(tagForm);
+    axios.post('/tag', {games: gameIds, tag: formData.get('tag')});
+    console.log(gameIds);
+    evt.preventDefault();
+  });
 
   const editSection = is(HTMLElement, document.body.querySelector('section.editSection'));
 
