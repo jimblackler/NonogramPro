@@ -1,8 +1,8 @@
 import {readdir, readFile} from 'fs/promises';
 import {JSDOM} from 'jsdom';
 import path from 'path';
-import {ClientGameData} from '../common/clientGame';
 import {encode} from '../common/encoder';
+import {GameData} from '../common/gameData';
 import {generateClues} from '../common/generateClues';
 import {getImageData, imageDataToGridData} from '../common/importImage';
 import {isComplete, Round, solve} from '../common/solve';
@@ -59,7 +59,7 @@ export async function main() {
                   return;
                 }
 
-                const data: ClientGameData = {
+                const data: GameData = {
                   name,
                   spec,
                   style: 'midnight',

@@ -1,7 +1,7 @@
 import Alea from 'alea';
 import axios from 'axios';
-import {ClientGame, ClientGameData} from '../common/clientGame';
 import {encode} from '../common/encoder';
+import {ClientGame, GameData} from '../common/gameData';
 import {getEmpty} from '../common/generate';
 import {generateClues} from '../common/generateClues';
 import {getImageData, imageDataToGridData, loadFile} from '../common/importImage';
@@ -220,7 +220,7 @@ svg.addEventListener('gridmove', evt => {
     }
 );
 
-function getGameFunction(game: ClientGameData) {
+function getGameFunction(game: GameData) {
   spec = game.spec;
   if (typeof game.gridData !== 'object') {
     throw new Error();
@@ -340,7 +340,7 @@ if (gameId) {
 }
 
 function saveLocal() {
-  const data_: ClientGameData = {
+  const data_: GameData = {
     gridData: data,
     spec,
     name,

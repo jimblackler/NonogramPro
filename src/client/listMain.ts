@@ -1,5 +1,5 @@
 import axios from 'axios';
-import {ClientGame, ClientGameData} from '../common/clientGame';
+import {ClientGame, GameData} from '../common/gameData';
 import {completedDb} from './db/completedDb';
 import {gamesDb} from './db/gamesDb';
 import {playsDb} from './db/playsDb';
@@ -9,7 +9,7 @@ import {isString} from './isString';
 import {notNull} from './notNull';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 
-function createThumbnail(parent: HTMLElement, game: ClientGameData) {
+function createThumbnail(parent: HTMLElement, game: GameData) {
   const canvas = document.createElement('canvas');
   parent.append(canvas);
   const ctx = notNull(canvas.getContext('2d'));
@@ -28,7 +28,7 @@ function createThumbnail(parent: HTMLElement, game: ClientGameData) {
   canvas.setAttribute('class', 'thumbnail');
 }
 
-function addGame(key: string, game: ClientGameData, playing: boolean, completed: boolean,
+function addGame(key: string, game: GameData, playing: boolean, completed: boolean,
                  list: HTMLElement, full: boolean, clickListener: (evt: MouseEvent) => void) {
   const li = document.createElement('li');
   list.append(li);

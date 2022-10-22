@@ -1,6 +1,6 @@
 import {Spec} from './spec';
 
-export interface ClientGameData {
+export interface GameData {
   creator?: string;
   difficulty: number;
   gridData: string | boolean[][];
@@ -12,5 +12,5 @@ export interface ClientGameData {
 
 export interface ClientGame {
   key: string;
-  data: ClientGameData
+  data: GameData
 }

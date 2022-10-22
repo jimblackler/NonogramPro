@@ -1,6 +1,6 @@
 import {RequestHandler} from 'express';
 import {isString} from '../../client/isString';
-import {ClientGame, ClientGameData} from '../../common/clientGame';
+import {ClientGame, GameData} from '../../common/gameData';
 import {getSignInUrl} from '../components/globalControls';
 import {GameInDb, gameToClientGame} from '../gameToClientGame';
 import {getEmail} from '../getEmail';
@@ -29,7 +29,7 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
     gameId = await getName(game.data.name);
   }
 
-  const data: ClientGameData = {
+  const data: GameData = {
     name: game.data.name,
     spec: game.data.spec,
     style: game.data.style,

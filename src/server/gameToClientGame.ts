@@ -1,7 +1,7 @@
-import {ClientGame, ClientGameData} from '../common/clientGame';
+import {ClientGame, GameData} from '../common/gameData';
 import {datastore} from './globalDatastore';
 
-export type GameInDb = ClientGameData & { [datastore.KEY]: { name: string } };
+export type GameInDb = GameData & { [datastore.KEY]: { name: string } };
 
 export function gameToClientGame(game: GameInDb): ClientGame {
   return {
