@@ -1,6 +1,6 @@
 import Alea from 'alea';
 import axios from 'axios';
-import {ClientGameData} from '../common/clientGame';
+import {ClientGame, ClientGameData} from '../common/clientGame';
 import {encode} from '../common/encoder';
 import {getEmpty} from '../common/generate';
 import {generateClues} from '../common/generateClues';
@@ -278,13 +278,18 @@ publish.addEventListener('click', evt => {
     saveLocal();
     repaint();
   }
-  axios.post('/publish', {
-    gridData: encode(data),
-    spec,
-    name,
-    style,
-    gameId
-  }).then(response => response.data)
+  const data_: ClientGame = {
+    key: gameId,
+    data: {
+      gridData: encode(data),
+      spec,
+      name,
+      style,
+      needsPublish,
+      difficulty: -1
+    }
+  };
+  axios.post('/publish', data_).then(response => response.data)
       .then(obj => {
         if (obj.login) {
           window.location.href = obj.login;

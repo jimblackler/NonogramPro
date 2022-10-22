@@ -1,4 +1,6 @@
 import {RequestHandler} from 'express';
+import {isString} from '../../client/isString';
+import {ClientGame} from '../../common/clientGame';
 import {getSignInUrl} from '../components/globalControls';
 import {Game} from '../game';
 import {GameInDb, gameToClientGame} from '../gameToClientGame';
@@ -18,23 +20,24 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
     return;
   }
 
-  let gameId = req.body.gameId;
+  const game = req.body as ClientGame;
+  let gameId = game.key;
 
   const existingGame = await datastore.get(datastore.key(['game', gameId]))
       .then(result => result[0] as GameInDb | undefined);
 
   if (!existingGame || existingGame.creator !== email) {
-    gameId = await getName(req.body.name);
+    gameId = await getName(game.data.name);
   }
 
   const data: Game = {
-    name: req.body.name,
-    width: req.body.spec.width,
-    height: req.body.spec.height,
-    style: req.body.style,
+    name: game.data.name,
+    width: game.data.spec.width,
+    height: game.data.spec.height,
+    style: game.data.style,
     creator: email,
     difficulty: 0,
-    gridData: req.body.gridData
+    gridData: isString(game.data.gridData)
   };
 
   const key = datastore.key(['game', gameId]);
