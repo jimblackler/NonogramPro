@@ -275,7 +275,6 @@ publish.addEventListener('click', evt => {
 
   if (name === 'Untitled' || name === '') {
     name = prompt('Enter a name for your puzzle') || '';
-    saveLocal();
     repaint();
   }
   const data_: ClientGame = {
@@ -293,6 +292,7 @@ publish.addEventListener('click', evt => {
   axios.post('/publish', data_).then(response => response.data)
       .then(obj => {
         if (obj.login) {
+          setNeedsPublish(true);
           window.location.href = obj.login;
           return;
         }
@@ -307,13 +307,13 @@ publish.addEventListener('click', evt => {
         }
 
         game.gridData = decode(game.spec, game.gridData);
-        if (gameId !== newId) {
-          gamesDb
-              .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
-              .then(transactionToPromise).then(
-              () => window.history.replaceState({}, '', `edit?game=${gameId}`));
+        const oldId = gameId;
+        if (oldId !== newId) {
           gameId = newId;
-          return;
+          gamesDb
+              .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(oldId))
+              .then(transactionToPromise)
+              .then(() => window.history.replaceState({}, '', `edit?game=${gameId}`));
         }
         gamesDb
             .then(db => db.transaction('games', 'readwrite').objectStore('games').put(game, gameId))
@@ -341,6 +341,7 @@ if (gameId) {
 }
 
 function saveLocal() {
+  console.trace(`saving ${gameId}`);
   const data_: GameData = {
     gridData: data,
     spec,
