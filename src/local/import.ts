@@ -79,7 +79,8 @@ export async function main() {
                 style: 'midnight',
                 creator: 'auto',
                 difficulty,
-                gridData: gridDataEncoded
+                gridData: gridDataEncoded,
+                tags: []
               };
 
               getName(stub).then(name => {

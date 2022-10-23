@@ -35,7 +35,8 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
     style: game.data.style,
     creator: email,
     difficulty: 0,
-    gridData: isString(game.data.gridData)
+    gridData: isString(game.data.gridData),
+    tags: game.data.tags
   };
 
   const key = datastore.key(['game', gameId]);

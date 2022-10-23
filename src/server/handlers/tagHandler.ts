@@ -1,15 +1,14 @@
 import {RequestHandler} from 'express';
 import {shard} from '../../local/shard';
 import {getSignInUrl} from '../components/globalControls';
+import {GameInDb} from '../gameToClientGame';
 import {getEmail} from '../getEmail';
 import {getOAuth2} from '../getOAuth2';
 import {datastore} from '../globalDatastore';
 import secrets from '../secret/secrets.json';
 
-export interface Tag {
-  game: string;
-  tag: string;
-  user: string;
+function isDefined<T>(object: T | undefined): object is T {
+  return object !== undefined;
 }
 
 export const tagHandler: RequestHandler = async (req, res, next) => {
@@ -31,10 +30,14 @@ export const tagHandler: RequestHandler = async (req, res, next) => {
   const games = req.body.games as string[];
   const tag = req.body.tag;
 
-  await Promise.all(shard(games.map(game => {
-    const data: Tag = {game, tag, user: email};
-    return ({key: datastore.key('tag'), data});
-  }), 500).map(entities => datastore.save(entities)));
+  await Promise.all(games.map(gameId => datastore.get(datastore.key(['game', gameId]))
+      .then(result => result[0] as GameInDb | undefined))).then(results =>
+      results.filter(isDefined)
+          .filter(game => game.tags.indexOf(tag) === -1)
+          .map(game => {
+            game.tags.push(tag);
+            return game;
+          })).then(results => shard(results, 500).map(shard => datastore.save(shard)));
 
   res.send(JSON.stringify({}, null, 2));
 };

@@ -12,7 +12,8 @@ export function gameToClientGame(game: GameInDb): ClientGame {
       gridData: game.gridData,
       spec: game.spec,
       name: game.name,
-      style: game.style
+      style: game.style,
+      tags: game.tags
     }
   };
 }

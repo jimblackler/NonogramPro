@@ -286,7 +286,8 @@ publish.addEventListener('click', evt => {
       name,
       style,
       needsPublish,
-      difficulty: -1
+      difficulty: -1,
+      tags: []
     }
   };
   axios.post('/publish', data_).then(response => response.data)
@@ -346,7 +347,8 @@ function saveLocal() {
     name,
     style,
     needsPublish,
-    difficulty: -1
+    difficulty: -1,
+    tags: []
   };
   return gamesDb
       .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data_, gameId))

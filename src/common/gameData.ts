@@ -8,6 +8,7 @@ export interface GameData {
   name: string;
   style: string;
   needsPublish?: boolean;
+  tags: string[];
 }
 
 export interface ClientGame {
