@@ -4,6 +4,7 @@ import {truthy} from '../common/truthy';
 import {checkColumn, checkRow, findHint} from './analyze';
 import {Complete, completedDb} from './db/completedDb';
 import {PlayInDb, playsDb} from './db/playsDb';
+import {decode} from './decoder';
 import {getGame} from './fetchGame';
 import {is} from './is';
 import {notNull} from './notNull';
@@ -14,9 +15,6 @@ import {transactionToPromise} from './transactionToPromise';
 const gameId = new URL(window.location.href).searchParams.get('game') || '';
 
 getGame(gameId).then(result => {
-  if (typeof result.gridData !== 'object') {
-    throw new Error();
-  }
   const svg = truthy(document.getElementsByTagName('svg')[0]);
   const renderer = enhanceRenderer(svg);
 
@@ -144,7 +142,7 @@ getGame(gameId).then(result => {
   });
 
   const spec = result.spec;
-  const data = result.gridData;
+  const data = decode(spec, result.gridData);
   const style = result.style;
   let on = getEmpty(spec);
   let off = getEmpty(spec);

@@ -13,14 +13,11 @@ function createThumbnail(parent: HTMLElement, game: GameData) {
   const canvas = document.createElement('canvas');
   parent.append(canvas);
   const ctx = notNull(canvas.getContext('2d'));
-  if (typeof game.gridData === 'string') {
-    throw new Error();
-  }
   const cellSize = Math.ceil(60 / game.spec.width);
   canvas.width = game.spec.width * cellSize;
   canvas.height = game.spec.height * cellSize;
   ctx.fillStyle = 'lightblue';
-  game.gridData.forEach((row, rowNumber) => row.forEach((cell, columnNumber) => {
+  decode(game.spec, game.gridData).forEach((row, rowNumber) => row.forEach((cell, columnNumber) => {
     if (cell) {
       ctx.fillRect(columnNumber * cellSize, rowNumber * cellSize, cellSize, cellSize);
     }
@@ -178,12 +175,6 @@ async function main() {
         .then(response => response.data as ClientGame[])
         .then(obj => {
           for (let game of obj) {
-            if (typeof game.data.gridData !== 'string') {
-              throw new Error();
-            }
-            // We write the incoming games to the local database (which needs
-            // the grid decoding). Might not always be desirable.
-            game.data.gridData = decode(game.data.spec, game.data.gridData);
             addGame(game.key, game.data, plays.has(game.key), completed.has(game.key), list, full,
                 clickEvent);
             gamesDb.then(db => db.transaction('games', 'readwrite').objectStore('games')

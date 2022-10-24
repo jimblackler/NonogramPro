@@ -1,7 +1,6 @@
 import axios from 'axios';
 import {GameData} from '../common/gameData';
 import {gamesDb} from './db/gamesDb';
-import {decode} from './decoder';
 import {transactionToPromise} from './transactionToPromise';
 
 export function getGameInternet(gameId: string): Promise<GameData> {
@@ -12,10 +11,6 @@ export function getGameInternet(gameId: string): Promise<GameData> {
           throw new Error();
         }
         const game = obj.results[0].data as GameData;
-        if (typeof game.gridData !== 'string') {
-          throw new Error();
-        }
-        game.gridData = decode(game.spec, game.gridData);
         game.needsPublish = false;
         gamesDb.then(db =>
             db.transaction('games', 'readwrite').objectStore('games').put(game, gameId));

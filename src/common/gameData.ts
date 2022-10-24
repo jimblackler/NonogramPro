@@ -3,7 +3,7 @@ import {Spec} from './spec';
 export interface GameData {
   creator?: string;
   difficulty: number;
-  gridData: string | boolean[][];
+  gridData: string;
   spec: Spec;
   name: string;
   style: string;

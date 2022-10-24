@@ -222,10 +222,7 @@ svg.addEventListener('gridmove', evt => {
 
 function getGameFunction(game: GameData) {
   spec = game.spec;
-  if (typeof game.gridData !== 'object') {
-    throw new Error();
-  }
-  data = game.gridData;
+  data = decode(spec, game.gridData);
   name = game.name;
   style = game.style;
   setNeedsPublish(game.needsPublish || false);
@@ -300,13 +297,8 @@ publish.addEventListener('click', evt => {
           alert(obj.exception);
           return;
         }
-        const game = obj.game.data;
-        const newId = obj.game.key;
-        if (typeof game.gridData != 'string') {
-          throw new Error();
-        }
-
-        game.gridData = decode(game.spec, game.gridData);
+        const game = obj.game.data as GameData;
+        const newId = obj.game.key as string;
         const oldId = gameId;
         if (oldId !== newId) {
           gameId = newId;
@@ -343,7 +335,7 @@ if (gameId) {
 function saveLocal() {
   console.trace(`saving ${gameId}`);
   const data_: GameData = {
-    gridData: data,
+    gridData: encode(data),
     spec,
     name,
     style,

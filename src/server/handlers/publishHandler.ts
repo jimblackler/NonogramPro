@@ -1,5 +1,4 @@
 import {RequestHandler} from 'express';
-import {isString} from '../../client/isString';
 import {ClientGame, GameData} from '../../common/gameData';
 import {getSignInUrl} from '../components/globalControls';
 import {GameInDb, gameToClientGame} from '../gameToClientGame';
@@ -34,8 +33,8 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
     spec: game.data.spec,
     style: game.data.style,
     creator: email,
-    difficulty: 0,
-    gridData: isString(game.data.gridData),
+    difficulty: game.data.difficulty,
+    gridData: game.data.gridData,
     tags: game.data.tags
   };
 
