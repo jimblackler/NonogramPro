@@ -1,20 +1,26 @@
 import {toUint8Array} from 'js-base64';
 import {Spec} from '../common/spec';
-import {defined} from './defined';
+
+function* getBits(str: string) {
+  const binary = toUint8Array(str);
+  for (const byte of binary) {
+    for (let bit = 1; bit < 1 << 8; bit <<= 1) {
+      yield (byte & bit) !== 0;
+    }
+  }
+}
 
 export function decode(spec: Spec, str: string) {
-  const binary = toUint8Array(str);
-  let pos = 0;
+  const bits = getBits(str);
   const data = [];
   for (let y = 0; y < spec.height; y++) {
-    let x = 0;
     const row = [];
-    while (x < spec.width) {
-      let byte = defined(binary.at(pos++));
-      for (let mask = 1 << 7; mask && x < spec.width; mask >>= 1) {
-        row.push((byte & mask) !== 0);
-        x++;
+    for (let x = 0; x < spec.width; x++) {
+      const data = bits.next();
+      if (data.done) {
+        throw new Error();
       }
+      row.push(data.value);
     }
     data.push(row);
   }
