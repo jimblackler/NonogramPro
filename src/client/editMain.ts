@@ -297,19 +297,13 @@ publish.addEventListener('click', evt => {
           alert(obj.exception);
           return;
         }
-        const game = obj.game.data as GameData;
-        const newId = obj.game.key as string;
         const oldId = gameId;
-        if (oldId !== newId) {
-          gameId = newId;
-          gamesDb
-              .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(oldId))
-              .then(transactionToPromise)
-              .then(() => window.history.replaceState({}, '', `edit?game=${gameId}`));
-        }
+        gameId = obj.game.key as string;
         gamesDb
-            .then(db => db.transaction('games', 'readwrite').objectStore('games').put(game, gameId))
-            .then(transactionToPromise);
+            .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(oldId))
+            .then(transactionToPromise)
+            .then(() => window.history.replaceState({}, '', `edit?game=${gameId}`));
+
       })
       .catch(() => setNeedsPublish(true))
       .finally(() => progress.remove());

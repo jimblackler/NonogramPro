@@ -10,11 +10,7 @@ export function getGameInternet(gameId: string): Promise<GameData> {
         if (obj.results.length !== 1) {
           throw new Error();
         }
-        const game = obj.results[0].data as GameData;
-        game.needsPublish = false;
-        gamesDb.then(db =>
-            db.transaction('games', 'readwrite').objectStore('games').put(game, gameId));
-        return game;
+        return obj.results[0].data as GameData;
       });
 }
 

@@ -1,7 +1,7 @@
 export const gamesDb: Promise<IDBDatabase> = new Promise((resolve, reject) => {
-  const request = indexedDB.open('games-store', 11);
+  const request = indexedDB.open('games-store', 12);
   request.addEventListener('upgradeneeded', event => {
-    if (event.oldVersion < 11) {
+    if (event.oldVersion < 12) {
       if (request.result.objectStoreNames.contains('games')) {
         request.result.deleteObjectStore('games');
       }

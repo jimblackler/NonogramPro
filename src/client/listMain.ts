@@ -177,8 +177,6 @@ async function main() {
           for (let game of obj) {
             addGame(game.key, game.data, plays.has(game.key), completed.has(game.key), list, full,
                 clickEvent);
-            gamesDb.then(db => db.transaction('games', 'readwrite').objectStore('games')
-                .put(game.data, game.key));
           }
         })
         .catch(e => {
