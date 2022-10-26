@@ -4,6 +4,7 @@ import {completedDb} from './db/completedDb';
 import {gamesDb} from './db/gamesDb';
 import {playsDb} from './db/playsDb';
 import {decode} from './decoder';
+import {getGame} from './fetchGame';
 import {is} from './is';
 import {isString} from './isString';
 import {notNull} from './notNull';
@@ -155,11 +156,22 @@ async function main() {
   }
 
   if ((params.get('v') || 'local') === 'local') {
+    const included = new Set<string>();
+    for (const gameId of plays) {
+      getGame(gameId).then(game => {
+        included.add(gameId);
+        addGame(gameId, game, true, completed.has(gameId), list, full, clickEvent)
+      });
+    }
+
     for await (const result of await gamesDb
         .then(db => db.transaction('games', 'readonly')
             .objectStore('games').index('byDifficulty').openCursor())
         .then(requestToAsyncGenerator)) {
       const key = result.primaryKey.toString();
+      if (included.has(key)) {
+        return;
+      }
       addGame(key, result.value, plays.has(key), completed.has(key), list, full, clickEvent);
     }
     progress.remove();
