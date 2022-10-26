@@ -1,22 +1,13 @@
-import {BASE64_ALPHABET} from '../common/base64utils';
+import {base64Decode} from '../common/base64utils';
 import {Spec} from '../common/spec';
 
-function* getBits(str: string) {
-  for (const chr of str) {
-    const bits = BASE64_ALPHABET.indexOf(chr);
-    for (let bit = 32; bit; bit >>= 1) {
-      yield (bits & bit) !== 0;
-    }
-  }
-}
-
 export function decode(spec: Spec, str: string) {
-  const bits = getBits(str);
-  const data = [];
+  const bits = base64Decode(str);
+  const data: boolean[][] = [];
   for (let y = 0; y < spec.height; y++) {
-    const row = [];
+    const row: boolean[] = [];
     for (let x = 0; x < spec.width; x++) {
-      row.push(bits.next().value);
+      row.push(bits.next().value === true);
     }
     data.push(row);
   }
