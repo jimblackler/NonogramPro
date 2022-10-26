@@ -3,10 +3,6 @@ import {GameInDb, gameToClientGame} from '../gameToClientGame';
 import {getParam} from '../getParam';
 import {datastore} from '../globalDatastore';
 
-function intersection<T>(a: Set<T>, b: Set<T>) {
-  return new Set<T>([...a].filter(element => b.has(element)));
-}
-
 export const gamesHandler: RequestHandler = async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
   const id = getParam(req.query, 'id');
