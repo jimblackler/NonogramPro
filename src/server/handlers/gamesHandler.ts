@@ -28,7 +28,6 @@ export const gamesHandler: RequestHandler = async (req, res, next) => {
   }
 
   const include = getParam(req.query, 'include');
-  const include_ = new Set<string>();
   if (include) {
     include.split(',').forEach(tag => query.filter('tags', tag));
   }
