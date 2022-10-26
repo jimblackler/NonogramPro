@@ -1,4 +1,4 @@
-import {fromUint8Array} from 'js-base64';
+import {BASE64_ALPHABET} from './base64utils';
 
 function* allCells(data: boolean[][]) {
   for (const row of data) {
@@ -9,22 +9,42 @@ function* allCells(data: boolean[][]) {
 }
 
 export function encode(data: boolean[][]) {
-  let binary: number[] = [];
-  let bit = 1;
+  let encoded = '';
+  let bit = 32;
   let byte = 0;
+  let totalBits = 0;
 
   for (const cell of allCells(data)) {
+    totalBits++;
     if (cell) {
       byte |= bit;
     }
-    bit <<= 1;
-    if (bit === 1 << 8) {
-      binary.push(byte);
-      bit = 1;
+    bit >>= 1;
+    if (!bit) {
+      encoded += BASE64_ALPHABET[byte];
+      bit = 32;
       byte = 0;
     }
   }
 
-  binary.push(byte);
-  return fromUint8Array(new Uint8Array(binary));
+  // https://www.rfc-editor.org/rfc/rfc4648#section-4
+  // "The Base 64 encoding is designed to represent arbitrary sequences of octets..."
+  while (totalBits % 8) {
+    totalBits++;
+    bit >>= 1;
+    if (!bit) {
+      encoded += BASE64_ALPHABET[byte];
+      bit = 32;
+      byte = 0;  // https://www.rfc-editor.org/rfc/rfc4648#section-3.5
+    }
+  }
+
+  if (bit !== 32) {
+    encoded += BASE64_ALPHABET[byte];
+  }
+
+  while (encoded.length % 4) {  // https://www.rfc-editor.org/rfc/rfc4648#section-4
+    encoded += BASE64_ALPHABET[64];
+  }
+  return encoded;
 }
