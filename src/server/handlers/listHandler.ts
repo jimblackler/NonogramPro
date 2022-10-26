@@ -1,5 +1,6 @@
 import {RequestHandler} from 'express';
 import {addGlobalControls} from '../components/globalControls';
+import {createLink} from '../components/linkButton';
 import {getEmail} from '../getEmail';
 import {getOAuth2} from '../getOAuth2';
 import {htmlRespond} from '../htmlRespond';
@@ -46,21 +47,8 @@ export const listHandler: RequestHandler = async (req, res, next) => {
       topRow.append(buttonRow);
       buttonRow.setAttribute('class', 'buttonRow');
 
-      {
-        const a = document.createElement('a');
-        buttonRow.append(a);
-        a.setAttribute('class', 'link_button');
-        a.setAttribute('href', '?v=local');
-        a.append('Local games');
-      }
-
-      {
-        const a = document.createElement('a');
-        buttonRow.append(a);
-        a.setAttribute('class', 'link_button');
-        a.setAttribute('href', '?v=published');
-        a.append('Published games');
-      }
+      createLink(document, buttonRow, '/?v=local', 'Local games', req.originalUrl);
+      createLink(document, buttonRow, '/?v=published', 'Published games', req.originalUrl);
 
       const editSection = document.createElement('section');
       topRow.append(editSection);

@@ -24,15 +24,31 @@ body, button, a {
   color: white;
 }
 
-a.link_button {
-  background-color: #b3002f;
+a.linkButton {
+  border-color: gray;
+  border-style: solid;
   display: inline-block;
   padding: 10px;
 }
 
-a.link_button:hover {
-  background: white;
+a.linkButton:not(.currentUrl) {
+  background-color: black;
+  color: white;
+}
+
+a.linkButton:hover:not(.currentUrl) {
+  background-color: white;
   color: black;
+  text-decoration: none;
+}
+
+a.linkButton.currentUrl {
+  background-color: darkred;
+  color: white
+}
+
+a.linkButton.currentUrl:hover {
+  border-color: white;
   text-decoration: none;
 }
 

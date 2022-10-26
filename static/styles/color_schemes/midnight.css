@@ -10,7 +10,7 @@ body, button, a, select {
   color: white;
 }
 
-button, a.link_button, select {
+button, a.linkButton, select {
   background-color: #b35e5e;
 }
 
