@@ -37,7 +37,7 @@ export async function main() {
   const window = new JSDOM().window;
   const document = window.document;
   global.DOMParser = window.DOMParser;
-  const path = '/Users/jimblackler/code/material-design-icons/src/social';
+  const path = '/Users/jimblackler/code/material-design-icons/src';
 
   for await (const file of getFiles(path)) {
     if (!file.endsWith('.svg')) {
