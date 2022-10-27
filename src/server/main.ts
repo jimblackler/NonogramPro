@@ -1,4 +1,7 @@
 import express, {Express} from 'express';
+import parseurl from 'parseurl';
+import send from 'send';
+import {assertTruthy} from '../common/check/truthy';
 import {cookiesToObject} from './cookieUtils';
 import {authCallbackHandler} from './handlers/authCallbackHandler';
 import {deleteHandler} from './handlers/deleteHandler';
@@ -8,7 +11,6 @@ import {listHandler} from './handlers/listHandler';
 import {playHandler} from './handlers/playHandler';
 import {publishHandler} from './handlers/publishHandler';
 import {signOutHandler} from './handlers/signOutHandler';
-import {staticHandler} from './handlers/staticHandler';
 import {tagHandler} from './handlers/tagHandler';
 
 const app: Express = express();
@@ -33,6 +35,11 @@ app.route('/publish').post(publishHandler);
 app.route('/signOut').get(signOutHandler);
 app.route('/tag').post(tagHandler);
 app.route('/').get(listHandler);
-app.route('*').get(staticHandler);
+app.route('/dist/*').get((req, res) => {
+  res.set('Cache-control', `public, max-age=${365 * 24 * 60 * 60}`);
+  send(req, assertTruthy(parseurl(req)?.pathname), {root: 'static'}).pipe(res);
+});
+app.route('*').get((req, res) =>
+    send(req, assertTruthy(parseurl(req)?.pathname), {root: 'static'}).pipe(res));
 
 app.listen(8081);
