@@ -1,1 +1,5 @@
 indexes:
+  - kind: game
+    properties:
+      - name: tags
+      - name: difficulty

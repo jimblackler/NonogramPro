@@ -19,6 +19,8 @@ export const gamesHandler: RequestHandler = async (req, res, next) => {
     query.filter('creator', creator);
   }
 
+  query.order('difficulty');
+
   const limit = getParam(req.query, 'limit');
   if (limit) {
     query.limit(Number.parseInt(limit));
