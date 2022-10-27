@@ -1,12 +1,12 @@
 import {assertIs} from '../common/check/is';
 import {assertNotNull} from '../common/check/null';
 import {assertTruthy} from '../common/check/truthy';
+import {decode} from '../common/decoder';
 import {equals, getEmpty} from '../common/generate';
 import {generateClues} from '../common/generateClues';
 import {checkColumn, checkRow, findHint} from './analyze';
 import {Complete, completedDb} from './db/completedDb';
 import {PlayInDb, playsDb} from './db/playsDb';
-import {decode} from './decoder';
 import {getGame} from './fetchGame';
 import {plotLine} from './plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';

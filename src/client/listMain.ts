@@ -2,11 +2,11 @@ import axios from 'axios';
 import {assertIs} from '../common/check/is';
 import {assertNotNull} from '../common/check/null';
 import {assertString} from '../common/check/string';
+import {decode} from '../common/decoder';
 import {ClientGame, GameData} from '../common/gameData';
 import {completedDb} from './db/completedDb';
 import {gamesDb} from './db/gamesDb';
 import {playsDb} from './db/playsDb';
-import {decode} from './decoder';
 import {getGame} from './fetchGame';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 

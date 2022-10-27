@@ -1,5 +1,7 @@
 import {RequestHandler} from 'express';
+import {decode} from '../../common/decoder';
 import {ClientGame, GameData} from '../../common/gameData';
+import {calculateDifficulty} from '../calculateDifficulty';
 import {getSignInUrl} from '../components/globalControls';
 import {GameInDb, gameToClientGame} from '../gameToClientGame';
 import {getEmail} from '../getEmail';
@@ -28,13 +30,16 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
     gameId = await getName(game.data.name);
   }
 
+  const spec = game.data.spec;
+  const gridData = game.data.gridData;
   const data: GameData = {
     name: game.data.name,
-    spec: game.data.spec,
+    spec,
     style: game.data.style,
     creator: email,
-    difficulty: game.data.difficulty,
-    gridData: game.data.gridData,
+    difficulty: game.data.difficulty === -1 ?
+        calculateDifficulty(spec, decode(spec, gridData)) : game.data.difficulty,
+    gridData,
     tags: game.data.tags
   };
 

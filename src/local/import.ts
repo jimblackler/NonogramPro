@@ -1,13 +1,11 @@
 import {readdir, readFile} from 'fs/promises';
 import {JSDOM} from 'jsdom';
 import path from 'path';
-import {assertDefined} from '../common/check/defined';
 import {encode} from '../common/encoder';
 import {GameData} from '../common/gameData';
-import {generateClues} from '../common/generateClues';
 import {getImageData, imageDataToGridData} from '../common/importImage';
-import {isComplete, Round, solve} from '../common/solve';
 import {Spec} from '../common/spec';
+import {calculateDifficulty} from '../server/calculateDifficulty';
 import {getName} from '../server/getName';
 import {datastore} from '../server/globalDatastore';
 
@@ -50,15 +48,9 @@ export async function main() {
           [5, 10, 20, 25, 30].forEach(size => {
             const spec: Spec = {width: size, height: size};
             const gridData = imageDataToGridData(imageData, spec);
-            const clues = generateClues(spec, gridData);
-            let difficulty = 0;
-            let lastRound: Round | undefined;
-            for (const round of solve(spec, clues)) {
-              difficulty++;
-              lastRound = round;
-            }
+            const difficulty = calculateDifficulty(spec, gridData);
 
-            if (!isComplete(spec, assertDefined(lastRound))) {
+            if (!difficulty) {
               console.log('Cannot be completed with standard method.');
               return;
             }
