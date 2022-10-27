@@ -32,6 +32,7 @@ export default function config(env: any, argv: any) {
       extensions: ['.js', '.ts'],
     },
     output: {
+      chunkFilename: '[id].[contenthash].chunk.js',
       clean: true,
       filename: '[name].[contenthash].bundle.js',
       path: path.resolve('static/dist')
