@@ -33,7 +33,7 @@ export default function config(env: any, argv: any) {
     },
     output: {
       clean: true,
-      filename: '[name].bundle.js',
+      filename: '[name].[contenthash].bundle.js',
       path: path.resolve('static/dist')
     },
     optimization: {
