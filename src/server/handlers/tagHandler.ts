@@ -28,14 +28,18 @@ export const tagHandler: RequestHandler = async (req, res, next) => {
   }
 
   const games = req.body.games as string[];
-  const tag = req.body.tag;
+  const tag = req.body.tag as string;
 
   await Promise.all(games.map(gameId => datastore.get(datastore.key(['game', gameId]))
       .then(result => result[0] as GameInDb | undefined))).then(results =>
       results.filter(isDefined)
           .filter(game => game.tags.indexOf(tag) === -1)
           .map(game => {
-            game.tags.push(tag);
+            if (tag.startsWith('-')) {
+              game.tags = game.tags.filter(tag_ => tag_ !== tag.substring(1));
+            } else {
+              game.tags.push(tag);
+            }
             return game;
           })).then(results => shard(results, 500).map(shard => datastore.save(shard)));
 
