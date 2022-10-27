@@ -1,5 +1,7 @@
 import Alea from 'alea';
 import axios from 'axios';
+import {assertIs} from '../common/check/is';
+import {assertNotNull} from '../common/check/null';
 import {encode} from '../common/encoder';
 import {ClientGame, GameData} from '../common/gameData';
 import {getEmpty} from '../common/generate';
@@ -9,8 +11,6 @@ import {Spec} from '../common/spec';
 import {gamesDb} from './db/gamesDb';
 import {decode} from './decoder';
 import {getGame, getGameInternet} from './fetchGame';
-import {is} from './is';
-import {notNull} from './notNull';
 import {plotLine} from './plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';
 import {transactionToPromise} from './transactionToPromise';
@@ -25,17 +25,17 @@ let setStyle = '';
 let lastX = -1;
 let lastY = -1;
 
-const title = is(HTMLHeadingElement, document.body.querySelector('h1#title'));
-const status = is(HTMLElement, document.body.querySelector('#status'));
-const createNew = notNull(document.body.querySelector('#createNew'));
-const play = notNull(document.body.querySelector('#play'));
-const analyze = notNull(document.body.querySelector('#analyze'));
-const importImageButton = notNull(document.body.querySelector('#importImage'));
-const publish = notNull(document.body.querySelector('#publish'));
-const cancel = notNull(document.body.querySelector('#cancel'));
-const delete_ = notNull(document.body.querySelector('#delete'));
-const gridSize = is(HTMLSelectElement, document.body.querySelector('select#gridSize'));
-const colorScheme = is(HTMLSelectElement, document.body.querySelector('select#colorScheme'));
+const title = assertIs(HTMLHeadingElement, document.body.querySelector('h1#title'));
+const status = assertIs(HTMLElement, document.body.querySelector('#status'));
+const createNew = assertNotNull(document.body.querySelector('#createNew'));
+const play = assertNotNull(document.body.querySelector('#play'));
+const analyze = assertNotNull(document.body.querySelector('#analyze'));
+const importImageButton = assertNotNull(document.body.querySelector('#importImage'));
+const publish = assertNotNull(document.body.querySelector('#publish'));
+const cancel = assertNotNull(document.body.querySelector('#cancel'));
+const delete_ = assertNotNull(document.body.querySelector('#delete'));
+const gridSize = assertIs(HTMLSelectElement, document.body.querySelector('select#gridSize'));
+const colorScheme = assertIs(HTMLSelectElement, document.body.querySelector('select#colorScheme'));
 
 let needsPublish = false;
 
@@ -129,7 +129,7 @@ const renderer = enhanceRenderer(svg);
 
 function repaint() {
   const colorSchemeStylesheet =
-      is(HTMLLinkElement, document.getElementById('colorSchemeStylesheet'));
+      assertIs(HTMLLinkElement, document.getElementById('colorSchemeStylesheet'));
   title.textContent = name;
   renderer.paintOnSquares(data);
   const clues = generateClues(spec, data);
@@ -177,7 +177,7 @@ colorScheme.addEventListener('change', () => {
 });
 
 svg.addEventListener('griddown', evt => {
-      const {x, y} = is(CustomEvent, evt).detail as GridDownData;
+      const {x, y} = assertIs(CustomEvent, evt).detail as GridDownData;
       if (data[y][x]) {
         drawMode = DrawMode.DELETING;
         data[y][x] = false;
@@ -193,7 +193,7 @@ svg.addEventListener('griddown', evt => {
 );
 
 svg.addEventListener('gridmove', evt => {
-      const {x, y} = is(CustomEvent, evt).detail as GridMoveData;
+      const {x, y} = assertIs(CustomEvent, evt).detail as GridMoveData;
       if (drawMode === DrawMode.NOT_DRAWING) {
         return;
       }

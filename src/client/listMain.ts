@@ -1,19 +1,19 @@
 import axios from 'axios';
+import {assertIs} from '../common/check/is';
+import {assertNotNull} from '../common/check/null';
 import {ClientGame, GameData} from '../common/gameData';
 import {completedDb} from './db/completedDb';
 import {gamesDb} from './db/gamesDb';
 import {playsDb} from './db/playsDb';
 import {decode} from './decoder';
 import {getGame} from './fetchGame';
-import {is} from './is';
-import {isString} from './isString';
-import {notNull} from './notNull';
+import {assertString} from '../common/check/string';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 
 function createThumbnail(parent: HTMLElement, game: GameData) {
   const canvas = document.createElement('canvas');
   parent.append(canvas);
-  const ctx = notNull(canvas.getContext('2d'));
+  const ctx = assertNotNull(canvas.getContext('2d'));
   const cellSize = Math.ceil(60 / game.spec.width);
   canvas.width = game.spec.width * cellSize;
   canvas.height = game.spec.height * cellSize;
@@ -92,17 +92,17 @@ function addGame(key: string, game: GameData, playing: boolean, completed: boole
 }
 
 async function main() {
-  const list = notNull(document.getElementById('games'));
+  const list = assertNotNull(document.getElementById('games'));
   const progress = document.createElement('img');
   list.append(progress);
   progress.setAttribute('src', '/images/progress.svg');
 
-  const tagForm = is(HTMLFormElement, document.body.querySelector('form.tagForm'));
+  const tagForm = assertIs(HTMLFormElement, document.body.querySelector('form.tagForm'));
   tagForm.addEventListener('submit', evt => {
     const gameIds = [...list.querySelectorAll('li.selected')].map(li => {
-      const anchor = notNull(li.querySelector('a'));
+      const anchor = assertNotNull(li.querySelector('a'));
       const url = new URL(anchor.href);
-      return isString(url.searchParams.get('game'));
+      return assertString(url.searchParams.get('game'));
     });
     const formData = new FormData(tagForm);
     axios.post('/tag', {games: gameIds, tag: formData.get('tag')});
@@ -110,7 +110,7 @@ async function main() {
     evt.preventDefault();
   });
 
-  const editSection = is(HTMLElement, document.body.querySelector('section.editSection'));
+  const editSection = assertIs(HTMLElement, document.body.querySelector('section.editSection'));
 
   const plays = new Set<string>();
   for await (const currentTarget of await playsDb

@@ -1,4 +1,4 @@
-export function notNull<T>(object: T | null) {
+export function assertNotNull<T>(object: T | null) {
   if (object === null) {
     throw new Error();
   }

@@ -1,6 +1,6 @@
+import {assertNotNull} from './check/null';
 import {getEmpty} from './generate';
 import {Spec} from './spec';
-import {truthy} from './truthy';
 
 interface LocalImageData {
   data: ArrayLike<number>;
@@ -118,7 +118,7 @@ export function getImageData(type: string, data: ArrayBuffer, document_: Documen
   } else if (type === 'image/svg+xml') {
     return import('@jimblackler/canvg/dist').then(({Canvg, Parser}) => {
       const canvas = document_.createElement('canvas');
-      const ctx = truthy(canvas.getContext('2d'));
+      const ctx = assertNotNull(canvas.getContext('2d'));
       return new Parser().parse(new TextDecoder('utf-8').decode(data))
           .then(doc => {
             const canvg = new Canvg(ctx, doc, {});

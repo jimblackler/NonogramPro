@@ -1,13 +1,13 @@
+import {assertIs} from '../common/check/is';
+import {assertNotNull} from '../common/check/null';
+import {assertTruthy} from '../common/check/truthy';
 import {equals, getEmpty} from '../common/generate';
 import {generateClues} from '../common/generateClues';
-import {truthy} from '../common/truthy';
 import {checkColumn, checkRow, findHint} from './analyze';
 import {Complete, completedDb} from './db/completedDb';
 import {PlayInDb, playsDb} from './db/playsDb';
 import {decode} from './decoder';
 import {getGame} from './fetchGame';
-import {is} from './is';
-import {notNull} from './notNull';
 import {plotLine} from './plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';
 import {transactionToPromise} from './transactionToPromise';
@@ -15,7 +15,7 @@ import {transactionToPromise} from './transactionToPromise';
 const gameId = new URL(window.location.href).searchParams.get('game') || '';
 
 getGame(gameId).then(result => {
-  const svg = truthy(document.getElementsByTagName('svg')[0]);
+  const svg = assertTruthy(document.getElementsByTagName('svg')[0]);
   const renderer = enhanceRenderer(svg);
 
   let rowLock: number | false = false;
@@ -70,7 +70,7 @@ getGame(gameId).then(result => {
   }
 
   svg.addEventListener('griddown', evt => {
-        const {x, y, which, shiftKey, ctrlKey} = is(CustomEvent, evt).detail as GridDownData;
+        const {x, y, which, shiftKey, ctrlKey} = assertIs(CustomEvent, evt).detail as GridDownData;
         if (which === 3 || shiftKey) {
           // Right click.
           if (off[y][x]) {
@@ -98,7 +98,7 @@ getGame(gameId).then(result => {
   );
 
   svg.addEventListener('gridmove', evt => {
-        let {x, y} = is(CustomEvent, evt).detail as GridMoveData;
+        let {x, y} = assertIs(CustomEvent, evt).detail as GridMoveData;
         if (actionMode !== ActionMode.NOT_DRAWING) {
           if (rowLock === false && columnLock === false) {
             if (lastY !== y) {
@@ -149,10 +149,10 @@ getGame(gameId).then(result => {
   renderer.setDimensions(spec);
 
   const colorSchemeStylesheet =
-      is(HTMLLinkElement, document.getElementById('colorSchemeStylesheet'));
+      assertIs(HTMLLinkElement, document.getElementById('colorSchemeStylesheet'));
   colorSchemeStylesheet.href = `/styles/color_schemes/${style}.css`;
 
-  const title = notNull(document.body.querySelector('#title'));
+  const title = assertNotNull(document.body.querySelector('#title'));
   title.textContent = result.name;
   const clues = generateClues(spec, data);
   renderer.paintClues(clues);
@@ -174,9 +174,9 @@ getGame(gameId).then(result => {
         fromScratch();
       });
 
-  const replay = notNull(document.body.querySelector('#replay'));
-  const edit = notNull(document.body.querySelector('#edit'));
-  const hint = notNull(document.body.querySelector('#hint'));
+  const replay = assertNotNull(document.body.querySelector('#replay'));
+  const edit = assertNotNull(document.body.querySelector('#edit'));
+  const hint = assertNotNull(document.body.querySelector('#hint'));
 
   replay.addEventListener('click', () => {
     on = getEmpty(spec);

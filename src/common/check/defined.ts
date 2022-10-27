@@ -1,4 +1,4 @@
-export function defined<T>(object: T | undefined) {
+export function assertDefined<T>(object: T | undefined) {
   if (object === undefined) {
     throw new Error();
   }

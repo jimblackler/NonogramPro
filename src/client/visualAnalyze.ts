@@ -1,6 +1,6 @@
+import {assertTruthy} from '../common/check/truthy';
 import {isComplete, Round, solve} from '../common/solve';
 import {Spec} from '../common/spec';
-import {truthy} from '../common/truthy';
 import {enhanceRenderer} from './renderer';
 
 require('./dialog');
@@ -49,7 +49,7 @@ export function visualAnalyze(spec: Spec, clues: number[][][]) {
   }
 
   let phrase;
-  if (isComplete(spec, truthy(lastRound))) {
+  if (isComplete(spec, assertTruthy(lastRound))) {
     phrase = `Requires ${difficulty} rounds to complete with standard method.`;
   } else {
     phrase = 'Cannot be completed with standard method.';

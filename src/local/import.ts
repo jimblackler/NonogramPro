@@ -1,13 +1,13 @@
 import {readdir, readFile} from 'fs/promises';
 import {JSDOM} from 'jsdom';
 import path from 'path';
+import {assertDefined} from '../common/check/defined';
 import {encode} from '../common/encoder';
 import {GameData} from '../common/gameData';
 import {generateClues} from '../common/generateClues';
 import {getImageData, imageDataToGridData} from '../common/importImage';
 import {isComplete, Round, solve} from '../common/solve';
 import {Spec} from '../common/spec';
-import {truthy} from '../common/truthy';
 import {getName} from '../server/getName';
 import {datastore} from '../server/globalDatastore';
 
@@ -58,7 +58,7 @@ export async function main() {
               lastRound = round;
             }
 
-            if (!isComplete(spec, truthy(lastRound))) {
+            if (!isComplete(spec, assertDefined(lastRound))) {
               console.log('Cannot be completed with standard method.');
               return;
             }
