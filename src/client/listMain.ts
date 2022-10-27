@@ -126,7 +126,11 @@ async function main() {
     completed.add(currentTarget.key.toString());
   }
 
-  const params = new URL(window.location.href).searchParams;
+  // For aesthetic reasons the nude URL is equivalent to include=main.
+  const params = window.location.search ?
+      new URL(window.location.href).searchParams :
+      new URLSearchParams({include: 'main'});
+
   const full = params.has('full');
 
   function clickEvent(evt: MouseEvent) {
@@ -155,7 +159,7 @@ async function main() {
     evt.preventDefault();
   }
 
-  if ((params.get('v') || 'local') === 'local') {
+  if (params.get('v') === 'local') {
     const included = new Set<string>();
     for (const gameId of plays) {
       getGame(gameId).then(game => {
