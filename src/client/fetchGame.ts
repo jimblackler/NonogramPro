@@ -1,16 +1,16 @@
 import axios from 'axios';
-import {GameData} from '../common/gameData';
+import {ClientGame, GameData} from '../common/gameData';
 import {gamesDb} from './db/gamesDb';
 import {transactionToPromise} from './transactionToPromise';
 
 export function getGameInternet(gameId: string): Promise<GameData> {
   return axios.get(`/games?id=${gameId}`)
-      .then(value => value.data)
-      .then(obj => {
-        if (obj.results.length !== 1) {
+      .then(response => response.data as ClientGame[])
+      .then(games => {
+        if (games.length !== 1) {
           throw new Error();
         }
-        return obj.results[0].data as GameData;
+        return games[0].data;
       });
 }
 

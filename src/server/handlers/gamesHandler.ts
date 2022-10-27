@@ -10,7 +10,7 @@ export const gamesHandler: RequestHandler = async (req, res, next) => {
   if (id) {
     const game = await datastore.get(datastore.key(['game', id]))
         .then(result => result[0] as GameInDb | undefined);
-    res.send(JSON.stringify({results: game ? [gameToClientGame(game)] : []}, null, 2));
+    res.send(JSON.stringify(game ? [gameToClientGame(game)] : [], null, 2));
     return;
   }
   const query = datastore.createQuery('game');
