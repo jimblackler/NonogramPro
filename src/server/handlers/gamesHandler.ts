@@ -29,7 +29,11 @@ export const gamesHandler: RequestHandler = async (req, res, next) => {
     include.split(',').forEach(tag => query.filter('tags', tag));
   }
 
-  const results = await query.run().then(result => result[0] as GameInDb[]);
+  const exclude = new Set<string>((getParam(req.query, 'exclude') || '').split(','));
+
+  const results = await query.run()
+      .then(result => result[0] as GameInDb[])
+      .then(results => results.filter(gameInDb => !gameInDb.tags.some(tag => exclude.has(tag))));
 
   res.send(JSON.stringify(results.map(result => gameToClientGame(result)), null, 2));
 };
