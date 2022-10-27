@@ -105,8 +105,14 @@ async function main() {
       return assertString(url.searchParams.get('game'));
     });
     const formData = new FormData(tagForm);
-    axios.post('/tag', {games: gameIds, tag: formData.get('tag')});
-    console.log(gameIds);
+    axios.post('/tag', {games: gameIds, tag: formData.get('tag')})
+        .then(response => response.data)
+        .then(obj => {
+          if (obj.login) {
+            window.location.href = obj.login;
+            return;
+          }
+        });
     evt.preventDefault();
   });
 
