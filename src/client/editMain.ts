@@ -257,6 +257,16 @@ importImageButton.addEventListener('click', () => {
       });
 });
 
+function bustCache(url: string) {
+  return axios.get(url, {
+    headers: {
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
+      Expires: '0',
+    }
+  });
+}
+
 function addProgress() {
   const aside = document.body.getElementsByTagName('aside')[0];
   const progress = document.createElement('img');
@@ -299,7 +309,9 @@ publish.addEventListener('click', evt => {
         }
         const oldId = gameId;
         gameId = obj.game.key as string;
-        gamesDb
+        Promise.all([bustCache('/games?include=main'),
+          bustCache(`/games?id=${gameId}`)])
+            .then(() => gamesDb)
             .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(oldId))
             .then(transactionToPromise)
             .then(() => window.history.replaceState({}, '', `edit?game=${gameId}`));
