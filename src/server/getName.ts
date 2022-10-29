@@ -9,24 +9,18 @@ function randomId() {
   return out.join('');
 }
 
-export async function getName(input: string) {
-  let gameId = '';
+export async function getUniqueRawName(collection: string, input: string) {
   let nameStub = nameToId(input.toLowerCase());
   if (!nameStub) {
     nameStub = randomId();
   }
   let appendNumber = 0;
   while (true) {
-    if (appendNumber) {
-      gameId = `${nameStub}_${appendNumber}`;
-    } else {
-      gameId = nameStub;
-    }
-    if (await datastore.get(datastore.key(['game', gameId]))
+    const rawName = appendNumber ? `${nameStub}_${appendNumber}` : nameStub;
+    if (await datastore.get(datastore.key(['Collection', collection, 'Game', rawName]))
         .then(result => result[0]) === undefined) {
-      break;
+      return rawName;
     }
     appendNumber++;
   }
-  return gameId;
 }

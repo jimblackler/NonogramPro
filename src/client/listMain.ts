@@ -4,6 +4,8 @@ import {assertNotNull} from '../common/check/null';
 import {assertString} from '../common/check/string';
 import {decode} from '../common/decoder';
 import {ClientGame, GameData} from '../common/gameData';
+import {parseGameId} from '../server/parseGameId';
+import {bustCache} from './bustCache';
 import {completedDb} from './db/completedDb';
 import {gamesDb} from './db/gamesDb';
 import {playsDb} from './db/playsDb';
@@ -97,25 +99,6 @@ async function main() {
   list.append(progress);
   progress.setAttribute('src', '/images/progress.svg');
 
-  const tagForm = assertIs(HTMLFormElement, document.body.querySelector('form.tagForm'));
-  tagForm.addEventListener('submit', evt => {
-    const gameIds = [...list.querySelectorAll('li.selected')].map(li => {
-      const anchor = assertNotNull(li.querySelector('a'));
-      const url = new URL(anchor.href);
-      return assertString(url.searchParams.get('game'));
-    });
-    const formData = new FormData(tagForm);
-    axios.post('/tag', {games: gameIds, tag: formData.get('tag')})
-        .then(response => response.data)
-        .then(obj => {
-          if (obj.login) {
-            window.location.href = obj.login;
-            return;
-          }
-        });
-    evt.preventDefault();
-  });
-
   const editSection = assertIs(HTMLElement, document.body.querySelector('section.editSection'));
 
   const plays = new Set<string>();
@@ -135,7 +118,7 @@ async function main() {
   // For aesthetic reasons the nude URL is equivalent to include=main.
   const params = window.location.search ?
       new URL(window.location.href).searchParams :
-      new URLSearchParams({include: 'main'});
+      new URLSearchParams({collection: 'main'});
 
   const full = params.has('full');
 
@@ -186,17 +169,40 @@ async function main() {
     }
     progress.remove();
   } else {
-    const getParams = new URLSearchParams();
-    ['creator', 'limit', 'include', 'exclude'].forEach(param => {
-      const value = params.get(param);
-      if (value) {
-        getParams.set(param, value);
-      }
-    });
-    axios.get(`/games?${getParams}`)
+    const collection_ = assertNotNull(params.get('collection'));
+    axios.get(`/games?collection=${collection_}`)
         .then(response => response.data as ClientGame[])
-        .then(obj => {
-          for (let game of obj) {
+        .then(games => {
+          const changeCollectionForm =
+              assertIs(HTMLFormElement, document.body.querySelector('form.changeCollectionForm'));
+          changeCollectionForm.addEventListener('submit', evt => {
+            const gameIds = [...list.querySelectorAll('li.selected')].map(li => {
+              const anchor = assertNotNull(li.querySelector('a'));
+              const url = new URL(anchor.href);
+              return assertString(url.searchParams.get('game'));
+            });
+            const formData = new FormData(changeCollectionForm);
+            const newCollection = formData.get('collection');
+            Promise.all(gameIds.map(gameId => {
+              const clientGame = games.find(game => game.key === gameId);
+              if (!clientGame) {
+                throw new Error();
+              }
+              const {collection, rawName} = parseGameId(gameId);
+              const newClientGame: ClientGame = {
+                key: `${newCollection}.${rawName}`,
+                data: clientGame.data
+              };
+              return axios.post('/publish', newClientGame)
+                  .then(response => response.data)
+                  .then(() => axios.post('/delete', {gameId}));
+            })).then(() => bustCache(`/games?collection=${newCollection}`))
+                .then(() => bustCache(`/games?collection=${collection_}`))
+                .then(() => location.reload());
+            evt.preventDefault();
+          });
+
+          for (let game of games) {
             addGame(game.key, game.data, plays.has(game.key), completed.has(game.key), list, full,
                 clickEvent);
           }

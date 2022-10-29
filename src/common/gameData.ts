@@ -1,14 +1,13 @@
 import {Spec} from './spec';
 
 export interface GameData {
+  name: string;
+  gridData: string;
   creator?: string;
   difficulty: number;
-  gridData: string;
   spec: Spec;
-  name: string;
-  style: string;
+  style?: string;
   needsPublish?: boolean;
-  tags: string[];
 }
 
 export interface ClientGame {

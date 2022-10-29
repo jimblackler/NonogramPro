@@ -6,7 +6,7 @@ import {GameData} from '../common/gameData';
 import {getImageData, imageDataToGridData} from '../common/importImage';
 import {Spec} from '../common/spec';
 import {calculateDifficulty} from '../server/calculateDifficulty';
-import {getName} from '../server/getName';
+import {getUniqueRawName} from '../server/getName';
 import {datastore} from '../server/globalDatastore';
 
 async function* getFiles(directory: string): AsyncGenerator<string> {
@@ -71,14 +71,15 @@ export async function main() {
                 style: 'midnight',
                 creator: 'auto',
                 difficulty,
-                gridData: gridDataEncoded,
-                tags: []
+                gridData: gridDataEncoded
               };
 
-              getName(stub).then(name => {
-                const key = datastore.key(['game', name]);
-                datastore.save({key, data});
-              });
+              const collection = 'imported';
+              getUniqueRawName(collection, stub)
+                  .then(rawName => {
+                    const key = datastore.key(['Collection', collection, 'Game', rawName]);
+                    datastore.save({key, data});
+                  });
             });
           });
         })

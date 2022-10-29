@@ -1,21 +1,20 @@
 import axios from 'axios';
 import {ClientGame, GameData} from '../common/gameData';
+import {parseGameId} from '../server/parseGameId';
 import {gamesDb} from './db/gamesDb';
 import {transactionToPromise} from './transactionToPromise';
 
 export function getGameInternet(gameId: string): Promise<GameData> {
-  // First we look in the main collection of games because this is virtually certain to be cached.
-  return axios.get('/games?include=main')
+  const {collection, rawName} = parseGameId(gameId);
+  return axios.get(`/games?collection=${collection}`)
       .then(response => response.data as ClientGame[])
-      .then(games => games.find(game => game.key === gameId))
-      .then(game => game ? game.data : axios.get(`/games?id=${gameId}`)
-          .then(response => response.data as ClientGame[])
-          .then(games => {
-            if (games.length !== 1) {
-              throw new Error();
-            }
-            return games[0].data;
-          }));
+      .then(games => {
+        const game = games.find(game => game.key === `${collection}.${rawName}`);
+        if (game === undefined) {
+          throw new Error();
+        }
+        return game.data;
+      });
 }
 
 export function getGame(gameId: string): Promise<GameData> {

@@ -9,6 +9,7 @@ import {getEmpty} from '../common/generate';
 import {generateClues} from '../common/generateClues';
 import {getImageData, imageDataToGridData, loadFile} from '../common/importImage';
 import {Spec} from '../common/spec';
+import {bustCache} from './bustCache';
 import {gamesDb} from './db/gamesDb';
 import {getGame, getGameInternet} from './fetchGame';
 import {plotLine} from './plotLine';
@@ -16,11 +17,12 @@ import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';
 import {transactionToPromise} from './transactionToPromise';
 import {visualAnalyze} from './visualAnalyze';
 
+let collection = '';
 let data: boolean[][] = [];
 let gameId = '';
 let name = '';
 let spec: Spec = {width: 0, height: 0};
-let style = '';
+let style: string | undefined;
 let setStyle = '';
 let lastX = -1;
 let lastY = -1;
@@ -90,7 +92,7 @@ createNew.addEventListener('click', () => {
 });
 
 play.addEventListener('click', () => {
-  window.location.href = `/play?game=${gameId}`;
+  window.location.href = `/play?collection=${collection}&game=${gameId}`;
 });
 
 analyze.addEventListener('click', () => {
@@ -137,17 +139,17 @@ function repaint() {
 
   gridSize.value = JSON.stringify(spec);
 
-  colorScheme.value = style;
+  colorScheme.value = style || 'midnight';
 
   if (setStyle !== style) {
-    colorSchemeStylesheet.href = `/styles/color_schemes/${style}.css`;
-    setStyle = style;
+    colorSchemeStylesheet.href = `/styles/color_schemes/${colorScheme.value}.css`;
+    setStyle = colorScheme.value;
   }
 }
 
 function makeNewGame(spec_: Spec, replace: boolean) {
   const random = Alea();
-  gameId = `draft${random() * 10000 | 0}`;
+  gameId = `default.draft${Math.floor(random() * 10000)}`;
   const url = `edit?game=${gameId}`;
   if (replace) {
     window.history.replaceState({}, '', url);
@@ -170,7 +172,7 @@ gridSize.addEventListener('change', () => {
 });
 
 colorScheme.addEventListener('change', () => {
-  style = colorScheme.value;
+  style = colorScheme.value || undefined;
   setNeedsPublish(true);
   repaint();
   saveLocal();
@@ -257,16 +259,6 @@ importImageButton.addEventListener('click', () => {
       });
 });
 
-function bustCache(url: string) {
-  return axios.get(url, {
-    headers: {
-      'Cache-Control': 'no-cache',
-      Pragma: 'no-cache',
-      Expires: '0',
-    }
-  });
-}
-
 function addProgress() {
   const aside = document.body.getElementsByTagName('aside')[0];
   const progress = document.createElement('img');
@@ -282,7 +274,8 @@ publish.addEventListener('click', evt => {
 
   if (name === 'Untitled' || name === '') {
     name = prompt('Enter a name for your puzzle') || '';
-    repaint();
+    needsPublish = true;
+    saveLocal().then(repaint);
   }
   const data_: ClientGame = {
     key: gameId,
@@ -292,8 +285,7 @@ publish.addEventListener('click', evt => {
       name,
       style,
       needsPublish,
-      difficulty: -1,
-      tags: []
+      difficulty: -1
     }
   };
   axios.post('/publish', data_).then(response => response.data)
@@ -309,8 +301,7 @@ publish.addEventListener('click', evt => {
         }
         const oldId = gameId;
         gameId = obj.game.key as string;
-        Promise.all([bustCache('/games?include=main'),
-          bustCache(`/games?id=${gameId}`)])
+        bustCache(`/games?collection=${obj.game.collection}`)
             .then(() => gamesDb)
             .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(oldId))
             .then(transactionToPromise)
@@ -339,15 +330,13 @@ if (gameId) {
 }
 
 function saveLocal() {
-  console.trace(`saving ${gameId}`);
   const data_: GameData = {
     gridData: encode(data),
     spec,
     name,
     style,
     needsPublish,
-    difficulty: -1,
-    tags: []
+    difficulty: -1
   };
   return gamesDb
       .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data_, gameId))

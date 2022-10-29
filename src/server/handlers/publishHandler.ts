@@ -5,9 +5,11 @@ import {calculateDifficulty} from '../calculateDifficulty';
 import {getSignInUrl} from '../components/globalControls';
 import {GameInDb, gameToClientGame} from '../gameToClientGame';
 import {getEmail} from '../getEmail';
-import {getName} from '../getName';
+import {getUniqueRawName} from '../getName';
 import {getOAuth2} from '../getOAuth2';
 import {datastore} from '../globalDatastore';
+import {parseGameId} from '../parseGameId';
+import {userCanModify} from '../userCanModify';
 
 export const publishHandler: RequestHandler = async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
@@ -21,13 +23,19 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
   }
 
   const game = req.body as ClientGame;
-  let gameId = game.key;
 
-  const existingGame = await datastore.get(datastore.key(['game', gameId]))
-      .then(result => result[0] as GameInDb | undefined);
+  let {collection, rawName} = parseGameId(game.key);
+
+  if (!userCanModify(email, collection)) {
+    throw new Error();
+  }
+
+  const existingGame =
+      await datastore.get(datastore.key(['Collection', collection, 'Game', rawName]))
+          .then(result => result[0] as GameInDb | undefined);
 
   if (!existingGame || existingGame.creator !== email) {
-    gameId = await getName(game.data.name);
+    rawName = await getUniqueRawName(collection, game.data.name);
   }
 
   const spec = game.data.spec;
@@ -39,11 +47,10 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
     creator: email,
     difficulty: game.data.difficulty === -1 ?
         calculateDifficulty(spec, decode(spec, gridData)) : game.data.difficulty,
-    gridData,
-    tags: game.data.tags
+    gridData
   };
 
-  const key = datastore.key(['game', gameId]);
+  const key = datastore.key(['Collection', collection, 'Game', rawName]);
   await datastore.save({key, data});
 
   res.send(JSON.stringify({

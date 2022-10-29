@@ -1,5 +1,5 @@
 indexes:
-  - kind: game
+  - kind: Game
+    ancestor: yes
     properties:
-      - name: tags
       - name: difficulty

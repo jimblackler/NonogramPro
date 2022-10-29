@@ -9,7 +9,6 @@ import {addScripts} from '../manifest';
 export const listHandler: RequestHandler = async (req, res, next) => {
   const oAuth = await getOAuth2(req);
   const email = await getEmail(oAuth);
-
   await htmlRespond(req, res, {
     _class: '',
     addStyles: (document, parent) => {
@@ -49,26 +48,26 @@ export const listHandler: RequestHandler = async (req, res, next) => {
 
       createLink(document, buttonRow, '/', 'Main collection', req.originalUrl);
       createLink(document, buttonRow, '/?v=local', 'Local games', req.originalUrl);
-      createLink(document, buttonRow, '/?exclude=hidden', 'All games', req.originalUrl);
+      createLink(document, buttonRow, '/?collection=default', 'Default collection', req.originalUrl);
 
       const editSection = document.createElement('section');
       topRow.append(editSection);
       editSection.setAttribute('class', 'editSection');
       editSection.setAttribute('style', 'visibility: hidden');
 
-      const tagForm = document.createElement('form');
-      editSection.append(tagForm);
-      tagForm.setAttribute('class', 'tagForm');
+      const changeCollectionForm = document.createElement('form');
+      editSection.append(changeCollectionForm);
+      changeCollectionForm.setAttribute('class', 'changeCollectionForm');
 
-      const tagInput = document.createElement('input');
-      tagForm.append(tagInput);
-      tagInput.setAttribute('type', 'text');
-      tagInput.setAttribute('name', 'tag');
+      const input = document.createElement('input');
+      changeCollectionForm.append(input);
+      input.setAttribute('type', 'text');
+      input.setAttribute('name', 'collection');
 
-      const tagSubmit = document.createElement('input');
-      tagForm.append(tagSubmit);
-      tagSubmit.setAttribute('type', 'submit');
-      tagSubmit.setAttribute('value', 'Tag');
+      const submit = document.createElement('input');
+      changeCollectionForm.append(submit);
+      submit.setAttribute('type', 'submit');
+      submit.setAttribute('value', 'Collection');
 
       const ol = document.createElement('ol');
       parent.append(ol);

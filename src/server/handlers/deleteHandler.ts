@@ -4,6 +4,9 @@ import {getSignInUrl} from '../components/globalControls';
 import {getEmail} from '../getEmail';
 import {getOAuth2} from '../getOAuth2';
 import {datastore} from '../globalDatastore';
+import {parseGameId} from '../parseGameId';
+import secrets from '../secret/secrets.json';
+import {userCanModify} from '../userCanModify';
 
 export const deleteHandler: RequestHandler = async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
@@ -16,17 +19,21 @@ export const deleteHandler: RequestHandler = async (req, res, next) => {
     return;
   }
 
-  let gameId = req.body.gameId;
+  let {collection, rawName} = parseGameId(req.body.gameId);
 
-  const existingGame = await datastore.get(datastore.key(['game', gameId]))
-      .then(result => result[0] as GameData | undefined);
+  if (!userCanModify(email, collection)) {
+    throw new Error();
+  }
+  const existingGame =
+      await datastore.get(datastore.key(['Collection', collection, 'Game', rawName]))
+          .then(result => result[0] as GameData | undefined);
 
-  if (!existingGame || existingGame.creator !== email) {
+  if (!existingGame || (email !== secrets.administrator && existingGame.creator !== email)) {
     res.send(JSON.stringify({'exception': 'Not signed in'}, null, 2));
     return;
   }
 
-  await datastore.delete(datastore.key(['game', gameId]));
+  await datastore.delete(datastore.key(['Collection', collection, 'Game', rawName]));
 
-  res.send(JSON.stringify({gameId}, null, 2));
+  res.send(JSON.stringify({gameId: `${collection}.${rawName}`}, null, 2));
 };

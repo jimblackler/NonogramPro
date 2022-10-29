@@ -11,7 +11,6 @@ import {listHandler} from './handlers/listHandler';
 import {playHandler} from './handlers/playHandler';
 import {publishHandler} from './handlers/publishHandler';
 import {signOutHandler} from './handlers/signOutHandler';
-import {tagHandler} from './handlers/tagHandler';
 
 const app: Express = express();
 
@@ -33,7 +32,6 @@ app.route('/games').get(gamesHandler);
 app.route('/play').get(playHandler);
 app.route('/publish').post(publishHandler);
 app.route('/signOut').get(signOutHandler);
-app.route('/tag').post(tagHandler);
 app.route('/').get(listHandler);
 app.route('/dist/*').get((req, res) => {
   res.set('Cache-control', `public, max-age=${365 * 24 * 60 * 60}`);
