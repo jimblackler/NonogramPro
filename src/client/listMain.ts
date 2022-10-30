@@ -39,8 +39,11 @@ async function main() {
   const full = params.has('full');
 
   if (params.get('v') === 'local') {
-    const included = new Set<string>();
     {
+      const title = document.createElement('h2');
+      main.append(title);
+      title.append(`Games you're playing`);
+
       const list = document.createElement('ol');
       main.append(list);
       list.setAttribute('id', 'games');
@@ -51,8 +54,31 @@ async function main() {
 
       for (const gameId of plays) {
         getGame(gameId).then(game => {
-          included.add(gameId);
-          addGame(list, gameId, game, true, completed.has(gameId), full, () => {
+          if (!completed.has(gameId)) {
+            addGame(list, gameId, game, true, false, full, () => {
+            });
+          }
+        });
+      }
+      progress.remove();
+    }
+
+    {
+      const title = document.createElement('h2');
+      main.append(title);
+      title.append(`Games you've completed`);
+
+      const list = document.createElement('ol');
+      main.append(list);
+      list.setAttribute('id', 'games');
+
+      const progress = document.createElement('img');
+      list.append(progress);
+      progress.setAttribute('src', '/images/progress.svg');
+
+      for (const gameId of completed) {
+        getGame(gameId).then(game => {
+          addGame(list, gameId, game, true, true, full, () => {
           });
         });
       }
@@ -60,6 +86,10 @@ async function main() {
     }
 
     {
+      const title = document.createElement('h2');
+      main.append(title);
+      title.append(`Games you're creating`);
+
       const list = document.createElement('ol');
       main.append(list);
       list.setAttribute('id', 'games');
@@ -73,9 +103,6 @@ async function main() {
               .objectStore('games').index('byDifficulty').openCursor())
           .then(requestToAsyncGenerator)) {
         const key = result.primaryKey.toString();
-        if (included.has(key)) {
-          return;
-        }
         addGame(list, key, result.value, plays.has(key), completed.has(key), full, () => {
         });
       }
