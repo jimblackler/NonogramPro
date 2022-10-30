@@ -56,4 +56,9 @@ section.infoRow {
   display: flex;
   flex-wrap: wrap;
   gap: 2em;
+  justify-content: space-between;
+}
+
+section.infoRow a {
+  font-size: larger;
 }
