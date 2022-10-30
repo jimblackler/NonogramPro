@@ -18,10 +18,10 @@ section#controls {
 
 select {
   border: none;
+  color: white;
   font-size: large;
   height: 38px;
   width: 135px;
-  color: white;
 }
 
 g.labels text {
@@ -49,8 +49,8 @@ svg.main g.major line, svg.main g.outer line {
 }
 
 svg.mini g.major line, svg.mini g.outer line {
-  stroke-width: 1px;
   opacity: 0.5;
+  stroke-width: 1px;
 }
 
 svg.main g.minor line {
@@ -91,9 +91,9 @@ svg.mini {
 }
 
 div#dialog {
+  margin: 28px;
   position: absolute;
   top: 80px;
-  margin: 28px;
 }
 
 div#dialog header {
