@@ -28,8 +28,8 @@ function createThumbnail(parent: HTMLElement, game: GameData) {
   canvas.setAttribute('class', 'thumbnail');
 }
 
-function addGame(key: string, game: GameData, playing: boolean, completed: boolean,
-                 list: HTMLElement, full: boolean, clickListener: (evt: MouseEvent) => void) {
+function addGame(list: HTMLElement, key: string, game: GameData, playing: boolean,
+                 completed: boolean, full: boolean, clickListener: (evt: MouseEvent) => void) {
   const li = document.createElement('li');
   list.append(li);
 
@@ -153,7 +153,7 @@ async function main() {
     for (const gameId of plays) {
       getGame(gameId).then(game => {
         included.add(gameId);
-        addGame(gameId, game, true, completed.has(gameId), list, full, clickEvent)
+        addGame(list, gameId, game, true, completed.has(gameId), full, clickEvent)
       });
     }
 
@@ -165,7 +165,7 @@ async function main() {
       if (included.has(key)) {
         return;
       }
-      addGame(key, result.value, plays.has(key), completed.has(key), list, full, clickEvent);
+      addGame(list, key, result.value, plays.has(key), completed.has(key), full, clickEvent);
     }
     progress.remove();
   } else {
@@ -203,8 +203,7 @@ async function main() {
           });
 
           for (let game of games) {
-            addGame(game.key, game.data, plays.has(game.key), completed.has(game.key), list, full,
-                clickEvent);
+            addGame(list, game.key, game.data, plays.has(game.key), completed.has(game.key), full, clickEvent);
           }
         })
         .catch(e => {
