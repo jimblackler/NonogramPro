@@ -10,6 +10,7 @@ header {
   display: flex;
   flex-direction: column;
   gap: 1em;
+  max-width: 60em;
   padding: 2em;
 }
 
@@ -63,6 +64,13 @@ ol#games {
 ol#games li {
   display: flex;
   list-style-type: none;
+}
+
+ol#games a.createGame {
+  align-items: center;
+  background: darkred;
+  min-height: 5em;
+  padding: 0.5em;
 }
 
 ol#games a {
@@ -160,3 +168,5 @@ form.tagForm {
   display: flex;
   gap: 1em;
 }
+
+

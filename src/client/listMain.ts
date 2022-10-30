@@ -106,6 +106,15 @@ async function main() {
         addGame(list, key, result.value, plays.has(key), completed.has(key), full, () => {
         });
       }
+      const li = document.createElement('li');
+      list.append(li);
+
+      const a = document.createElement('a');
+      li.append(a);
+      a.setAttribute('class', 'createGame');
+      a.setAttribute('href', '/edit');
+      a.append('Create a game');
+
       progress.remove();
     }
   } else {
