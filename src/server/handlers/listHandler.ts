@@ -48,7 +48,6 @@ export const listHandler: RequestHandler = async (req, res, next) => {
 
       createLink(document, buttonRow, '/', 'Main collection', req.originalUrl);
       createLink(document, buttonRow, '/?v=local', 'Local games', req.originalUrl);
-      createLink(document, buttonRow, '/?collection=default', 'Default collection', req.originalUrl);
 
       const editSection = document.createElement('section');
       topRow.append(editSection);
