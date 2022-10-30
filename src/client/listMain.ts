@@ -14,13 +14,6 @@ import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 
 async function main() {
   const main = assertNotNull(document.getElementsByTagName('main')[0]);
-  const list = document.createElement('ol');
-  main.append(list);
-  list.setAttribute('id', 'games');
-
-  const progress = document.createElement('img');
-  list.append(progress);
-  progress.setAttribute('src', '/images/progress.svg');
 
   const editSection = assertIs(HTMLElement, document.body.querySelector('section.editSection'));
 
@@ -47,27 +40,56 @@ async function main() {
 
   if (params.get('v') === 'local') {
     const included = new Set<string>();
-    for (const gameId of plays) {
-      getGame(gameId).then(game => {
-        included.add(gameId);
-        addGame(list, gameId, game, true, completed.has(gameId), full, () => {
+    {
+      const list = document.createElement('ol');
+      main.append(list);
+      list.setAttribute('id', 'games');
+
+      const progress = document.createElement('img');
+      list.append(progress);
+      progress.setAttribute('src', '/images/progress.svg');
+
+      for (const gameId of plays) {
+        getGame(gameId).then(game => {
+          included.add(gameId);
+          addGame(list, gameId, game, true, completed.has(gameId), full, () => {
+          });
         });
-      });
+      }
+      progress.remove();
     }
 
-    for await (const result of await gamesDb
-        .then(db => db.transaction('games', 'readonly')
-            .objectStore('games').index('byDifficulty').openCursor())
-        .then(requestToAsyncGenerator)) {
-      const key = result.primaryKey.toString();
-      if (included.has(key)) {
-        return;
+    {
+      const list = document.createElement('ol');
+      main.append(list);
+      list.setAttribute('id', 'games');
+
+      const progress = document.createElement('img');
+      list.append(progress);
+      progress.setAttribute('src', '/images/progress.svg');
+
+      for await (const result of await gamesDb
+          .then(db => db.transaction('games', 'readonly')
+              .objectStore('games').index('byDifficulty').openCursor())
+          .then(requestToAsyncGenerator)) {
+        const key = result.primaryKey.toString();
+        if (included.has(key)) {
+          return;
+        }
+        addGame(list, key, result.value, plays.has(key), completed.has(key), full, () => {
+        });
       }
-      addGame(list, key, result.value, plays.has(key), completed.has(key), full, () => {
-      });
+      progress.remove();
     }
-    progress.remove();
   } else {
+    const list = document.createElement('ol');
+    main.append(list);
+    list.setAttribute('id', 'games');
+
+    const progress = document.createElement('img');
+    list.append(progress);
+    progress.setAttribute('src', '/images/progress.svg');
+
     function clickEvent(evt: MouseEvent) {
       const li = evt.currentTarget;
       if (!(li instanceof HTMLLIElement)) {
