@@ -94,7 +94,11 @@ function addGame(list: HTMLElement, key: string, game: GameData, playing: boolea
 }
 
 async function main() {
-  const list = assertNotNull(document.getElementById('games'));
+  const main = assertNotNull(document.getElementsByTagName('main')[0]);
+  const list = document.createElement('ol');
+  main.append(list);
+  list.setAttribute('id', 'games');
+
   const progress = document.createElement('img');
   list.append(progress);
   progress.setAttribute('src', '/images/progress.svg');

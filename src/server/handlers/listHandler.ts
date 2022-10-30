@@ -68,10 +68,6 @@ export const listHandler: RequestHandler = async (req, res, next) => {
       changeCollectionForm.append(submit);
       submit.setAttribute('type', 'submit');
       submit.setAttribute('value', 'Collection');
-
-      const ol = document.createElement('ol');
-      parent.append(ol);
-      ol.setAttribute('id', 'games');
     },
     addScripts: (document, parent) => {
       addScripts(document, parent, 'listMain');
