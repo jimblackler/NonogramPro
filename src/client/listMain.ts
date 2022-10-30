@@ -57,7 +57,7 @@ function addGame(key: string, game: GameData, playing: boolean, completed: boole
     name.append(game.name);
   }
 
-  if (game.creator) {
+  if (game.creator && game.creator !== 'auto') {
     const creator = document.createElement('span');
     section.append(creator);
     creator.setAttribute('class', 'creator');
