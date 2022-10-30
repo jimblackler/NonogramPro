@@ -69,7 +69,7 @@ ol#games a {
   border-radius: 1em;
   display: flex;
   overflow: hidden;
-  padding: 0.5em;
+  padding: 0.25em;
 }
 
 ol#games canvas.thumbnail {
@@ -79,6 +79,7 @@ ol#games canvas.thumbnail {
 ol#games section.puzzleInfo {
   display: flex;
   flex-direction: column;
+  gap: 0.5em;
   padding: 0.5em;
 }
 
@@ -121,6 +122,9 @@ button:hover:enabled, select:hover:enabled {
 span.name {
   flex-grow: 1;
   font-weight: bold;
+  max-height: 4em;
+  overflow: hidden;
+  text-overflow: ellipsis;
   width: 6em;
 }
 
