@@ -126,38 +126,13 @@ async function main() {
 
   const full = params.has('full');
 
-  function clickEvent(evt: MouseEvent) {
-    const li = evt.currentTarget;
-    if (!(li instanceof HTMLLIElement)) {
-      return;
-    }
-    if (!evt.ctrlKey && !evt.metaKey) {
-      return;
-    }
-    if (li.classList.contains('selected')) {
-      li.classList.remove('selected');
-    } else {
-      li.classList.add('selected');
-    }
-    const numberSelected = list.querySelectorAll('li.selected').length;
-    if (numberSelected === 0) {
-      if (editSection.style.getPropertyValue('visibility') === 'visible') {
-        editSection.style.setProperty('visibility', 'hidden');
-      }
-    } else {
-      if (editSection.style.getPropertyValue('visibility') === 'hidden') {
-        editSection.style.setProperty('visibility', 'visible');
-      }
-    }
-    evt.preventDefault();
-  }
-
   if (params.get('v') === 'local') {
     const included = new Set<string>();
     for (const gameId of plays) {
       getGame(gameId).then(game => {
         included.add(gameId);
-        addGame(list, gameId, game, true, completed.has(gameId), full, clickEvent)
+        addGame(list, gameId, game, true, completed.has(gameId), full, () => {
+        });
       });
     }
 
@@ -169,10 +144,37 @@ async function main() {
       if (included.has(key)) {
         return;
       }
-      addGame(list, key, result.value, plays.has(key), completed.has(key), full, clickEvent);
+      addGame(list, key, result.value, plays.has(key), completed.has(key), full, () => {
+      });
     }
     progress.remove();
   } else {
+    function clickEvent(evt: MouseEvent) {
+      const li = evt.currentTarget;
+      if (!(li instanceof HTMLLIElement)) {
+        return;
+      }
+      if (!evt.ctrlKey && !evt.metaKey) {
+        return;
+      }
+      if (li.classList.contains('selected')) {
+        li.classList.remove('selected');
+      } else {
+        li.classList.add('selected');
+      }
+      const numberSelected = list.querySelectorAll('li.selected').length;
+      if (numberSelected === 0) {
+        if (editSection.style.getPropertyValue('visibility') === 'visible') {
+          editSection.style.setProperty('visibility', 'hidden');
+        }
+      } else {
+        if (editSection.style.getPropertyValue('visibility') === 'hidden') {
+          editSection.style.setProperty('visibility', 'visible');
+        }
+      }
+      evt.preventDefault();
+    }
+
     const collection_ = assertNotNull(params.get('collection'));
     axios.get(`/games?collection=${collection_}`)
         .then(response => response.data as ClientGame[])
