@@ -4,7 +4,7 @@ import {getSignInUrl} from '../components/globalControls';
 import {getEmail} from '../getEmail';
 import {getOAuth2} from '../getOAuth2';
 import {datastore} from '../globalDatastore';
-import {parseGameId} from '../parseGameId';
+import {parseGameId} from '../../common/parseGameId';
 import secrets from '../secret/secrets.json';
 import {userCanModify} from '../userCanModify';
 

@@ -3,7 +3,7 @@ import {assertIs} from '../common/check/is';
 import {assertNotNull} from '../common/check/null';
 import {assertString} from '../common/check/string';
 import {ClientGame} from '../common/gameData';
-import {parseGameId} from '../server/parseGameId';
+import {parseGameId} from '../common/parseGameId';
 import {bustCache} from './bustCache';
 import {completedDb} from './db/completedDb';
 import {gamesDb} from './db/gamesDb';

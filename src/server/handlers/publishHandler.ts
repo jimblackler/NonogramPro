@@ -8,7 +8,7 @@ import {getEmail} from '../getEmail';
 import {getUniqueRawName} from '../getName';
 import {getOAuth2} from '../getOAuth2';
 import {datastore} from '../globalDatastore';
-import {parseGameId} from '../parseGameId';
+import {parseGameId} from '../../common/parseGameId';
 import {userCanModify} from '../userCanModify';
 
 export const publishHandler: RequestHandler = async (req, res, next) => {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import {ClientGame, GameData} from '../common/gameData';
-import {parseGameId} from '../server/parseGameId';
+import {parseGameId} from '../common/parseGameId';
 import {gamesDb} from './db/gamesDb';
 import {transactionToPromise} from './transactionToPromise';
 
