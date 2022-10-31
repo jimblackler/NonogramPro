@@ -1,4 +1,5 @@
 import axios from 'axios';
+import {isDefined} from '../common/check/defined';
 import {assertIs} from '../common/check/is';
 import {assertNotNull} from '../common/check/null';
 import {assertString} from '../common/check/string';
@@ -28,7 +29,9 @@ async function main() {
   for await (const currentTarget of await completedDb
       .then(db => db.transaction('completed', 'readonly').objectStore('completed').openCursor())
       .then(requestToAsyncGenerator)) {
-    completed.add(currentTarget.key.toString());
+    const gameId = currentTarget.key.toString();
+    completed.add(gameId);
+    plays.delete(gameId);
   }
 
   // For aesthetic reasons the nude URL is equivalent to include=main.
@@ -39,7 +42,10 @@ async function main() {
   const full = params.has('full');
 
   if (params.get('v') === 'local') {
-    {
+    const playData = (await Promise.all([...plays].map(
+        gameId => getGame(gameId)
+            .then(game => ({gameId, game})).catch(() => undefined)))).filter(isDefined);
+    if (playData.length) {
       const title = document.createElement('h2');
       main.append(title);
       title.append(`Games you're playing`);
@@ -47,23 +53,16 @@ async function main() {
       const list = document.createElement('ol');
       main.append(list);
       list.setAttribute('id', 'games');
-
-      const progress = document.createElement('img');
-      list.append(progress);
-      progress.setAttribute('src', '/images/progress.svg');
-
-      for (const gameId of plays) {
-        getGame(gameId).then(game => {
-          if (!completed.has(gameId)) {
-            addGame(list, gameId, game, true, false, full, () => {
-            });
-          }
+      for (const {gameId, game} of playData) {
+        addGame(list, gameId, game, true, false, full, () => {
         });
       }
-      progress.remove();
     }
 
-    {
+    const completedData = (await Promise.all([...completed].map(
+        gameId => getGame(gameId)
+            .then(game => ({gameId, game})).catch(() => undefined)))).filter(isDefined);
+    if (completedData.length) {
       const title = document.createElement('h2');
       main.append(title);
       title.append(`Games you've completed`);
@@ -72,17 +71,10 @@ async function main() {
       main.append(list);
       list.setAttribute('id', 'games');
 
-      const progress = document.createElement('img');
-      list.append(progress);
-      progress.setAttribute('src', '/images/progress.svg');
-
-      for (const gameId of completed) {
-        getGame(gameId).then(game => {
-          addGame(list, gameId, game, true, true, full, () => {
-          });
+      for (const {game, gameId} of completedData) {
+        addGame(list, gameId, game, true, true, full, () => {
         });
       }
-      progress.remove();
     }
 
     {
