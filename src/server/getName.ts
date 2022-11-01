@@ -10,7 +10,7 @@ function randomId() {
 }
 
 export async function getUniqueRawName(collection: string, input: string) {
-  let nameStub = nameToId(input.toLowerCase());
+  let nameStub = nameToId(input);
   if (!nameStub) {
     nameStub = randomId();
   }

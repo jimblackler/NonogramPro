@@ -342,3 +342,5 @@ function saveLocal() {
       .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data_, gameId))
       .then(transactionToPromise);
 }
+
+require('./requestScreenName');

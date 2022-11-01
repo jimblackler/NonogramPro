@@ -1,6 +1,7 @@
 import {Request} from 'express';
 import {OAuth2Client} from 'google-auth-library';
 import {Document, HTMLElement} from '../../common/domStreamTypes';
+import {UserInfo} from '../userInfo';
 
 export function getSignInUrl(req: Request, oAuth: OAuth2Client) {
   return oAuth.generateAuthUrl({
@@ -14,7 +15,7 @@ export function getSignInUrl(req: Request, oAuth: OAuth2Client) {
 }
 
 export function addGlobalControls(document: Document, parent: HTMLElement, req: Request,
-                                  oAuth: OAuth2Client, email?: string) {
+                                  oAuth: OAuth2Client, email?: string, userInfo?: UserInfo) {
   const section = document.createElement('section');
   parent.append(section);
   section.setAttribute('class', 'infoRow');
@@ -36,7 +37,7 @@ export function addGlobalControls(document: Document, parent: HTMLElement, req: 
     const anchor = document.createElement('a');
     section.append(anchor);
     anchor.setAttribute('href', `/signOut?return=${encodeURIComponent(req.path)}`);
-    anchor.append(`Sign out ${email}`);
+    anchor.append(`Sign out ${userInfo ? userInfo.screenName : email}`);
   } else {
     const anchor = document.createElement('a');
     section.append(anchor);

@@ -1,12 +1,22 @@
 import {Request, Response} from 'express';
+import {OAuth2Client} from 'google-auth-library';
+import {ClientPageData} from '../common/clientPageData';
 import {Document, HTMLElement} from '../common/domStreamTypes';
 import {DomStream} from './domStream';
+import {getEmail} from './getEmail';
+import {getOAuth2} from './getOAuth2';
+import {datastore} from './globalDatastore';
+import {getValidAndUniqueScreenName} from './screenNameGenerator';
+import {suggestScreenName} from './suggestScreenName';
+import {UserInfo} from './userInfo';
 
 interface HtmlRespondClient {
   _class: string,
   addStyles: (document: Document, parent: HTMLElement) => void,
-  addHeader: (document: Document, parent: HTMLElement) => void,
-  addMain: (document: Document, parent: HTMLElement) => void,
+  addHeader: (document: Document, parent: HTMLElement, oAuth: OAuth2Client, email?: string,
+              userInfo?: UserInfo) => void,
+  addMain: (document: Document, parent: HTMLElement, oAuth: OAuth2Client, email?: string,
+            userInfo?: UserInfo) => void,
   addScripts: (document: Document, parent: HTMLElement) => void
 }
 
@@ -44,13 +54,19 @@ export async function htmlRespond(req: Request, res: Response, client: HtmlRespo
   const body = document.body;
   body.setAttribute('class', client._class);
 
+  const oAuth = await getOAuth2(req);
+  const email = await getEmail(oAuth);
+  const userInfo = email ?
+      await datastore.get(datastore.key(['UserInfo', email]))
+          .then(result => result[0] as UserInfo | undefined) : undefined;
+
   const header = document.createElement('header');
   body.append(header);
-  client.addHeader(document, header);
+  client.addHeader(document, header, oAuth, email, userInfo);
 
   const main = document.createElement('main');
   body.append(main);
-  client.addMain(document, main);
+  client.addMain(document, main, oAuth, email, userInfo);
 
   const div = document.createElement('div');
   body.append(div);
@@ -66,7 +82,15 @@ export async function htmlRespond(req: Request, res: Response, client: HtmlRespo
   div.append(dialogContent);
   dialogContent.setAttribute('id', 'dialog_content');
 
-  client.addScripts(document, body);
+  const clientPageData: ClientPageData = {
+    suggestedScreenName: email &&
+    !userInfo ? await getValidAndUniqueScreenName(suggestScreenName(email)) : undefined
+  };
 
+  const script = document.createElement('script');
+  body.append(script);
+  script.append(`globalThis.clientPageData=${JSON.stringify(clientPageData)}`);
+
+  client.addScripts(document, body);
   domStream.end();
 }

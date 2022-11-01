@@ -1,8 +1,6 @@
 import {Request, Response} from 'express';
 import {Document, HTMLElement} from '../common/domStreamTypes';
 import {addGlobalControls} from './components/globalControls';
-import {getEmail} from './getEmail';
-import {getOAuth2} from './getOAuth2';
 import {htmlRespond} from './htmlRespond';
 
 interface HasGridHtmlRespondClient {
@@ -13,9 +11,6 @@ interface HasGridHtmlRespondClient {
 
 export async function hasGridHtmlRespond(
     req: Request, res: Response, client: HasGridHtmlRespondClient) {
-  const oAuth = await getOAuth2(req);
-  const email = await getEmail(oAuth);
-
   await htmlRespond(req, res, {
     _class: client._class,
     addStyles: (document, parent) => {
@@ -31,7 +26,7 @@ export async function hasGridHtmlRespond(
     },
     addHeader: (document, parent) => {
     },
-    addMain: (document, parent) => {
+    addMain: (document, parent, oAuth, email, userInfo) => {
       const svg = document.createElement('svg');
       parent.append(svg);
       svg.setAttribute('id', 'game');
@@ -45,7 +40,7 @@ export async function hasGridHtmlRespond(
 
       const aside = document.createElement('aside');
       parent.append(aside);
-      addGlobalControls(document, aside, req, oAuth, email);
+      addGlobalControls(document, aside, req, oAuth, email, userInfo);
 
       client.addControls(document, aside);
 

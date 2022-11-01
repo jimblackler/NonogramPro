@@ -1,14 +1,10 @@
 import {RequestHandler} from 'express';
 import {addGlobalControls} from '../components/globalControls';
 import {createLink} from '../components/linkButton';
-import {getEmail} from '../getEmail';
-import {getOAuth2} from '../getOAuth2';
 import {htmlRespond} from '../htmlRespond';
 import {addScripts} from '../manifest';
 
 export const listHandler: RequestHandler = async (req, res, next) => {
-  const oAuth = await getOAuth2(req);
-  const email = await getEmail(oAuth);
   await htmlRespond(req, res, {
     _class: '',
     addStyles: (document, parent) => {
@@ -17,8 +13,8 @@ export const listHandler: RequestHandler = async (req, res, next) => {
       style.setAttribute('rel', 'stylesheet');
       style.setAttribute('href', '/styles/list.css');
     },
-    addHeader: (document, parent) => {
-      addGlobalControls(document, parent, req, oAuth, email);
+    addHeader: (document, parent, oAuth, email, userInfo) => {
+      addGlobalControls(document, parent, req, oAuth, email, userInfo);
       const section = document.createElement('section');
       parent.append(section);
       section.setAttribute('class', 'infoRow');
@@ -37,7 +33,7 @@ export const listHandler: RequestHandler = async (req, res, next) => {
         a.append('Design a game');
       }
     },
-    addMain: (document, parent) => {
+    addMain: (document, parent, oAuth, email, userInfo) => {
       const topRow = document.createElement('section');
       parent.append(topRow);
       topRow.setAttribute('class', 'topRow');

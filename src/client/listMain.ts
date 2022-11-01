@@ -190,3 +190,5 @@ async function main() {
 }
 
 main().then();
+
+require('./requestScreenName');
