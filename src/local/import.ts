@@ -2,12 +2,13 @@ import {readdir, readFile} from 'fs/promises';
 import {JSDOM} from 'jsdom';
 import path from 'path';
 import {encode} from '../common/encoder';
-import {GameData} from '../common/gameData';
+import {ClientGame, GameData} from '../common/gameData';
 import {getImageData, imageDataToGridData} from '../common/importImage';
 import {Spec} from '../common/spec';
 import {calculateDifficulty} from '../server/calculateDifficulty';
 import {getUniqueRawName} from '../server/getName';
 import {datastore} from '../server/globalDatastore';
+import tempReference from './tempReference.json';
 
 async function* getFiles(directory: string): AsyncGenerator<string> {
   for (const dirent of await readdir(directory, {withFileTypes: true})) {
@@ -36,6 +37,7 @@ export async function main() {
   const document = window.document;
   global.DOMParser = window.DOMParser;
   const path = '/Users/jimblackler/code/material-design-icons/src';
+  const license = 'https://github.com/google/material-design-icons#license';
 
   for await (const file of getFiles(path)) {
     if (!file.endsWith('.svg')) {
@@ -67,14 +69,15 @@ export async function main() {
 
               const data: GameData = {
                 name,
+                license,
                 spec,
-                style: 'midnight',
-                creator: 'auto',
                 difficulty,
                 gridData: gridDataEncoded
               };
 
-              const collection = 'imported';
+              const collection =
+                  tempReference.some((game: ClientGame) =>
+                      game.data.gridData === gridDataEncoded) ? 'main' : 'imported';
               getUniqueRawName(collection, stub)
                   .then(rawName => {
                     const key = datastore.key(['Collection', collection, 'Game', rawName]);

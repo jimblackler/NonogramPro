@@ -48,11 +48,11 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
     name.append(game.name);
   }
 
-  if (game.creator && game.creator !== 'auto') {
+  if (game.creatorScreenName) {
     const creator = document.createElement('span');
     section.append(creator);
     creator.setAttribute('class', 'creator');
-    creator.append(`by ${game.creator}`);
+    creator.append(`by ${game.creatorScreenName}`);
   }
 
   if (game.difficulty) {

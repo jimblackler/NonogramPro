@@ -3,8 +3,10 @@ import {Spec} from './spec';
 export interface GameData {
   name: string;
   gridData: string;
-  creator?: string;
+  creatorEmail?: string;
+  creatorScreenName?: string;
   difficulty: number;
+  license?: string;
   spec: Spec;
   style?: string;
   needsPublish?: boolean;

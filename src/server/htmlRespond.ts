@@ -83,6 +83,7 @@ export async function htmlRespond(req: Request, res: Response, client: HtmlRespo
   dialogContent.setAttribute('id', 'dialog_content');
 
   const clientPageData: ClientPageData = {
+    hardReload: req.headers.pragma === 'no-cache',
     suggestedScreenName: email &&
     !userInfo ? await getValidAndUniqueScreenName(suggestScreenName(email)) : undefined
   };

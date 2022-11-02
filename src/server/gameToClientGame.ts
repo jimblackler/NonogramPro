@@ -10,12 +10,14 @@ export function gameToClientGame(game: GameInDb): ClientGame {
   return {
     key: `${assertDefined(key.parent).name}.${key.name}`,
     data: {
-      creator: game.creator,
+      // Does not send creator email.
+      creatorScreenName: game.creatorScreenName,
       difficulty: game.difficulty,
       gridData: game.gridData,
       spec: game.spec,
       name: game.name,
-      style: game.style
+      style: game.style,
+      license: game.license
     }
   };
 }

@@ -3,6 +3,7 @@ import {isDefined} from '../common/check/defined';
 import {assertIs} from '../common/check/is';
 import {assertNotNull} from '../common/check/null';
 import {assertString} from '../common/check/string';
+import {ClientPageData} from '../common/clientPageData';
 import {ClientGame} from '../common/gameData';
 import {parseGameId} from '../common/parseGameId';
 import {bustCache} from './bustCache';
@@ -12,6 +13,10 @@ import {playsDb} from './db/playsDb';
 import {getGame} from './fetchGame';
 import {addGame} from './gameInList';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
+
+declare global {
+  const clientPageData: ClientPageData;
+}
 
 async function main() {
   const main = assertNotNull(document.getElementsByTagName('main')[0]);
@@ -44,7 +49,10 @@ async function main() {
   if (params.get('v') === 'local') {
     const playData = (await Promise.all([...plays].map(
         gameId => getGame(gameId)
-            .then(game => ({gameId, game})).catch(() => undefined)))).filter(isDefined);
+            .then(game => ({gameId, game})).catch(err => {
+              console.error(err);
+              return undefined;
+            })))).filter(isDefined);
     if (playData.length) {
       const title = document.createElement('h2');
       main.append(title);
@@ -145,7 +153,13 @@ async function main() {
     }
 
     const collection_ = assertNotNull(params.get('collection'));
-    axios.get(`/games?collection=${collection_}`)
+    axios.get(`/games?collection=${collection_}`, clientPageData.hardReload ? {
+      headers: {
+        'Cache-Control': 'no-cache',
+        Pragma: 'no-cache',
+        Expires: '0',
+      }
+    } : {})
         .then(response => response.data as ClientGame[])
         .then(games => {
           const changeCollectionForm =
