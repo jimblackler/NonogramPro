@@ -32,59 +32,87 @@ function gameExists(gridDataEncoded: string) {
       .then(result => result[0].length !== 0);
 }
 
+interface ImageSet {
+  path: string;
+  license: string;
+  namePathOffset: number;
+}
+
 export async function main() {
   const window = new JSDOM().window;
   const document = window.document;
   global.DOMParser = window.DOMParser;
-  const path = '/Users/jimblackler/code/material-design-icons/src';
-  const license = 'https://github.com/google/material-design-icons#license';
 
-  for await (const file of getFiles(path)) {
-    if (!file.endsWith('.svg')) {
-      continue;
-    }
+  const imageSets: { [key: string]: ImageSet } = {
+    oct: {
+      path: '/Users/jimblackler/code/octicons/icons',
+      license: 'https://github.com/primer/octicons/blob/main/LICENSE',
+      namePathOffset: 1
+    },
+    ionic: {
+      path: '/Users/jimblackler/code/ionicons/src/svg',
+      license: 'https://github.com/ionic-team/ionicons/blob/main/LICENSE',
+      namePathOffset: 1
+    },
+    material: {
+      path: '/Users/jimblackler/code/material-design-icons/src',
+      license: 'https://github.com/google/material-design-icons#license',
+      namePathOffset: 3
+    },
+  };
 
-    readFile(file).then(result => getImageData('image/svg+xml', result.buffer, document))
-        .then(imageData => {
+  for (const [imageSetName, imageSet] of Object.entries(imageSets)) {
+    for await (const file of getFiles(imageSet.path)) {
+      if (!file.endsWith('.svg')) {
+        continue;
+      }
 
-          [5, 10, 20, 25, 30].forEach(size => {
-            const spec: Spec = {width: size, height: size};
-            const gridData = imageDataToGridData(imageData, spec);
-            const difficulty = calculateDifficulty(spec, gridData);
+      readFile(file).then(result => getImageData('image/svg+xml', result.buffer, document))
+          .then(imageData => {
+            [5, 10, 20, 25, 30].forEach(size => {
+              const spec: Spec = {width: size, height: size};
+              const gridData = imageDataToGridData(imageData, spec);
+              const difficulty = calculateDifficulty(spec, gridData);
 
-            if (!difficulty) {
-              console.log('Cannot be completed with standard method.');
-              return;
-            }
-            const parts = file.split('/');
-            const stub = parts[parts.length - 3];
-            const name = stub.split('_')
-                .map(part => part.substring(0, 1).toUpperCase() + part.substring(1)).join(' ');
-            console.log(`Requires ${difficulty} rounds to complete with standard method.`);
-            const gridDataEncoded = encode(gridData);
-            gameExists(gridDataEncoded).then(exists => {
-              if (exists) {
+              if (!difficulty) {
+                console.log('Cannot be completed with standard method.');
                 return;
               }
+              const parts = file.split('/');
+              const originalStub = parts[parts.length - imageSet.namePathOffset];
+              const dotPosition = originalStub.indexOf('.');
+              const stub =
+                  dotPosition === -1 ? originalStub : originalStub.substring(0, dotPosition);
+              const name = stub.split('_')
+                  .map(part => part.substring(0, 1).toUpperCase() + part.substring(1)).join(' ');
+              console.log(
+                  `${name} Requires ${difficulty} rounds to complete with standard method.`);
+              const gridDataEncoded = encode(gridData);
+              gameExists(gridDataEncoded).then(exists => {
+                if (exists) {
+                  console.log('exists');
+                  return;
+                }
 
-              const data: GameData = {
-                name,
-                license,
-                spec,
-                difficulty,
-                gridData: gridDataEncoded
-              };
+                const data: GameData = {
+                  name,
+                  license: imageSet.license,
+                  spec,
+                  difficulty,
+                  gridData: gridDataEncoded
+                };
 
-              const collection =
-                  tempReference.some((game: ClientGame) =>
-                      game.data.gridData === gridDataEncoded) ? 'main' : 'imported';
-              getUniqueRawName(collection, stub)
-                  .then(rawName => {
-                    const key = datastore.key(['Collection', collection, 'Game', rawName]);
-                    datastore.save({key, data});
-                  });
+                const collection =
+                    tempReference.some((game: ClientGame) =>
+                        game.data.gridData === gridDataEncoded) ? 'main' : imageSetName;
+                getUniqueRawName(collection, stub)
+                    .then(rawName => {
+                      const key = datastore.key(['Collection', collection, 'Game', rawName]);
+                      datastore.save({key, data});
+                    });
+              });
             });
-          });
-        })
+          })
+    }
   }
 }
