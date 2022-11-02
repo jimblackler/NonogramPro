@@ -3,9 +3,9 @@ export interface Complete {
 }
 
 export const completedDb: Promise<IDBDatabase> = new Promise((resolve, reject) => {
-  const request = indexedDB.open('completed-store', 2);
+  const request = indexedDB.open('completed-store', 3);
   request.addEventListener('upgradeneeded', event => {
-    if (event.oldVersion < 13) {
+    if (event.oldVersion < 3) {
       if (request.result.objectStoreNames.contains('completed')) {
         request.result.deleteObjectStore('completed');
       }
