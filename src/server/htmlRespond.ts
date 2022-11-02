@@ -85,7 +85,8 @@ export async function htmlRespond(req: Request, res: Response, client: HtmlRespo
   const clientPageData: ClientPageData = {
     hardReload: req.headers.pragma === 'no-cache',
     suggestedScreenName: email &&
-    !userInfo ? await getValidAndUniqueScreenName(suggestScreenName(email)) : undefined
+        !userInfo ? await getValidAndUniqueScreenName(suggestScreenName(email)) : undefined,
+    screenName: userInfo?.screenName
   };
 
   const script = document.createElement('script');

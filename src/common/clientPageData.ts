@@ -1,4 +1,5 @@
 export interface ClientPageData {
-  hardReload: boolean,
+  hardReload: boolean;
   suggestedScreenName?: string;
+  screenName?: string;
 }

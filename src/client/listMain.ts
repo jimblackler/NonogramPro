@@ -18,6 +18,91 @@ declare global {
   const clientPageData: ClientPageData;
 }
 
+function addCollectionList(main: HTMLElement, editSection: HTMLElement, collection: string,
+                           plays: Set<string>, completed: Set<string>, full: boolean) {
+  const list = document.createElement('ol');
+  main.append(list);
+  list.setAttribute('id', 'games');
+
+  const progress = document.createElement('img');
+  list.append(progress);
+  progress.setAttribute('src', '/images/progress.svg');
+
+  function clickEvent(evt: MouseEvent) {
+    const li = evt.currentTarget;
+    if (!(li instanceof HTMLLIElement)) {
+      return;
+    }
+    if (!evt.ctrlKey && !evt.metaKey) {
+      return;
+    }
+    if (li.classList.contains('selected')) {
+      li.classList.remove('selected');
+    } else {
+      li.classList.add('selected');
+    }
+    const numberSelected = list.querySelectorAll('li.selected').length;
+    if (numberSelected === 0) {
+      if (editSection.style.getPropertyValue('visibility') === 'visible') {
+        editSection.style.setProperty('visibility', 'hidden');
+      }
+    } else {
+      if (editSection.style.getPropertyValue('visibility') === 'hidden') {
+        editSection.style.setProperty('visibility', 'visible');
+      }
+    }
+    evt.preventDefault();
+  }
+
+  axios.get(`/games?collection=${collection}`, clientPageData.hardReload ? {
+    headers: {
+      'Cache-Control': 'no-cache',
+      Pragma: 'no-cache',
+      Expires: '0',
+    }
+  } : {})
+      .then(response => response.data as ClientGame[])
+      .then(games => {
+        const changeCollectionForm =
+            assertIs(HTMLFormElement, document.body.querySelector('form.changeCollectionForm'));
+        changeCollectionForm.addEventListener('submit', evt => {
+          const gameIds = [...list.querySelectorAll('li.selected')].map(li => {
+            const anchor = assertNotNull(li.querySelector('a'));
+            const url = new URL(anchor.href);
+            return assertString(url.searchParams.get('game'));
+          });
+          const formData = new FormData(changeCollectionForm);
+          const newCollection = formData.get('collection');
+          Promise.all(gameIds.map(gameId => {
+            const clientGame = games.find(game => game.key === gameId);
+            if (!clientGame) {
+              throw new Error();
+            }
+            const {collection, rawName} = parseGameId(gameId);
+            const newClientGame: ClientGame = {
+              key: `${newCollection}.${rawName}`,
+              data: clientGame.data
+            };
+            return axios.post('/publish', newClientGame)
+                .then(response => response.data)
+                .then(() => axios.post('/delete', {gameId}));
+          })).then(() => bustCache(`/games?collection=${newCollection}`))
+              .then(() => bustCache(`/games?collection=${collection}`))
+              .then(() => location.reload());
+          evt.preventDefault();
+        });
+
+        for (let game of games) {
+          addGame(list, game.key, game.data, plays.has(game.key), completed.has(game.key), full, clickEvent);
+        }
+      })
+      .catch(e => {
+        console.error(e);
+        list.append(e.toString());
+      })
+      .finally(() => progress.remove());
+}
+
 async function main() {
   const main = assertNotNull(document.getElementsByTagName('main')[0]);
 
@@ -117,89 +202,16 @@ async function main() {
 
       progress.remove();
     }
-  } else {
-    const list = document.createElement('ol');
-    main.append(list);
-    list.setAttribute('id', 'games');
 
-    const progress = document.createElement('img');
-    list.append(progress);
-    progress.setAttribute('src', '/images/progress.svg');
-
-    function clickEvent(evt: MouseEvent) {
-      const li = evt.currentTarget;
-      if (!(li instanceof HTMLLIElement)) {
-        return;
-      }
-      if (!evt.ctrlKey && !evt.metaKey) {
-        return;
-      }
-      if (li.classList.contains('selected')) {
-        li.classList.remove('selected');
-      } else {
-        li.classList.add('selected');
-      }
-      const numberSelected = list.querySelectorAll('li.selected').length;
-      if (numberSelected === 0) {
-        if (editSection.style.getPropertyValue('visibility') === 'visible') {
-          editSection.style.setProperty('visibility', 'hidden');
-        }
-      } else {
-        if (editSection.style.getPropertyValue('visibility') === 'hidden') {
-          editSection.style.setProperty('visibility', 'visible');
-        }
-      }
-      evt.preventDefault();
+    if (clientPageData.screenName) {
+      const title = document.createElement('h2');
+      main.append(title);
+      title.append(`Games you've published`);
+      addCollectionList(main, editSection, clientPageData.screenName, plays, completed, full);
     }
-
-    const collection_ = assertNotNull(params.get('collection'));
-    axios.get(`/games?collection=${collection_}`, clientPageData.hardReload ? {
-      headers: {
-        'Cache-Control': 'no-cache',
-        Pragma: 'no-cache',
-        Expires: '0',
-      }
-    } : {})
-        .then(response => response.data as ClientGame[])
-        .then(games => {
-          const changeCollectionForm =
-              assertIs(HTMLFormElement, document.body.querySelector('form.changeCollectionForm'));
-          changeCollectionForm.addEventListener('submit', evt => {
-            const gameIds = [...list.querySelectorAll('li.selected')].map(li => {
-              const anchor = assertNotNull(li.querySelector('a'));
-              const url = new URL(anchor.href);
-              return assertString(url.searchParams.get('game'));
-            });
-            const formData = new FormData(changeCollectionForm);
-            const newCollection = formData.get('collection');
-            Promise.all(gameIds.map(gameId => {
-              const clientGame = games.find(game => game.key === gameId);
-              if (!clientGame) {
-                throw new Error();
-              }
-              const {collection, rawName} = parseGameId(gameId);
-              const newClientGame: ClientGame = {
-                key: `${newCollection}.${rawName}`,
-                data: clientGame.data
-              };
-              return axios.post('/publish', newClientGame)
-                  .then(response => response.data)
-                  .then(() => axios.post('/delete', {gameId}));
-            })).then(() => bustCache(`/games?collection=${newCollection}`))
-                .then(() => bustCache(`/games?collection=${collection_}`))
-                .then(() => location.reload());
-            evt.preventDefault();
-          });
-
-          for (let game of games) {
-            addGame(list, game.key, game.data, plays.has(game.key), completed.has(game.key), full, clickEvent);
-          }
-        })
-        .catch(e => {
-          console.error(e);
-          list.append(e.toString());
-        })
-        .finally(() => progress.remove());
+  } else {
+    addCollectionList(
+        main, editSection, assertNotNull(params.get('collection')), plays, completed, full);
   }
 }
 
