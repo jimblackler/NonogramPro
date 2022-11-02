@@ -89,7 +89,8 @@ function addCollectionList(main: HTMLElement, editSection: HTMLElement, collecti
         });
 
         for (let game of games) {
-          addGame(list, game.key, game.data, plays.has(game.key), completed.has(game.key), full, clickEvent);
+          addGame(list, game.key, game.data, plays.has(game.key), completed.has(game.key),
+              full, clickEvent);
         }
       })
       .catch(e => {
