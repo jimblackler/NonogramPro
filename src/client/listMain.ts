@@ -3,7 +3,6 @@ import {isDefined} from '../common/check/defined';
 import {assertIs} from '../common/check/is';
 import {assertNotNull} from '../common/check/null';
 import {assertString} from '../common/check/string';
-import {ClientPageData} from '../common/clientPageData';
 import {ClientGame} from '../common/gameData';
 import {parseGameId} from '../common/parseGameId';
 import {bustCache} from './bustCache';
@@ -12,11 +11,8 @@ import {gamesDb} from './db/gamesDb';
 import {playsDb} from './db/playsDb';
 import {getGame} from './fetchGame';
 import {addGame} from './gameInList';
+import './globals';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
-
-declare global {
-  const clientPageData: ClientPageData;
-}
 
 function addCollectionList(main: HTMLElement, editSection: HTMLElement, collection: string,
                            plays: Set<string>, completed: Set<string>, full: boolean) {

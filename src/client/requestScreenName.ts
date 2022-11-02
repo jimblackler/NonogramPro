@@ -1,9 +1,5 @@
 import axios from 'axios';
-import {ClientPageData} from '../common/clientPageData';
-
-declare global {
-  const clientPageData: ClientPageData;
-}
+import './globals';
 
 function promptForName(suggestedName: string, question: string) {
   const requestedScreenName =

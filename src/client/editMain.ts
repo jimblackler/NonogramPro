@@ -3,11 +3,14 @@ import axios from 'axios';
 import {assertIs} from '../common/check/is';
 import {assertNotNull} from '../common/check/null';
 import {decode} from '../common/decoder';
+import {DeleteResponse} from '../common/deleteResponse';
 import {encode} from '../common/encoder';
 import {ClientGame, GameData} from '../common/gameData';
 import {getEmpty} from '../common/generate';
 import {generateClues} from '../common/generateClues';
 import {getImageData, imageDataToGridData, loadFile} from '../common/importImage';
+import {parseGameId} from '../common/parseGameId';
+import {PublishResponse} from '../common/publishResponse';
 import {Spec} from '../common/spec';
 import {bustCache} from './bustCache';
 import {gamesDb} from './db/gamesDb';
@@ -103,16 +106,20 @@ analyze.addEventListener('click', () => {
 delete_.addEventListener('click', () => {
   delete_.setAttribute('disabled', '');
   const progress = addProgress();
-  Promise.all([
-    // Local delete.
-    gamesDb
-        .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
-        .then(transactionToPromise),
-    // Server delete.
-    axios.post('/delete', {gameId})
-  ]).then(() => {
-    window.location.href = window.location.origin;
-  }).finally(() => {
+  const {collection, rawName} = parseGameId(gameId);
+  (collection === 'local' ?
+      gamesDb.then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
+          .then(transactionToPromise)
+      :
+      axios.post('/delete', {gameId}).then(response => response.data as DeleteResponse)
+          .then(response => {
+            if (response.error) {
+              alert(response.error);
+            }
+          }))
+      .then(() => {
+        window.location.href = window.location.origin;
+      }).finally(() => {
     progress.remove();
     delete_.removeAttribute('disabled');
   });
@@ -149,7 +156,7 @@ function repaint() {
 
 function makeNewGame(spec_: Spec, replace: boolean) {
   const random = Alea();
-  gameId = `default.draft${Math.floor(random() * 10000)}`;
+  gameId = `local.draft${Math.floor(random() * 10000)}`;
   const url = `edit?game=${gameId}`;
   if (replace) {
     window.history.replaceState({}, '', url);
@@ -288,24 +295,28 @@ publish.addEventListener('click', evt => {
       difficulty: -1
     }
   };
-  axios.post('/publish', data_).then(response => response.data)
+  axios.post('/publish', data_).then(response => response.data as PublishResponse)
       .then(obj => {
         if (obj.login) {
           setNeedsPublish(true);
           window.location.href = obj.login;
           return;
         }
-        if (obj.exception) {
-          alert(obj.exception);
+        if (obj.error) {
+          alert(obj.error);
           return;
         }
+        if (!obj.game) {
+          throw new Error();
+        }
         const oldId = gameId;
-        gameId = obj.game.key as string;
-        bustCache(`/games?collection=${obj.game.collection}`)
+        const newId = obj.game.key;
+        const {collection, rawName} = parseGameId(newId);
+        bustCache(`/games?collection=${collection}`)
             .then(() => gamesDb)
             .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(oldId))
             .then(transactionToPromise)
-            .then(() => window.history.replaceState({}, '', `edit?game=${gameId}`));
+            .then(() => window.history.replaceState({}, '', `edit?game=${newId}`));
 
       })
       .catch(() => setNeedsPublish(true))
@@ -338,6 +349,10 @@ function saveLocal() {
     needsPublish,
     difficulty: -1
   };
+  const {collection, rawName} = parseGameId(gameId);
+  if (collection !== 'local') {
+    throw new Error();
+  }
   return gamesDb
       .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data_, gameId))
       .then(transactionToPromise);

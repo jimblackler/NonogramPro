@@ -2,6 +2,7 @@ import {RequestHandler} from 'express';
 import {decode} from '../../common/decoder';
 import {ClientGame, GameData} from '../../common/gameData';
 import {parseGameId} from '../../common/parseGameId';
+import {PublishResponse} from '../../common/publishResponse';
 import {calculateDifficulty} from '../calculateDifficulty';
 import {getSignInUrl} from '../components/globalControls';
 import {GameInDb, gameToClientGame} from '../gameToClientGame';
@@ -19,7 +20,8 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
   const email = await getEmail(oAuth);
 
   if (!email) {
-    res.send(JSON.stringify({'login': getSignInUrl(req, oAuth)}, null, 2));
+    const publishResponse: PublishResponse = {'login': getSignInUrl(req, oAuth)};
+    res.send(JSON.stringify(publishResponse, null, 2));
     return;
   }
 
@@ -27,16 +29,16 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
       .then(result => result[0] as UserInfo | undefined);
 
   if (!userInfo) {
-    throw new Error();
+    const publishResponse: PublishResponse = {
+      error: 'Could not find user information'
+    };
+    res.send(JSON.stringify(publishResponse, null, 2));
+    return;
   }
 
   const game = req.body as ClientGame;
 
   let {collection, rawName} = parseGameId(game.key);
-
-  if (!userCanModify(email, collection)) {
-    throw new Error();
-  }
 
   const existingGame =
       await datastore.get(datastore.key(['Collection', collection, 'Game', rawName]))
@@ -45,6 +47,14 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
   if (!existingGame || existingGame.creatorEmail !== email) {
     collection = userInfo.screenName;
     rawName = await getUniqueRawName(collection, game.data.name);
+  }
+
+  if (!userCanModify(email, collection, userInfo)) {
+    const publishResponse: PublishResponse = {
+      error: `${userInfo.screenName} has no permission to publish to collection ${collection}`
+    };
+    res.send(JSON.stringify(publishResponse, null, 2));
+    return;
   }
 
   const spec = game.data.spec;
@@ -63,7 +73,8 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
   const key = datastore.key(['Collection', collection, 'Game', rawName]);
   await datastore.save({key, data});
 
-  res.send(JSON.stringify({
+  const publishResponse: PublishResponse = {
     game: gameToClientGame((await datastore.get(key))[0])
-  }, null, 2));
+  };
+  res.send(JSON.stringify(publishResponse, null, 2));
 };
