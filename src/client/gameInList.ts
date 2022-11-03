@@ -2,7 +2,7 @@ import {assertNotNull} from '../common/check/null';
 import {decode} from '../common/decoder';
 import {GameData} from '../common/gameData';
 
-function createThumbnail(parent: HTMLElement, game: GameData) {
+function addThumbnail(parent: HTMLElement, game: GameData) {
   const canvas = document.createElement('canvas');
   parent.append(canvas);
   const ctx = assertNotNull(canvas.getContext('2d'));
@@ -37,7 +37,7 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
       completed ? 'completed' : playing ? 'playing' : game.needsPublish ? 'draft' : 'unstarted');
 
   if (full) {
-    createThumbnail(anchor, game);
+    addThumbnail(anchor, game);
   }
 
   const section = document.createElement('section');
