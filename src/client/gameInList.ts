@@ -10,11 +10,15 @@ function createThumbnail(parent: HTMLElement, game: GameData) {
   canvas.width = game.spec.width * cellSize;
   canvas.height = game.spec.height * cellSize;
   ctx.fillStyle = 'lightblue';
-  decode(game.spec, game.gridData).forEach((row, rowNumber) => row.forEach((cell, columnNumber) => {
-    if (cell) {
-      ctx.fillRect(columnNumber * cellSize, rowNumber * cellSize, cellSize, cellSize);
-    }
-  }));
+  let rowNumber = 0;
+  for (const row of decode(game.spec, game.gridData)) {
+    row.forEach((cell, columnNumber) => {
+      if (cell) {
+        ctx.fillRect(columnNumber * cellSize, rowNumber * cellSize, cellSize, cellSize);
+      }
+    });
+    rowNumber++;
+  }
   canvas.setAttribute('class', 'thumbnail');
 }
 

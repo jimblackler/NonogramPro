@@ -231,7 +231,7 @@ svg.addEventListener('gridmove', evt => {
 
 function getGameFunction(game: GameData) {
   spec = game.spec;
-  data = decode(spec, game.gridData);
+  data = [...decode(spec, game.gridData)];
   name = game.name;
   style = game.style;
   setNeedsPublish(game.needsPublish || false);

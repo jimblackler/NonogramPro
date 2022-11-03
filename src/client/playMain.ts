@@ -142,7 +142,7 @@ getGame(gameId).then(result => {
   });
 
   const spec = result.spec;
-  const data = decode(spec, result.gridData);
+  const data = [...decode(spec, result.gridData)];
   const style = result.style || 'midnight';
   let on = getEmpty(spec);
   let off = getEmpty(spec);

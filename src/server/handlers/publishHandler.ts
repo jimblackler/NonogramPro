@@ -69,7 +69,7 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
     creatorEmail: email,
     creatorScreenName: userInfo.screenName,
     difficulty: game.data.difficulty === -1 ?
-        calculateDifficulty(spec, decode(spec, gridData)) : game.data.difficulty,
+        calculateDifficulty(spec, [...decode(spec, gridData)]) : game.data.difficulty,
     gridData
   };
 
