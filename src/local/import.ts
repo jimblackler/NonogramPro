@@ -35,7 +35,7 @@ function gameExists(gridDataEncoded: string) {
 interface ImageSet {
   path: string;
   license: string;
-  namePathOffset: number;
+  namePathOffset?: number;
 }
 
 export async function main() {
@@ -46,19 +46,25 @@ export async function main() {
   const imageSets: { [key: string]: ImageSet } = {
     oct: {
       path: '/Users/jimblackler/code/octicons/icons',
-      license: 'https://github.com/primer/octicons/blob/main/LICENSE',
-      namePathOffset: 1
+      license: 'https://github.com/primer/octicons/blob/main/LICENSE'
     },
     ionic: {
       path: '/Users/jimblackler/code/ionicons/src/svg',
-      license: 'https://github.com/ionic-team/ionicons/blob/main/LICENSE',
-      namePathOffset: 1
+      license: 'https://github.com/ionic-team/ionicons/blob/main/LICENSE'
     },
     material: {
       path: '/Users/jimblackler/code/material-design-icons/src',
       license: 'https://github.com/google/material-design-icons#license',
       namePathOffset: 3
     },
+    awesome: {
+      path: '/Users/jimblackler/code/Font-Awesome/svgs',
+      license: 'https://github.com/FortAwesome/Font-Awesome/blob/6.x/LICENSE.txt'
+    },
+    box: {
+      path: '/Users/jimblackler/code/boxicons/svg',
+      license: 'https://github.com/atisawd/boxicons/blob/master/LICENSE'
+    }
   };
 
   for (const [imageSetName, imageSet] of Object.entries(imageSets)) {
@@ -79,7 +85,7 @@ export async function main() {
                 return;
               }
               const parts = file.split('/');
-              const originalStub = parts[parts.length - imageSet.namePathOffset];
+              const originalStub = parts[parts.length - (imageSet.namePathOffset ?? 1)];
               const dotPosition = originalStub.indexOf('.');
               const stub =
                   dotPosition === -1 ? originalStub : originalStub.substring(0, dotPosition);
