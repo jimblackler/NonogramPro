@@ -9,6 +9,7 @@
     "start": "node dist/server/main.js",
     "start:dev": "nodemon dist/server/main.js",
     "start-delete-all": "node -e \"require('./dist/local/deleteAll').main()\"",
+    "start-delete-dupes": "node -e \"require('./dist/local/deleteDupes').main()\"",
     "start-import": "node -e \"require('./dist/local/import').main()\""
   },
   "dependencies": {
