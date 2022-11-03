@@ -40,12 +40,15 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
 
   let {collection, rawName} = parseGameId(game.key);
 
-  const existingGame =
+  if (collection === 'local') {
+    collection = userInfo.screenName;
+  }
+
+  const existingGame_ =
       await datastore.get(datastore.key(['Collection', collection, 'Game', rawName]))
           .then(result => result[0] as GameInDb | undefined);
 
-  if (!existingGame || existingGame.creatorEmail !== email) {
-    collection = userInfo.screenName;
+  if (!existingGame_) {
     rawName = await getUniqueRawName(collection, game.data.name);
   }
 
