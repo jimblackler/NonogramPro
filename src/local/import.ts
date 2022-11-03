@@ -1,11 +1,13 @@
 import {readdir, readFile} from 'fs/promises';
 import {JSDOM} from 'jsdom';
 import path from 'path';
+import {isDefined} from '../common/check/defined';
 import {encode} from '../common/encoder';
 import {ClientGame, GameData} from '../common/gameData';
 import {getImageData, imageDataToGridData} from '../common/importImage';
 import {Spec} from '../common/spec';
 import {calculateDifficulty} from '../server/calculateDifficulty';
+import {GameInDb} from '../server/gameToClientGame';
 import {getUniqueRawName} from '../server/getName';
 import {datastore} from '../server/globalDatastore';
 import tempReference from './tempReference.json';
@@ -23,15 +25,6 @@ async function* getFiles(directory: string): AsyncGenerator<string> {
 
 const checked = new Set<string>();
 
-function gameExists(gridDataEncoded: string) {
-  if (checked.has(gridDataEncoded)) {
-    return Promise.resolve(true);
-  }
-  checked.add(gridDataEncoded);
-  return datastore.createQuery('Game').filter('gridData', gridDataEncoded).run()
-      .then(result => result[0].length !== 0);
-}
-
 interface ImageSet {
   path: string;
   license: string;
@@ -42,6 +35,11 @@ export async function main() {
   const window = new JSDOM().window;
   const document = window.document;
   global.DOMParser = window.DOMParser;
+
+  const gridDatas = new Set<string>(
+      [...(await datastore.createQuery('Game').select('gridData').run()
+      .then(result => result[0] as Partial<GameInDb>[])
+      .then(games => games.map(game => game.gridData).filter(isDefined)))]);
 
   const imageSets: { [key: string]: ImageSet } = {
     oct: {
@@ -68,6 +66,9 @@ export async function main() {
   };
 
   for (const [imageSetName, imageSet] of Object.entries(imageSets)) {
+    if (imageSetName !== 'box') {
+      continue;
+    }
     for await (const file of getFiles(imageSet.path)) {
       if (!file.endsWith('.svg')) {
         continue;
@@ -94,29 +95,28 @@ export async function main() {
               console.log(
                   `${name} Requires ${difficulty} rounds to complete with standard method.`);
               const gridDataEncoded = encode(gridData);
-              gameExists(gridDataEncoded).then(exists => {
-                if (exists) {
-                  console.log('exists');
-                  return;
-                }
+              if (gridDatas.has(gridDataEncoded)) {
+                console.log('exists');
+                return;
+              }
+              gridDatas.add(gridDataEncoded);
 
-                const data: GameData = {
-                  name,
-                  license: imageSet.license,
-                  spec,
-                  difficulty,
-                  gridData: gridDataEncoded
-                };
+              const data: GameData = {
+                name,
+                license: imageSet.license,
+                spec,
+                difficulty,
+                gridData: gridDataEncoded
+              };
 
-                const collection =
-                    tempReference.some((game: ClientGame) =>
-                        game.data.gridData === gridDataEncoded) ? 'main' : imageSetName;
-                getUniqueRawName(collection, stub)
-                    .then(rawName => {
-                      const key = datastore.key(['Collection', collection, 'Game', rawName]);
-                      datastore.save({key, data});
-                    });
-              });
+              const collection =
+                  tempReference.some((game: ClientGame) =>
+                      game.data.gridData === gridDataEncoded) ? 'main' : imageSetName;
+              getUniqueRawName(collection, stub)
+                  .then(rawName => {
+                    const key = datastore.key(['Collection', collection, 'Game', rawName]);
+                    datastore.save({key, data});
+                  });
             });
           })
     }
