@@ -28,7 +28,7 @@ function gameExists(gridDataEncoded: string) {
     return Promise.resolve(true);
   }
   checked.add(gridDataEncoded);
-  return datastore.createQuery('game').filter('gridData', gridDataEncoded).run()
+  return datastore.createQuery('Game').filter('gridData', gridDataEncoded).run()
       .then(result => result[0].length !== 0);
 }
 
