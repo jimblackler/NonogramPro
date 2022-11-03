@@ -1,3 +1,4 @@
+import {entity} from '@google-cloud/datastore/build/src/entity';
 import {readdir, readFile} from 'fs/promises';
 import {JSDOM} from 'jsdom';
 import path from 'path';
@@ -38,8 +39,16 @@ export async function main() {
 
   const gridDatas = new Set<string>(
       [...(await datastore.createQuery('Game').select('gridData').run()
-      .then(result => result[0] as Partial<GameInDb>[])
-      .then(games => games.map(game => game.gridData).filter(isDefined)))]);
+          .then(result => result[0] as Partial<GameInDb>[])
+          .then(games => games.map(game => game.gridData).filter(isDefined)))]);
+
+  const usedNames = new Set<string>(
+      [...(await datastore.createQuery('Game').select('__key__').run()
+          .then(result => result[0] as Partial<GameInDb>[])
+          .then(games => games.map(game => {
+            const key = game[datastore.KEY];
+            return `${key?.parent?.name}.${key?.name}`;
+          }).filter(isDefined)))]);
 
   const imageSets: { [key: string]: ImageSet } = {
     oct: {
@@ -65,6 +74,16 @@ export async function main() {
     }
   };
 
+  const exists = (collection: string, rawName: string): boolean => {
+    const fullName = `${collection}.${rawName}`;
+    const had = usedNames.has(fullName);
+    usedNames.add(fullName);
+    return had;
+  };
+
+  let puzzles: { data: GameData; key: entity.Key }[] = [];
+  const allPromises: Promise<any>[] = [];
+
   for (const [imageSetName, imageSet] of Object.entries(imageSets)) {
     if (imageSetName !== 'box') {
       continue;
@@ -74,11 +93,17 @@ export async function main() {
         continue;
       }
 
-      readFile(file).then(result => getImageData('image/svg+xml', result.buffer, document))
+      await readFile(file).then(result => getImageData('image/svg+xml', result.buffer, document))
           .then(imageData => {
             [5, 10, 20, 25, 30].forEach(size => {
               const spec: Spec = {width: size, height: size};
               const gridData = imageDataToGridData(imageData, spec);
+              const gridDataEncoded = encode(gridData);
+              if (gridDatas.has(gridDataEncoded)) {
+                console.log('exists');
+                return;
+              }
+              gridDatas.add(gridDataEncoded);
               const difficulty = calculateDifficulty(spec, gridData);
 
               if (!difficulty) {
@@ -94,12 +119,7 @@ export async function main() {
                   .map(part => part.substring(0, 1).toUpperCase() + part.substring(1)).join(' ');
               console.log(
                   `${name} Requires ${difficulty} rounds to complete with standard method.`);
-              const gridDataEncoded = encode(gridData);
-              if (gridDatas.has(gridDataEncoded)) {
-                console.log('exists');
-                return;
-              }
-              gridDatas.add(gridDataEncoded);
+
 
               const data: GameData = {
                 name,
@@ -112,13 +132,19 @@ export async function main() {
               const collection =
                   tempReference.some((game: ClientGame) =>
                       game.data.gridData === gridDataEncoded) ? 'main' : imageSetName;
-              getUniqueRawName(collection, stub)
+              getUniqueRawName(collection, stub, exists)
                   .then(rawName => {
-                    const key = datastore.key(['Collection', collection, 'Game', rawName]);
-                    datastore.save({key, data});
+                    puzzles.push(
+                        {key: datastore.key(['Collection', collection, 'Game', rawName]), data});
+                    if (puzzles.length === 500) {
+                      allPromises.push(datastore.save(puzzles));
+                      puzzles = [];
+                    }
                   });
             });
           })
     }
   }
+  allPromises.push(datastore.save(puzzles));
+  await Promise.all(allPromises);
 }

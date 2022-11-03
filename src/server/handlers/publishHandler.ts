@@ -13,6 +13,11 @@ import {datastore} from '../globalDatastore';
 import {userCanModify} from '../userCanModify';
 import {UserInfo} from '../userInfo';
 
+function exists(collection: string, rawName: string): Promise<boolean> {
+  return datastore.get(datastore.key(['Collection', collection, 'Game', rawName]))
+      .then(result => result[0] === undefined);
+}
+
 export const publishHandler: RequestHandler = async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
 
@@ -49,7 +54,7 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
           .then(result => result[0] as GameInDb | undefined);
 
   if (!existingGame_) {
-    rawName = await getUniqueRawName(collection, game.data.name);
+    rawName = await getUniqueRawName(collection, game.data.name, exists);
   }
 
   if (!userCanModify(email, collection, userInfo)) {

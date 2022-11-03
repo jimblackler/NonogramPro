@@ -1,4 +1,3 @@
-import {datastore} from './globalDatastore';
 import {nameToId} from './nameToId';
 
 function randomId() {
@@ -9,10 +8,11 @@ function randomId() {
   return out.join('');
 }
 
-// This is a bit hacky. Mainly for the importer which was double allocating through race conditions.
-const checkedName = new Set<string>();
 
-export async function getUniqueRawName(collection: string, input: string) {
+export async function getUniqueRawName(
+    collection: string, input: string,
+    exists: (collection: string, rawName: string) => Promise<boolean> | boolean) {
+
   let nameStub = nameToId(input);
   if (!nameStub) {
     nameStub = randomId();
@@ -20,13 +20,8 @@ export async function getUniqueRawName(collection: string, input: string) {
   let appendNumber = 0;
   while (true) {
     const rawName = appendNumber ? `${nameStub}_${appendNumber}` : nameStub;
-    const fullName = `${collection}.${rawName}`;
-    if (!checkedName.has(fullName)) {
-      checkedName.add(fullName);
-      if (await datastore.get(datastore.key(['Collection', collection, 'Game', rawName]))
-          .then(result => result[0]) === undefined) {
-        return rawName;
-      }
+    if (!await exists(collection, rawName)) {
+      return rawName;
     }
     appendNumber++;
   }
