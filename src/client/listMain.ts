@@ -15,7 +15,8 @@ import './globals';
 import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 
 function addCollectionList(main: HTMLElement, editSection: HTMLElement, collection: string,
-                           plays: Set<string>, completed: Set<string>, full: boolean) {
+                           plays: Set<string>, completed: Set<string>, full: boolean,
+                           alphaSort:boolean) {
   const list = document.createElement('ol');
   main.append(list);
   list.setAttribute('id', 'games');
@@ -59,6 +60,9 @@ function addCollectionList(main: HTMLElement, editSection: HTMLElement, collecti
   } : {})
       .then(response => response.data as ClientGame[])
       .then(games => {
+        if (alphaSort) {
+          games.sort((a, b) => a.data.name < b.data.name ? -1 : 1);
+        }
         const changeCollectionForm =
             assertIs(HTMLFormElement, document.body.querySelector('form.changeCollectionForm'));
         changeCollectionForm.addEventListener('submit', evt => {
@@ -204,11 +208,12 @@ async function main() {
       const title = document.createElement('h2');
       main.append(title);
       title.append(`Games you've published`);
-      addCollectionList(main, editSection, clientPageData.screenName, plays, completed, full);
+      addCollectionList(main, editSection, clientPageData.screenName, plays, completed, full,
+          params.has('sort'));
     }
   } else {
-    addCollectionList(
-        main, editSection, assertNotNull(params.get('collection')), plays, completed, full);
+    addCollectionList(main, editSection, assertNotNull(params.get('collection')), plays, completed,
+        full, params.has('sort'));
   }
 }
 
