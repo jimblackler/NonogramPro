@@ -115,7 +115,6 @@ export async function main() {
               console.log(
                   `${name} Requires ${difficulty} rounds to complete with standard method.`);
 
-
               const data: GameData = {
                 name,
                 license: imageSet.license,
