@@ -99,8 +99,28 @@ ol#games li.selected canvas {
   filter: invert(1);
 }
 
-ol#games a.unstarted {
+ol#games a.unstarted.d5x5 {
   background: linear-gradient(purple, rebeccapurple);
+}
+
+ol#games a.unstarted.d10x10 {
+  background: linear-gradient(darkslateblue, dimgrey);
+}
+
+ol#games a.unstarted.d15x15 {
+  background: linear-gradient(saddlebrown, sienna);
+}
+
+ol#games a.unstarted.d20x20 {
+  background: linear-gradient(maroon, brown);
+}
+
+ol#games a.unstarted.d25x25 {
+  background: linear-gradient(slateblue, darkslateblue);
+}
+
+ol#games a.unstarted.d30x30 {
+  background: linear-gradient(indigo, darkmagenta);
 }
 
 ol#games a.playing {
@@ -167,5 +187,3 @@ form.tagForm {
   display: flex;
   gap: 1em;
 }
-
-

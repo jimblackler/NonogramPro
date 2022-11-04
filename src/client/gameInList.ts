@@ -33,8 +33,19 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
   const anchor = document.createElement('a');
   li.append(anchor);
   anchor.setAttribute('href', `/play?game=${key}`);
-  anchor.setAttribute('class',
-      completed ? 'completed' : playing ? 'playing' : game.needsPublish ? 'draft' : 'unstarted');
+  const classes: string[] = [];
+  if (completed) {
+    classes.push('completed');
+  } else if (playing) {
+    classes.push('playing');
+  } else if (game.needsPublish) {
+    classes.push('draft');
+  } else {
+    classes.push('unstarted');
+  }
+  classes.push(`d${game.spec.width}x${game.spec.height}`);
+
+  anchor.setAttribute('class', classes.join(' '));
 
   if (full) {
     addThumbnail(anchor, game);
