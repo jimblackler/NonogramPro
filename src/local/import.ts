@@ -24,8 +24,6 @@ async function* getFiles(directory: string): AsyncGenerator<string> {
   }
 }
 
-const checked = new Set<string>();
-
 interface ImageSet {
   path: string;
   license: string;
