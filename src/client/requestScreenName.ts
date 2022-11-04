@@ -2,8 +2,10 @@ import axios from 'axios';
 import './globals';
 
 function promptForName(suggestedName: string, question: string) {
-  const requestedScreenName =
-      prompt(question, suggestedName);
+  const requestedScreenName = prompt(question, suggestedName);
+  if (!requestedScreenName) {
+    return;
+  }
   axios.post('/setScreenName', {requestedScreenName})
       .then(response => response.data as string | undefined)
       .then(response => {
