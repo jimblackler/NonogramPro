@@ -15,7 +15,7 @@ import {UserInfo} from '../userInfo';
 
 function exists(collection: string, rawName: string): Promise<boolean> {
   return datastore.get(datastore.key(['Collection', collection, 'Game', rawName]))
-      .then(result => result[0] === undefined);
+      .then(result => result[0] !== undefined);
 }
 
 export const publishHandler: RequestHandler = async (req, res, next) => {
