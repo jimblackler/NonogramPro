@@ -16,7 +16,7 @@ import {requestToAsyncGenerator} from './requestToAsyncGenerator';
 
 function addCollectionList(main: HTMLElement, editSection: HTMLElement, collection: string,
                            plays: Set<string>, completed: Set<string>, full: boolean,
-                           alphaSort:boolean) {
+                           alphaSort: boolean) {
   const list = document.createElement('ol');
   main.append(list);
   list.setAttribute('id', 'games');
