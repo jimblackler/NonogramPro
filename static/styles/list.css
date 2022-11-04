@@ -100,23 +100,23 @@ ol#games li.selected canvas {
 }
 
 ol#games a.unstarted.d5x5 {
-  background: linear-gradient(purple, rebeccapurple);
+  background: linear-gradient(deeppink, darkmagenta);
 }
 
 ol#games a.unstarted.d10x10 {
-  background: linear-gradient(darkslateblue, dimgrey);
+  background: linear-gradient(cornflowerblue, indigo);
 }
 
 ol#games a.unstarted.d15x15 {
-  background: linear-gradient(saddlebrown, sienna);
+  background: linear-gradient(goldenrod, sienna);
 }
 
 ol#games a.unstarted.d20x20 {
-  background: linear-gradient(maroon, brown);
+  background: linear-gradient(indianred, maroon);
 }
 
 ol#games a.unstarted.d25x25 {
-  background: linear-gradient(slateblue, darkslateblue);
+  background: linear-gradient(blue, darkblue);
 }
 
 ol#games a.unstarted.d30x30 {
