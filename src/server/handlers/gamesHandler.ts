@@ -13,7 +13,8 @@ export const gamesHandler: RequestHandler = async (req, res, next) => {
 
   const query = datastore.createQuery('Game')
       .hasAncestor(datastore.key(['Collection', collection]))
-      .order('difficulty');
+      .order('difficulty')
+      .order('spec.width');
 
   res.send(JSON.stringify((await query.run()
       .then(result => result[0] as GameInDb[]))

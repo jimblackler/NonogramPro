@@ -3,3 +3,5 @@ indexes:
     ancestor: yes
     properties:
       - name: difficulty
+      - name: spec.width
+
