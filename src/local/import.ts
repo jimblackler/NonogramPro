@@ -83,9 +83,6 @@ export async function main() {
   const allPromises: Promise<any>[] = [];
 
   for (const [imageSetName, imageSet] of Object.entries(imageSets)) {
-    if (imageSetName !== 'box') {
-      continue;
-    }
     for await (const file of getFiles(imageSet.path)) {
       if (!file.endsWith('.svg')) {
         continue;
@@ -93,7 +90,7 @@ export async function main() {
 
       await readFile(file).then(result => getImageData('image/svg+xml', result.buffer, document))
           .then(imageData => {
-            [5, 10, 20, 25, 30].forEach(size => {
+            [5, 10, 15, 20, 25, 30].forEach(size => {
               const spec: Spec = {width: size, height: size};
               const gridData = imageDataToGridData(imageData, spec);
               const gridDataEncoded = encode(gridData);
