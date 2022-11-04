@@ -28,6 +28,7 @@ interface ImageSet {
   path: string;
   license: string;
   namePathOffset?: number;
+  transformName: (name: string) => string;
 }
 
 export async function main() {
@@ -51,24 +52,29 @@ export async function main() {
   const imageSets: { [key: string]: ImageSet } = {
     oct: {
       path: '/Users/jimblackler/code/octicons/icons',
-      license: 'https://github.com/primer/octicons/blob/main/LICENSE'
+      license: 'https://github.com/primer/octicons/blob/main/LICENSE',
+      transformName: name => name.substring(0, name.lastIndexOf('-')),
     },
     ionic: {
       path: '/Users/jimblackler/code/ionicons/src/svg',
-      license: 'https://github.com/ionic-team/ionicons/blob/main/LICENSE'
+      license: 'https://github.com/ionic-team/ionicons/blob/main/LICENSE',
+      transformName: name => name.split('-outline').join('').split('-sharp').join(''),
     },
     material: {
       path: '/Users/jimblackler/code/material-design-icons/src',
       license: 'https://github.com/google/material-design-icons#license',
-      namePathOffset: 3
+      namePathOffset: 3,
+      transformName: name => name
     },
     awesome: {
       path: '/Users/jimblackler/code/Font-Awesome/svgs',
-      license: 'https://github.com/FortAwesome/Font-Awesome/blob/6.x/LICENSE.txt'
+      license: 'https://github.com/FortAwesome/Font-Awesome/blob/6.x/LICENSE.txt',
+      transformName: name => name
     },
     box: {
       path: '/Users/jimblackler/code/boxicons/svg',
-      license: 'https://github.com/atisawd/boxicons/blob/master/LICENSE'
+      license: 'https://github.com/atisawd/boxicons/blob/master/LICENSE',
+      transformName: name => name.substring(name.indexOf('-') + 1)
     }
   };
 
@@ -106,11 +112,12 @@ export async function main() {
                 return;
               }
               const parts = file.split('/');
-              const originalStub = parts[parts.length - (imageSet.namePathOffset ?? 1)];
+              const originalStub =
+                  imageSet.transformName(parts[parts.length - (imageSet.namePathOffset ?? 1)]);
               const dotPosition = originalStub.indexOf('.');
               const stub =
                   dotPosition === -1 ? originalStub : originalStub.substring(0, dotPosition);
-              const name = stub.split('_')
+              const name = stub.split('_').map(s => s.split('-')).flat()
                   .map(part => part.substring(0, 1).toUpperCase() + part.substring(1)).join(' ');
               console.log(
                   `${name} Requires ${difficulty} rounds to complete with standard method.`);
