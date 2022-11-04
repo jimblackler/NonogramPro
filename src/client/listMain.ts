@@ -26,6 +26,9 @@ function addCollectionList(main: HTMLElement, editSection: HTMLElement, collecti
   progress.setAttribute('src', '/images/progress.svg');
 
   function clickEvent(evt: MouseEvent) {
+    if (!clientPageData.isAdmin) {
+      return;
+    }
     const li = evt.currentTarget;
     if (!(li instanceof HTMLLIElement)) {
       return;

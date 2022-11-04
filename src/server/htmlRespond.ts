@@ -7,6 +7,7 @@ import {getEmail} from './getEmail';
 import {getOAuth2} from './getOAuth2';
 import {datastore} from './globalDatastore';
 import {getValidAndUniqueScreenName} from './screenNameGenerator';
+import secrets from './secret/secrets.json';
 import {suggestScreenName} from './suggestScreenName';
 import {UserInfo} from './userInfo';
 
@@ -85,8 +86,9 @@ export async function htmlRespond(req: Request, res: Response, client: HtmlRespo
   const clientPageData: ClientPageData = {
     hardReload: req.headers.pragma === 'no-cache',
     suggestedScreenName: email &&
-        !userInfo ? await getValidAndUniqueScreenName(suggestScreenName(email)) : undefined,
-    screenName: userInfo?.screenName
+    !userInfo ? await getValidAndUniqueScreenName(suggestScreenName(email)) : undefined,
+    screenName: userInfo?.screenName,
+    isAdmin: email == secrets.administrator
   };
 
   const script = document.createElement('script');
