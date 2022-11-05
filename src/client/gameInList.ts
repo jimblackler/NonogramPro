@@ -43,7 +43,7 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
   } else {
     classes.push('unstarted');
   }
-  classes.push(`d${game.spec.width}x${game.spec.height}`);
+  classes.push(`difficultyMod${game.difficulty % 3}`);
 
   anchor.setAttribute('class', classes.join(' '));
 
