@@ -53,15 +53,16 @@ a.linkButton.currentUrl:hover {
 }
 
 ol#games {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1em;
+  display: grid;
+  grid-gap: 1em;
+  grid-template-columns: repeat(auto-fill, 130px );
   margin: 0;
   padding: 0;
 }
 
 ol#games li {
   display: flex;
+  height: 130px;
   list-style-type: none;
 }
 
@@ -75,8 +76,7 @@ ol#games a.createGame {
 ol#games a {
   border-radius: 0.5em;
   display: flex;
-  overflow: hidden;
-  padding: 0.25em;
+  flex: auto;
 }
 
 ol#games canvas.thumbnail {
@@ -85,8 +85,10 @@ ol#games canvas.thumbnail {
 
 ol#games section.puzzleInfo {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 0.5em;
+  justify-content: space-between;
   padding: 0.5em;
 }
 
