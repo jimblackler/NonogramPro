@@ -102,15 +102,15 @@ ol#games li.selected canvas {
 }
 
 ol#games a.unstarted.difficultyMod0:not(:hover) {
-  background: linear-gradient(sienna, maroon);
+  background: linear-gradient(hsl(270 100% 45%), hsl(270 100% 20%));
 }
 
 ol#games a.unstarted.difficultyMod1:not(:hover) {
-  background: linear-gradient(indianred, maroon);
+  background: linear-gradient(hsl(210 100% 45%), hsl(210 100% 20%));
 }
 
 ol#games a.unstarted.difficultyMod2:not(:hover) {
-  background: linear-gradient(cornflowerblue, indigo);
+  background: linear-gradient(hsl(240 100% 45%), hsl(240 100% 20%));
 }
 
 ol#games a.playing {
