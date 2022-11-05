@@ -202,7 +202,14 @@ async function main() {
       li.append(a);
       a.setAttribute('class', 'createGame');
       a.setAttribute('href', '/edit');
-      a.append('Create a game');
+
+      const topSpan = document.createElement('span');
+      a.append(topSpan);
+      topSpan.append('Create a game');
+
+      const bottomIcon = document.createElement('img');
+      a.append(bottomIcon);
+      bottomIcon.setAttribute('src', '/images/plus.svg');
 
       progress.remove();
     }
