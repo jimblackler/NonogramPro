@@ -63,38 +63,52 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
     name.append(game.name);
   }
 
+  const footSpan = document.createElement('span');
+  section.append(footSpan);
+  footSpan.setAttribute('class', 'footSpan');
+
+  const puzzleDetails = document.createElement('span');
+  footSpan.append(puzzleDetails);
+  puzzleDetails.setAttribute('class', 'puzzleDetails');
+
   if (game.creatorScreenName) {
     const creator = document.createElement('span');
-    section.append(creator);
+    puzzleDetails.append(creator);
     creator.setAttribute('class', 'creator');
     creator.append(`by ${game.creatorScreenName}`);
   }
 
   if (game.difficulty) {
     const name = document.createElement('span');
-    section.append(name);
+    puzzleDetails.append(name);
     name.setAttribute('class', 'difficulty');
     name.append(`Difficulty ${game.difficulty}`);
   }
 
   if (game.needsPublish) {
     const name = document.createElement('span');
-    section.append(name);
+    puzzleDetails.append(name);
     name.append('Draft');
   }
 
   /* Dimensions */
   {
     const dimensions = document.createElement('span');
-    section.append(dimensions);
+    puzzleDetails.append(dimensions);
     dimensions.setAttribute('class', 'dimensions');
     dimensions.append(`${game.spec.width} x ${game.spec.height}`);
   }
 
   if (completed || playing) {
     const span = document.createElement('span');
-    section.append(span);
+    puzzleDetails.append(span);
     span.setAttribute('class', 'status');
     span.append(completed ? 'Completed' : 'In progress');
+  }
+
+  if (!completed && !playing) {
+    const img = document.createElement('img');
+    footSpan.append(img);
+    img.setAttribute('src', `test.png?width=${game.spec.width}&height=${game.spec.height}&thickness=2&gap=3`);
   }
 }

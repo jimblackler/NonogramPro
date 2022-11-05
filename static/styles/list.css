@@ -99,27 +99,27 @@ ol#games li.selected canvas {
   filter: invert(1);
 }
 
-ol#games a.unstarted.d5x5 {
+ol#games a.unstarted.d5x5:not(:hover) {
   background: linear-gradient(deeppink, darkmagenta);
 }
 
-ol#games a.unstarted.d10x10 {
+ol#games a.unstarted.d10x10:not(:hover) {
   background: linear-gradient(cornflowerblue, indigo);
 }
 
-ol#games a.unstarted.d15x15 {
+ol#games a.unstarted.d15x15:not(:hover) {
   background: linear-gradient(goldenrod, sienna);
 }
 
-ol#games a.unstarted.d20x20 {
+ol#games a.unstarted.d20x20:not(:hover) {
   background: linear-gradient(indianred, maroon);
 }
 
-ol#games a.unstarted.d25x25 {
+ol#games a.unstarted.d25x25:not(:hover) {
   background: linear-gradient(blue, darkblue);
 }
 
-ol#games a.unstarted.d30x30 {
+ol#games a.unstarted.d30x30:not(:hover) {
   background: linear-gradient(indigo, darkmagenta);
 }
 
@@ -144,6 +144,23 @@ ol#games a:hover {
 button:hover:enabled, select:hover:enabled {
   background-color: white;
   color: black;
+}
+
+span.footSpan {
+  display: flex;
+  gap: 0.5em;
+}
+
+span.footSpan img {
+  align-self: end;
+  height: fit-content;
+}
+
+span.puzzleDetails {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  justify-content: end;
 }
 
 span.name {

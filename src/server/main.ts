@@ -10,6 +10,7 @@ import {gamesHandler} from './handlers/gamesHandler';
 import {listHandler} from './handlers/listHandler';
 import {playHandler} from './handlers/playHandler';
 import {publishHandler} from './handlers/publishHandler';
+import {puzzleSizeImageHandler} from './handlers/puzzleSizeImageHandler';
 import {setScreenNameHandler} from './handlers/setScreenNameHandler';
 import {signOutHandler} from './handlers/signOutHandler';
 
@@ -34,6 +35,7 @@ app.route('/play').get(playHandler);
 app.route('/publish').post(publishHandler);
 app.route('/setScreenName').post(setScreenNameHandler);
 app.route('/signOut').get(signOutHandler);
+app.route('/test.png').get(puzzleSizeImageHandler);
 app.route('/').get(listHandler);
 app.route('/dist/*').get((req, res) => {
   res.set('Cache-control', `public, max-age=${365 * 24 * 60 * 60}`);
