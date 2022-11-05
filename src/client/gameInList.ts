@@ -109,6 +109,7 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
   if (!completed && !playing) {
     const img = document.createElement('img');
     footSpan.append(img);
-    img.setAttribute('src', `test.png?width=${game.spec.width}&height=${game.spec.height}&thickness=2&gap=3`);
+    img.setAttribute(
+        'src', `test.png?width=${game.spec.width}&height=${game.spec.height}&thickness=2&gap=3`);
   }
 }
