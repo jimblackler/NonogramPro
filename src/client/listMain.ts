@@ -95,6 +95,21 @@ function addCollectionList(main: HTMLElement, editSection: HTMLElement, collecti
           evt.preventDefault();
         });
 
+        const li = document.createElement('li');
+        list.append(li);
+
+        const span = document.createElement('span');
+        li.append(span);
+        span.setAttribute('class', 'playPrompt');
+
+        const topSpan = document.createElement('span');
+        span.append(topSpan);
+        topSpan.append('Click a game to play');
+
+        const bottomIcon = document.createElement('img');
+        span.append(bottomIcon);
+        bottomIcon.setAttribute('src', '/images/arrow.svg');
+
         for (let game of games) {
           addGame(list, game.key, game.data, plays.has(game.key), completed.has(game.key),
               full, clickEvent);
