@@ -155,10 +155,7 @@ span.puzzleDetails {
 }
 
 span.name {
-  flex-grow: 1;
   font-weight: bold;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 span.creator {
