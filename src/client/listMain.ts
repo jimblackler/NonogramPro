@@ -192,7 +192,7 @@ async function main() {
     {
       const title = document.createElement('h2');
       main.append(title);
-      title.append(`Games you're creating`);
+      title.append(`Games you're creating or modifying`);
 
       const list = document.createElement('ol');
       main.append(list);

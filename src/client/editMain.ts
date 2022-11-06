@@ -21,7 +21,6 @@ import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';
 import {transactionToPromise} from './transactionToPromise';
 import {visualAnalyze} from './visualAnalyze';
 
-let collection = '';
 let data: boolean[][] = [];
 let gameId = '';
 let name = '';
@@ -96,7 +95,7 @@ createNew.addEventListener('click', () => {
 });
 
 play.addEventListener('click', () => {
-  window.location.href = `/play?collection=${collection}&game=${gameId}`;
+  window.location.href = `/play?game=${gameId}`;
 });
 
 analyze.addEventListener('click', () => {
@@ -108,16 +107,15 @@ delete_.addEventListener('click', () => {
   delete_.setAttribute('disabled', '');
   const progress = addProgress();
   const {collection, rawName} = parseGameId(gameId);
-  (collection === 'local' ?
-      gamesDb.then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
-          .then(transactionToPromise)
-      :
+  gamesDb.then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
+      .then(transactionToPromise).then(() =>
       axios.post('/delete', {gameId}).then(response => response.data as DeleteResponse)
           .then(response => {
             if (response.error) {
               alert(response.error);
             }
           }))
+      .then(() => bustCache(`/games?collection=${collection}`))
       .then(() => {
         window.location.href = '/?v=local';
       }).finally(() => {
@@ -351,9 +349,6 @@ function saveLocal() {
     difficulty: -1
   };
   const {collection, rawName} = parseGameId(gameId);
-  if (collection !== 'local') {
-    throw new Error();
-  }
   return gamesDb
       .then(db => db.transaction('games', 'readwrite').objectStore('games').put(data_, gameId))
       .then(transactionToPromise);
