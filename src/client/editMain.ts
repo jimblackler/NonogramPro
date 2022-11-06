@@ -15,6 +15,7 @@ import {Spec} from '../common/spec';
 import {bustCache} from './bustCache';
 import {gamesDb} from './db/gamesDb';
 import {getGame, getGameInternet} from './fetchGame';
+import './globals';
 import {plotLine} from './plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';
 import {transactionToPromise} from './transactionToPromise';
@@ -346,6 +347,7 @@ function saveLocal() {
     name,
     style,
     needsPublish,
+    creatorScreenName: clientPageData.screenName,
     difficulty: -1
   };
   const {collection, rawName} = parseGameId(gameId);

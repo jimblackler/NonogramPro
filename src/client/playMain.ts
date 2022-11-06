@@ -8,6 +8,7 @@ import {checkColumn, checkRow, findHint} from './analyze';
 import {Complete, completedDb} from './db/completedDb';
 import {PlayInDb, playsDb} from './db/playsDb';
 import {getGame} from './fetchGame';
+import './globals';
 import {plotLine} from './plotLine';
 import {enhanceRenderer, GridDownData, GridMoveData} from './renderer';
 import {transactionToPromise} from './transactionToPromise';
@@ -175,7 +176,10 @@ getGame(gameId).then(result => {
       });
 
   const replay = assertNotNull(document.body.querySelector('#replay'));
-  const edit = assertNotNull(document.body.querySelector('#edit'));
+  const edit = assertIs(HTMLButtonElement, document.body.querySelector('#edit'));
+  edit.style.visibility =
+      clientPageData.screenName === result.creatorScreenName ? 'visible' : 'hidden';
+
   const hint = assertNotNull(document.body.querySelector('#hint'));
 
   replay.addEventListener('click', () => {
