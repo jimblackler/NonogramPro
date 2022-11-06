@@ -2,11 +2,11 @@ import {assertNotNull} from '../common/check/null';
 import {decode} from '../common/decoder';
 import {GameData} from '../common/gameData';
 
-function addThumbnail(parent: HTMLElement, game: GameData) {
+function addThumbnail(parent: HTMLElement, game: GameData, scale: number) {
   const canvas = document.createElement('canvas');
   parent.append(canvas);
   const ctx = assertNotNull(canvas.getContext('2d'));
-  const cellSize = Math.ceil(60 / game.spec.width);
+  const cellSize = Math.ceil(scale / game.spec.width);
   canvas.width = game.spec.width * cellSize;
   canvas.height = game.spec.height * cellSize;
   ctx.fillStyle = 'lightblue';
@@ -48,7 +48,7 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
   anchor.setAttribute('class', classes.join(' '));
 
   if (full) {
-    addThumbnail(anchor, game);
+    addThumbnail(anchor, game, 60);
   }
 
   /* Name */
@@ -67,7 +67,11 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
   footSpan.append(puzzleDetails);
   puzzleDetails.setAttribute('class', 'puzzleDetails');
 
-  if (game.creatorScreenName) {
+  if (completed) {
+    addThumbnail(puzzleDetails, game, 70);
+  }
+
+  if (!completed && game.creatorScreenName) {
     const creator = document.createElement('span');
     puzzleDetails.append(creator);
     creator.setAttribute('class', 'creator');
@@ -87,7 +91,6 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
     name.append('Draft');
   }
 
-  /* Dimensions */
   if (!completed) {
     const dimensions = document.createElement('span');
     puzzleDetails.append(dimensions);
@@ -95,11 +98,11 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
     dimensions.append(`${game.spec.width} x ${game.spec.height}`);
   }
 
-  if (completed || playing) {
+  if (playing) {
     const span = document.createElement('span');
     puzzleDetails.append(span);
     span.setAttribute('class', 'status');
-    span.append(completed ? 'Completed' : 'In progress');
+    span.append('In progress');
   }
 
   if (!completed && !playing) {
