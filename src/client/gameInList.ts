@@ -74,7 +74,7 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
     creator.append(`by ${game.creatorScreenName}`);
   }
 
-  if (game.difficulty) {
+  if (!completed && game.difficulty) {
     const name = document.createElement('span');
     puzzleDetails.append(name);
     name.setAttribute('class', 'difficulty');
@@ -88,7 +88,7 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
   }
 
   /* Dimensions */
-  {
+  if (!completed) {
     const dimensions = document.createElement('span');
     puzzleDetails.append(dimensions);
     dimensions.setAttribute('class', 'dimensions');
