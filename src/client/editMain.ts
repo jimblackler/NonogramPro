@@ -108,7 +108,7 @@ delete_.addEventListener('click', () => {
   const progress = addProgress();
   const {collection, rawName} = parseGameId(gameId);
   gamesDb.then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
-      .then(transactionToPromise).then(() =>
+      .then(transactionToPromise).then(() => collection === 'local' ? Promise.resolve() :
       axios.post('/delete', {gameId}).then(response => response.data as DeleteResponse)
           .then(response => {
             if (response.error) {
@@ -242,12 +242,12 @@ cancel.addEventListener('click', evt => {
   // Defined as 'delete any local changes and restore to the published
   // version'.
 
-  // We don't have a local copy so must refresh from server. Requires
-  // internet. May not be the best solution.
-
-  setNeedsPublish(false);
   const progress = addProgress();
-  getGameInternet(gameId).then(getGameFunction)
+  setNeedsPublish(false);
+  gamesDb.then(db => db.transaction('games', 'readwrite').objectStore('games').delete(gameId))
+      .then(transactionToPromise)
+      .then(() => getGameInternet(gameId))
+      .then(getGameFunction)
       .catch(() => setNeedsPublish(true)).finally(() => progress.remove());
 });
 
