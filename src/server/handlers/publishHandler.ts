@@ -72,7 +72,7 @@ export const publishHandler: RequestHandler = async (req, res, next) => {
     spec,
     style: game.data.style,
     creatorEmail: email,
-    creatorScreenName: userInfo.screenName,
+    creatorScreenName: userInfo.screenName,  // We don't trust the client value.
     difficulty: game.data.difficulty === -1 ?
         calculateDifficulty(spec, [...decode(spec, gridData)]) : game.data.difficulty,
     gridData
