@@ -177,8 +177,9 @@ getGame(gameId).then(result => {
 
   const replay = assertNotNull(document.body.querySelector('#replay'));
   const edit = assertIs(HTMLButtonElement, document.body.querySelector('#edit'));
-  edit.style.visibility =
-      clientPageData.screenName === result.creatorScreenName ? 'visible' : 'hidden';
+  edit.style.visibility = result.creatorScreenName &&
+      clientPageData.screenName === result.creatorScreenName
+      || clientPageData.isAdmin ? 'visible' : 'hidden';
 
   const hint = assertNotNull(document.body.querySelector('#hint'));
 
