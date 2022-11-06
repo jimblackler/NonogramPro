@@ -69,22 +69,18 @@ ol#games li {
 ol#games a.createGame, ol#games span.playPrompt {
   align-items: center;
   background-color: black;
-  padding: 0.5em;
-}
-
-ol#games > li > a, ol#games > li > span {
-  border-radius: 0.5em;
   display: flex;
-  flex: auto;
   flex-direction: column;
   justify-content: space-between;
+  padding: 0.25em;
 }
 
 ol#games canvas.thumbnail {
   align-self: center;
 }
 
-ol#games section.puzzleInfo {
+ol#games a.puzzleInfo {
+  border-radius: 0.5em;
   display: flex;
   flex: 1;
   flex-direction: column;

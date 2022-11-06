@@ -33,7 +33,7 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
   const anchor = document.createElement('a');
   li.append(anchor);
   anchor.setAttribute('href', `/play?game=${key}`);
-  const classes: string[] = [];
+  const classes: string[] = ['puzzleInfo'];
   if (completed) {
     classes.push('completed');
   } else if (playing) {
@@ -51,20 +51,16 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
     addThumbnail(anchor, game);
   }
 
-  const section = document.createElement('section');
-  anchor.append(section);
-  section.setAttribute('class', 'puzzleInfo');
-
   /* Name */
   {
     const name = document.createElement('span');
-    section.append(name);
+    anchor.append(name);
     name.setAttribute('class', 'name');
     name.append(game.name);
   }
 
   const footSpan = document.createElement('span');
-  section.append(footSpan);
+  anchor.append(footSpan);
   footSpan.setAttribute('class', 'footSpan');
 
   const puzzleDetails = document.createElement('span');
