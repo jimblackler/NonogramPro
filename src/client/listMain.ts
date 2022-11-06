@@ -143,7 +143,7 @@ async function main() {
     plays.delete(gameId);
   }
 
-  // For aesthetic reasons the nude URL is equivalent to include=main.
+  // For aesthetic reasons the nude URL is equivalent to collection=main.
   const params = window.location.search ?
       new URL(window.location.href).searchParams :
       new URLSearchParams({collection: 'main'});
