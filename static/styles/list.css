@@ -152,6 +152,8 @@ span.puzzleDetails {
 
 span.name {
   font-weight: bold;
+  overflow: hidden;
+  overflow-wrap: anywhere;
 }
 
 span.creator {
