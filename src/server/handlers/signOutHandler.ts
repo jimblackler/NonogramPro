@@ -14,6 +14,5 @@ export const signOutHandler: RequestHandler = async (req, res, next) => {
     next();
     return;
   }
-  res.clearCookie('identity');
   res.redirect(_return);
 };
