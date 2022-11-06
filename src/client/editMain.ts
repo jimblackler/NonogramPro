@@ -118,7 +118,7 @@ delete_.addEventListener('click', () => {
             }
           }))
       .then(() => {
-        window.location.href = window.location.origin;
+        window.location.href = '/?v=local';
       }).finally(() => {
     progress.remove();
     delete_.removeAttribute('disabled');
