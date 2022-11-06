@@ -66,14 +66,13 @@ ol#games li {
   list-style-type: none;
 }
 
-ol#games a.createGame {
+ol#games a.createGame, ol#games span.playPrompt {
   align-items: center;
-  background: darkred;
-  min-height: 5em;
+  background-color: black;
   padding: 0.5em;
 }
 
-ol#games a {
+ol#games > li > a, ol#games > li > span {
   border-radius: 0.5em;
   display: flex;
   flex: auto;
