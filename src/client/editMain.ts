@@ -310,14 +310,13 @@ publish.addEventListener('click', evt => {
           throw new Error();
         }
         const oldId = gameId;
-        const newId = obj.game.key;
-        const {collection, rawName} = parseGameId(newId);
+        gameId = obj.game.key;
+        const {collection, rawName} = parseGameId(gameId);
         bustCache(`/games?collection=${collection}`)
             .then(() => gamesDb)
             .then(db => db.transaction('games', 'readwrite').objectStore('games').delete(oldId))
             .then(transactionToPromise)
-            .then(() => window.history.replaceState({}, '', `edit?game=${newId}`));
-
+            .then(() => window.history.replaceState({}, '', `edit?game=${gameId}`));
       })
       .catch(() => setNeedsPublish(true))
       .finally(() => progress.remove());
