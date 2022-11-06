@@ -5,7 +5,7 @@ import {datastore} from '../globalDatastore';
 
 export const gamesHandler: RequestHandler = async (req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
-  res.set('Cache-control', `public, max-age=${7 * 24 * 60 * 60}`);
+  res.set('Cache-control', `max-age=${7 * 24 * 60 * 60}`);
   const collection = getParam(req.query, 'collection');
   if (!collection) {
     throw new Error();
