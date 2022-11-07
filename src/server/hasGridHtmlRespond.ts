@@ -48,7 +48,7 @@ export async function hasGridHtmlRespond(
       aside.append(footer);
       const a = document.createElement('a');
       footer.append(a);
-      a.setAttribute('href', 'about:blank');
+      a.setAttribute('href', '/about.html');
       a.append('Click for game information and play guide');
     },
     addScripts: (document, parent) => {

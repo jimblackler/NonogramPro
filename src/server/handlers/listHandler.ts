@@ -22,7 +22,7 @@ export const listHandler: RequestHandler = async (req, res, next) => {
       {
         const a = document.createElement('a');
         section.append(a);
-        a.setAttribute('href', 'about:blank');
+        a.setAttribute('href', '/about.html');
         a.append('Click for game information and play guide');
       }
 

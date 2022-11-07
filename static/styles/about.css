@@ -1,0 +1,20 @@
+html {
+  background: black;
+  font-family: monospace;
+}
+
+body {
+  background: linear-gradient(darkslategray, black) no-repeat;
+  color: white;
+  font-size: x-large;
+  margin: 0;
+}
+
+p {
+  margin: 0;
+  padding: 1em;
+}
+
+a, a:visited {
+  color: white;
+}
