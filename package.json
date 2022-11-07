@@ -9,8 +9,10 @@
     "start": "node dist/server/main.js",
     "start:dev": "nodemon dist/server/main.js",
     "start-delete-all": "node -e \"require('./dist/local/deleteAll').main()\"",
+    "start-delete-collection": "node -e \"require('./dist/local/deleteCollection').main()\"",
     "start-delete-dupes": "node -e \"require('./dist/local/deleteDupes').main()\"",
-    "start-import": "node -e \"require('./dist/local/import').main()\""
+    "start-import": "node -e \"require('./dist/local/import').main()\"",
+    "start-import-characters": "node -e \"require('./dist/local/importCharacters').main()\""
   },
   "dependencies": {
     "@google-cloud/datastore": "^7.0.0",
