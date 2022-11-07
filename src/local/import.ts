@@ -106,11 +106,13 @@ export async function main() {
               }
               gridDatas.add(gridDataEncoded);
               const difficulty = calculateDifficulty(spec, gridData);
-
               if (!difficulty) {
-                console.log('Cannot be completed with standard method.');
                 return;
               }
+
+              const collection =
+                  tempReference.some((game: ClientGame) =>
+                      game.data.gridData === gridDataEncoded) ? 'main' : imageSetName;
               const parts = file.split('/');
               const originalStub =
                   imageSet.transformName(parts[parts.length - (imageSet.namePathOffset ?? 1)]);
@@ -119,22 +121,16 @@ export async function main() {
                   dotPosition === -1 ? originalStub : originalStub.substring(0, dotPosition);
               const name = stub.split('_').map(s => s.split('-')).flat()
                   .map(part => part.substring(0, 1).toUpperCase() + part.substring(1)).join(' ');
-              console.log(
-                  `${name} Requires ${difficulty} rounds to complete with standard method.`);
 
-              const data: GameData = {
-                name,
-                license: imageSet.license,
-                spec,
-                difficulty,
-                gridData: gridDataEncoded
-              };
-
-              const collection =
-                  tempReference.some((game: ClientGame) =>
-                      game.data.gridData === gridDataEncoded) ? 'main' : imageSetName;
               getUniqueRawName(collection, stub, exists)
                   .then(rawName => {
+                    const data: GameData = {
+                      name,
+                      license: imageSet.license,
+                      spec,
+                      difficulty,
+                      gridData: gridDataEncoded
+                    };
                     puzzles.push(
                         {key: datastore.key(['Collection', collection, 'Game', rawName]), data});
                     if (puzzles.length === 500) {

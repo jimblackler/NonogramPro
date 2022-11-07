@@ -2,7 +2,7 @@ import {assertNotNull} from './check/null';
 import {getEmpty} from './generate';
 import {Spec} from './spec';
 
-interface LocalImageData {
+export interface LocalImageData {
   data: ArrayLike<number>;
   width: number;
   height: number;
