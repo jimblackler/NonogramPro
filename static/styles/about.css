@@ -6,8 +6,11 @@ html {
 body {
   background: linear-gradient(darkslategray, black) no-repeat;
   color: white;
+  display: flex;
+  flex-direction: row;
   font-size: x-large;
-  margin: 0;
+  gap: 2em;
+  padding: 2em;
 }
 
 p {
@@ -17,4 +20,12 @@ p {
 
 a, a:visited {
   color: white;
+}
+
+main {
+  max-width: 800px;
+}
+
+img {
+  height: fit-content;
 }
