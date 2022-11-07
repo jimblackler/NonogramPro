@@ -47,10 +47,6 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
 
   anchor.setAttribute('class', classes.join(' '));
 
-  if (full) {
-    addThumbnail(anchor, game, 60);
-  }
-
   /* Name */
   {
     const name = document.createElement('span');
@@ -67,7 +63,7 @@ export function addGame(list: HTMLElement, key: string, game: GameData, playing:
   footSpan.append(puzzleDetails);
   puzzleDetails.setAttribute('class', 'puzzleDetails');
 
-  if (completed) {
+  if (completed || full) {
     addThumbnail(puzzleDetails, game, 70);
   }
 
