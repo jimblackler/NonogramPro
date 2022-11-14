@@ -17,8 +17,6 @@ export interface GridDownData {
   x: number;
   y: number;
   which: number;
-  shiftKey: boolean;
-  ctrlKey: boolean;
 }
 
 export interface GridMoveData {
@@ -52,7 +50,7 @@ export function enhanceRenderer(svg: SVGSVGElement) {
       return;
     }
     svg.dispatchEvent(new CustomEvent<GridDownData>('griddown', {
-      detail: {x, y, which: evt.which, shiftKey: evt.shiftKey, ctrlKey: evt.ctrlKey}
+      detail: {x, y, which: evt.which}
     }));
     evt.preventDefault();
   });
