@@ -1,3 +1,4 @@
+import {assertDefined} from '../common/check/defined';
 import {assertIs} from '../common/check/is';
 import {assertNotNull} from '../common/check/null';
 import {assertTruthy} from '../common/check/truthy';
@@ -23,6 +24,25 @@ getGame(gameId).then(result => {
   let columnLock: number | false = false;
   let lastX = -1;
   let lastY = -1;
+
+  const radioOn = assertIs(HTMLInputElement, document.querySelector('input[value=On]'));
+  const radioOff = assertIs(HTMLInputElement, document.querySelector('input[value=Off]'));
+  const radioUnknown = assertIs(HTMLInputElement, document.querySelector('input[value=Unknown]'));
+  const radioAuto = assertIs(HTMLInputElement, document.querySelector('input[value=Auto]'));
+
+  const ActionMode = {NOT_DRAWING: 0, SETTING_ON: 1, SETTING_OFF: 2, SETTING_UNKNOWN: 3};
+  let actionMode = ActionMode.NOT_DRAWING;
+
+  let preDrawMode = '';
+
+  function setActionMode(value: number) {
+    assertDefined(
+        value === ActionMode.SETTING_ON ? radioOn :
+            value === ActionMode.SETTING_OFF ? radioOff :
+                value === ActionMode.SETTING_UNKNOWN ? radioUnknown :
+                    undefined).checked = true;
+    actionMode = value;
+  }
 
   function setPoints(points: Iterable<{ x: number, y: number }>) {
     const columnModified = new Set<number>();
@@ -72,26 +92,37 @@ getGame(gameId).then(result => {
 
   svg.addEventListener('griddown', evt => {
         const {x, y, which, shiftKey, ctrlKey} = assertIs(CustomEvent, evt).detail as GridDownData;
-        if (which === 3 || shiftKey) {
-          // Right click.
-          if (off[y][x]) {
-            actionMode = ActionMode.SETTING_UNKNOWN;
+        preDrawMode =
+            assertIs(HTMLInputElement, document.querySelector('input[name="mode"]:checked')).value;
+
+        if (preDrawMode === 'On') {
+          setActionMode(ActionMode.SETTING_ON);
+        } else if (preDrawMode === 'Off') {
+          setActionMode(ActionMode.SETTING_OFF);
+        } else if (preDrawMode === 'Unknown') {
+          setActionMode(ActionMode.SETTING_UNKNOWN);
+        } else if (preDrawMode === 'Auto') {
+          if (which === 3 || shiftKey) {
+            // Right click.
+            if (off[y][x]) {
+              setActionMode(ActionMode.SETTING_UNKNOWN);
+            } else {
+              setActionMode(ActionMode.SETTING_OFF);
+            }
+          } else if (ctrlKey) {
+            if (on[y][x]) {
+              setActionMode(ActionMode.SETTING_UNKNOWN);
+            } else {
+              setActionMode(ActionMode.SETTING_ON);
+            }
           } else {
-            actionMode = ActionMode.SETTING_OFF;
-          }
-        } else if (ctrlKey) {
-          if (on[y][x]) {
-            actionMode = ActionMode.SETTING_UNKNOWN;
-          } else {
-            actionMode = ActionMode.SETTING_ON;
-          }
-        } else {
-          if (on[y][x]) {
-            actionMode = ActionMode.SETTING_OFF;
-          } else if (off[y][x]) {
-            actionMode = ActionMode.SETTING_UNKNOWN;
-          } else {
-            actionMode = ActionMode.SETTING_ON;
+            if (on[y][x]) {
+              setActionMode(ActionMode.SETTING_OFF);
+            } else if (off[y][x]) {
+              setActionMode(ActionMode.SETTING_UNKNOWN);
+            } else {
+              setActionMode(ActionMode.SETTING_ON);
+            }
           }
         }
         setPoints([{x, y}]);
@@ -177,9 +208,7 @@ getGame(gameId).then(result => {
 
   const replay = assertNotNull(document.body.querySelector('#replay'));
   const edit = assertIs(HTMLButtonElement, document.body.querySelector('#edit'));
-  edit.style.visibility = result.creatorScreenName &&
-      clientPageData.screenName === result.creatorScreenName
-      || clientPageData.isAdmin ? 'visible' : 'hidden';
+  edit.style.visibility = result.creatorScreenName && clientPageData.screenName === result.creatorScreenName || clientPageData.isAdmin ? 'visible' : 'hidden';
 
   const hint = assertNotNull(document.body.querySelector('#hint'));
 
@@ -200,10 +229,12 @@ getGame(gameId).then(result => {
     renderer.setHighlightColumn(hint[1]);
   });
 
-  const ActionMode = {NOT_DRAWING: 0, SETTING_ON: 1, SETTING_OFF: 2, SETTING_UNKNOWN: 3};
-  let actionMode = ActionMode.NOT_DRAWING;
-
   document.addEventListener('mouseup', evt => {
+    for (const element of document.querySelectorAll('input[name="mode"]')) {
+      const input = assertIs(HTMLInputElement, element);
+      input.checked = input.value === preDrawMode;
+    }
+
     actionMode = ActionMode.NOT_DRAWING;
     rowLock = false;
     columnLock = false;

@@ -36,6 +36,29 @@ export const playHandler: RequestHandler = async (req, res, next) => {
         button.setAttribute('id', 'edit');
         button.append('Edit');
       }
+
+      const fieldset = document.createElement('fieldset');
+      parent.append(fieldset);
+
+      const legend = document.createElement('legend');
+      fieldset.append(legend);
+      legend.append('Paint mode');
+
+      ['On', 'Off', 'Unknown', 'Auto'].forEach(name => {
+            const label = document.createElement('label');
+            fieldset.append(label);
+
+            const input = document.createElement('input');
+            label.append(input);
+            input.setAttribute('type', 'radio');
+            input.setAttribute('name', 'mode');
+            input.setAttribute('value', name);
+            if (name === 'Auto') {
+              input.setAttribute('checked', '');
+            }
+            label.append(name);
+          }
+      );
     },
 
     addScripts: (document, parent) => {

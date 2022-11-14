@@ -107,3 +107,19 @@ div#dialog_content {
 button#close {
   float: right;
 }
+
+fieldset {
+  border-color: grey;
+  display: flex;
+  font-size: x-large;
+  gap: 1em;
+  margin-top: 2em;
+  max-width: fit-content;
+  padding: 1em;
+}
+
+input[type='radio'] {
+  margin: 1em;
+  transform: scale(2);
+}
+
