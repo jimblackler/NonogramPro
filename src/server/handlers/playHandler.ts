@@ -7,10 +7,20 @@ export const playHandler: RequestHandler = async (req, res, next) => {
     _class: 'play',
 
     addControls: (document, parent) => {
+      const titleSection = document.createElement('section');
+      parent.append(titleSection);
+      titleSection.setAttribute('class', 'titleSection');
+
       const h1 = document.createElement('h1');
-      parent.append(h1);
+      titleSection.append(h1);
       h1.setAttribute('id', 'title');
       h1.append('Title');
+
+      const a = document.createElement('a');
+      titleSection.append(a);
+      a.setAttribute('id', 'license');
+      a.setAttribute('href', 'about:blank');
+      a.append('Puzzle source attribution');
 
       const section = document.createElement('section');
       parent.append(section);

@@ -123,3 +123,9 @@ input[type='radio'] {
   transform: scale(2);
 }
 
+section.titleSection {
+  display: flex;
+  justify-content: space-between;
+  place-items: baseline;
+}
+

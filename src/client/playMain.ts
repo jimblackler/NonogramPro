@@ -202,6 +202,15 @@ getGame(gameId).then(result => {
 
   const title = assertNotNull(document.body.querySelector('#title'));
   title.textContent = result.name;
+
+  const license = assertIs(HTMLAnchorElement, document.querySelector('a#license'));
+  if (result.license) {
+    license.setAttribute('href', result.license);
+    license.style.display = 'inherit';
+  } else {
+    license.style.display = 'none';
+  }
+
   const clues = generateClues(spec, data);
   renderer.paintClues(clues);
   playsDb
