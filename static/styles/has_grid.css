@@ -129,3 +129,25 @@ section.titleSection {
   place-items: baseline;
 }
 
+body.gameComplete fieldset {
+  display: none;
+}
+
+body.gameComplete footer {
+  display: none;
+}
+
+body.gameComplete button#hint {
+  display: none;
+}
+
+body:not(.gameComplete) section#completeSection {
+  display: none;
+}
+
+section#completeSection {
+  background: navy;
+  margin: 2em;
+  max-width: fit-content;
+  padding: 2em;
+}

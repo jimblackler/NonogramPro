@@ -69,6 +69,27 @@ export const playHandler: RequestHandler = async (req, res, next) => {
             label.append(name);
           }
       );
+
+      const completeSection = document.createElement('section');
+      parent.append(completeSection);
+      completeSection.setAttribute('id', 'completeSection');
+
+      const h = document.createElement('h1');
+      completeSection.append(h);
+      h.append('Game complete!');
+
+      const buttonRowSection = document.createElement('section');
+      completeSection.append(buttonRowSection);
+      buttonRowSection.setAttribute('class', 'buttonRow');
+
+      {
+        const a = document.createElement('a');
+        buttonRowSection.append(a);
+        a.setAttribute('class', 'linkButton');
+        a.setAttribute('href', '/');
+        a.append('Back to puzzle list');
+      }
+
     },
 
     addScripts: (document, parent) => {
