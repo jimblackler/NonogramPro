@@ -51,7 +51,7 @@ rect.even {
   fill: #292c82;
 }
 
-rect.odd, svg.gameComplete rect.even {
+rect.odd, body.gameComplete rect.even {
   fill: rgb(11, 11, 21);
 }
 
@@ -59,7 +59,7 @@ g.hover rect.highlighted, g.locked rect.highlighted {
   fill: #7c6088;
 }
 
-svg.gameComplete g.hover rect.highlighted {
+body.gameComplete g.hover rect.highlighted {
   fill: #221f2c;
 }
 

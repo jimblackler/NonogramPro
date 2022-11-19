@@ -291,14 +291,14 @@ getGame(gameId).then(result => {
     renderer.paintOnSquares(on);
     renderer.paintOffSquares(off); /* Check is complete */
     if (equals(on, data)) {
-      svg.classList.add('gameComplete');
+      document.body.classList.add('gameComplete');
       const value: Complete = {completed: true};
       completedDb
           .then(db => db.transaction('completed', 'readwrite').objectStore('completed')
               .put(value, gameId))
           .then(transactionToPromise);
     } else {
-      svg.classList.remove('gameComplete');
+      document.body.classList.remove('gameComplete');
     }
   }
 
