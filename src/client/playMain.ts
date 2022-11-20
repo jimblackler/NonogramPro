@@ -243,6 +243,11 @@ getGame(gameId).then(result => {
     on = getEmpty(spec);
     off = getEmpty(spec);
     fromScratch();
+
+    completedDb
+        .then(db => db.transaction('completed', 'readwrite').objectStore('completed')
+            .delete(gameId))
+        .then(transactionToPromise);
   });
 
   edit.addEventListener('click', () => {
