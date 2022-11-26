@@ -1,7 +1,7 @@
 import {ParsedQs} from 'qs';
 
-export function getParam(query: ParsedQs, signerHash: string) {
-  const element = query[signerHash];
+export function getParam(query: ParsedQs, parameterName: string) {
+  const element = query[parameterName];
   if (typeof element === 'string') {
     return element;
   }
