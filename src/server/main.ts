@@ -44,4 +44,4 @@ app.route('/dist/*').get((req, res) => {
 app.route('*').get((req, res) =>
     send(req, assertTruthy(parseurl(req)?.pathname), {root: 'static'}).pipe(res));
 
-app.listen(8081);
+app.listen(process.env.PORT ?? 8081);
