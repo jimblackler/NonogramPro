@@ -1,4 +1,4 @@
-export function assertIs<T>(type: { new(...a: any[]): T }, object: any) {
+export function assertIs<T>(type: new(...a: never[]) => T, object: unknown) {
   if (object instanceof type) {
     return object;
   }
